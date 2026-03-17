@@ -1,28 +1,10 @@
-// taken from this tutorial
-// http://www.javascriptkit.com/javatutors/copytoclipboard.shtml
 function selectElementText(el) {
-  // modern browsers
-  if (window.getSelection && document.createRange) {
-    // let's combine with previous code and augment
-    let range = document.createRange();
-    range.selectNodeContents(el);
-    let selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    return true;
-  }
-
-  // IE8 fallback
-  if (document.body != null) {
-    let bodyIE8 = document.body;
-
-    if (bodyIE8.createTextRange) {
-      let range = bodyIE8.createTextRange();
-      range.moveToElementText(el);
-      range.select();
-      return true;
-    }
-  }
+  let range = document.createRange();
+  range.selectNodeContents(el);
+  let selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
 }
 
 function copySelectionText() {
