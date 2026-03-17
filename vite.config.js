@@ -14,7 +14,7 @@ export default defineConfig({
       name: "bss"
     },
     oxc: {
-      charset: "windows-1251"
+      charset: "utf-8"
     },
     commonjsOptions: {
       transformMixedEsModules: true
