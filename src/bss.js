@@ -26,7 +26,6 @@ import addGuestNameClicks from "./topic/makeGuestNamesClickable";
 
 import createFastLoginLinks from "./various/createFastLoginLinks";
 import disableProfiles from "./various/disableProfiles";
-import addScriptCredits from "./various/addScriptCredits";
 import fixRusffReputationIssue from "./various/fixRusffReputation";
 
 // basic function
@@ -48,8 +47,7 @@ export {
   selectCodeBox,
   submitOnHotkey,
   disableProfiles,
-  addGuestNameClicks,
-  addScriptCredits
+  addGuestNameClicks
 };
 
 // possible config for reference:
