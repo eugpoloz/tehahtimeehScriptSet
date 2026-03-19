@@ -27,6 +27,7 @@ import addGuestNameClicks from "./topic/makeGuestNamesClickable";
 import createFastLoginLinks from "./various/createFastLoginLinks";
 import disableProfiles from "./various/disableProfiles";
 import fixRusffReputationIssue from "./various/fixRusffReputation";
+import transformProfiles from './various/transformProfiles';
 
 // basic function
 export function enhanceTextarea() {
@@ -37,6 +38,7 @@ export function enhanceTextarea() {
 // run by default
 fixRusffReputationIssue();
 restoreLatestPost();
+transformProfiles();
 
 // module exports
 export {
