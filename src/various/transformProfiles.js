@@ -7,6 +7,7 @@ $(function() {
       fldsToReplace.forEach(fld => {
         if (fld.textContent.includes('<')) {
           fld.innerHTML = fld.textContent;
+          fld.dataset.ready = "1";
         }
       });
     }
