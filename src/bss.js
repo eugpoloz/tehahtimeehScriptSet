@@ -12,7 +12,6 @@
 
 import countTextareaCharacters from "./textarea/charCounter";
 import submitOnHotkey from "./textarea/fastSubmit";
-import restoreLatestPost from "./textarea/restoreLatestPost";
 
 import {
   addCtrlClicks,
@@ -37,7 +36,6 @@ export function enhanceTextarea() {
 
 // run by default
 fixRusffReputationIssue();
-restoreLatestPost();
 transformProfiles();
 
 // module exports
