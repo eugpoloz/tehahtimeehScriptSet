@@ -185,7 +185,7 @@ const countPostsInTopic = async ({
   forumsToTrack = [],
   fldId = "5",
   countTopicStarter = false,
-}) => {
+} = {}) => {
   // пока что феноменально тупая версия счетчика: чисто добавляет те посты, что есть
   // TODO:
   // - обновлять счетчик автоматически при _удалении_ постов
@@ -204,7 +204,6 @@ const countPostsInTopic = async ({
     }
 
     if (!forumsToTrack.includes(forumId)) {
-      console.log("countPostsInTopic() >>> no post tracking needed here, bruh");
       return;
     }
 
@@ -245,32 +244,6 @@ const countPostsInTopic = async ({
         : 0;
       const updatedCounter = initialCounter + 1;
 
-      // const existingPostsData = JSON.parse(LZString.decompressFromBase64(initialCompressedData));
-      // const posted = +latestPost.dataset.posted;
-
-      // console.log('countPostsInTopic() >>> existingPostsData', {
-      //   initialCompressedData,
-      //   existingPostsData
-      // });
-
-      // if (Array.isArray(existingPostsData) && existingPostsData.includes(posted)) {
-      //   localStorage.removeItem(COUNTER_NEW_POST_KEY);
-
-      //   console.log('countPostsInTopic() >>> post already counted, exiting');
-      //   return;
-      // }
-
-      // const updatedPostsData = Array.isArray(existingPostsData)
-      //   ? [posted, ...existingPostsData]
-      //   : [posted];
-
-      // const compressedPostsData = LZString.compressToBase64(JSON.stringify(updatedPostsData));
-
-      // console.log('countPostsInTopic()', {
-      //   updatedPostsData,
-      //   compressedPostsData
-      // });
-
       const url = `/profile.php?section=fields&id=${window.UserID}`;
 
       const profileResponse = await fetch(`${url}&nohead`, {
@@ -307,10 +280,8 @@ const countPostsInTopic = async ({
       const uriEncodedData = uriEncodedFormArray.join("&");
 
       console.log(`countPostsInTopic() >>> fld${fldId}`, {
-        initialCounter: initialCounter,
-        updatedCounter: updatedCounter,
-        changingFld,
-        uriEncodedData
+        initialCounter,
+        updatedCounter
       });
 
       // save updated counter
@@ -338,16 +309,26 @@ const countPostsInTopic = async ({
       );
       const error = updatedProfile8.getElementById("pun-message");
 
-      console.log("countPostsInTopic() >>> updatedProfile8", updatedProfile8);
-
       if (!!error) {
         throw new Error("Failed to update profile");
       }
 
       window[`UserFld${fldId}`] = updatedCounter;
 
-      const countersInTopic = document.querySelectorAll(`.post[data-user-id="${UserID}"] .post-author .pa-fld${fldId}`);
-      countersInTopic.forEach(counter => counter.replaceWith(updatedCounter));
+      const authorsPostsInTopic = document.querySelectorAll(`.post[data-user-id="${UserID}"] .post-author`);
+
+      authorsPostsInTopic.forEach(author => {
+        const counter = author.querySelector(`.pa-fld${fldId}`);
+        const previousFld = author.querySelector(`.pa-posts`);
+        
+        if (counter) {
+          counter.innerText = updatedCounter;
+        } else {
+          const html = `<li class="pa-fld${fldId}" title="Постов:"> ${updatedCounter}</li>`;
+          
+          previousFld.insertAdjacentHTML('afterend', html);
+        }
+      });
 
       localStorage.removeItem(COUNTER_NEW_POST_KEY);
     }
