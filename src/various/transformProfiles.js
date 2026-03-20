@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 const transformProfiles = () => {
   const replaceFldContentWithHTML = (parent, selector) => {
     const fldsToReplace = parent.querySelectorAll(selector);
@@ -5,7 +7,9 @@ const transformProfiles = () => {
 
     fldsToReplace.forEach((fld) => {
       if (fld.textContent.includes("<")) {
-        fld.innerHTML = fld.textContent;
+        const cleanContent = DOMPurify.sanitize(fld.textContent);
+
+        fld.innerHTML = cleanContent;
         fld.dataset.ready = "1";
       }
     });
