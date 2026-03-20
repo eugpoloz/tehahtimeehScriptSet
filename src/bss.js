@@ -28,6 +28,7 @@ import createFastLoginLinks from "./various/createFastLoginLinks";
 import disableProfiles from "./various/disableProfiles";
 import fixRusffReputationIssue from "./various/fixRusffReputation";
 import transformProfiles from './various/transformProfiles';
+import countPostsInTopic from './various/countPostsInTopic';
 
 // basic function
 export function enhanceTextarea() {
@@ -49,7 +50,8 @@ export {
   selectCodeBox,
   submitOnHotkey,
   disableProfiles,
-  addGuestNameClicks
+  addGuestNameClicks,
+  countPostsInTopic
 };
 
 // possible config for reference:
@@ -59,4 +61,9 @@ export {
 // bss.disableProfiles({
 //   profiles: [4],
 //   message: "Don't even think about it!"
+// });
+// bss.countPostsInTopic({
+//   fldId: "5",
+//   forumsToTrack: [7, 8, 16, 18],
+//   countTopicStarter: false
 // });

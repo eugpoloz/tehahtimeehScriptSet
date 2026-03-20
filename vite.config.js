@@ -5,8 +5,8 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     plugins: [commonjs()],
-    sourcemap: true,
-    minify: true,
+    sourcemap: false,
+    minify: false,
     lib: {
       entry: path.resolve(__dirname, "src/bss.js"),
       fileName: (format) => `bss.${format}.js`,
