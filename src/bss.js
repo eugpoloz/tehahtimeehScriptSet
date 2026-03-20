@@ -10,7 +10,6 @@
   — http://urchoice.rolka.su/profile.php?id=4789
 */
 
-import addFontsToList from "./textarea/addFontsToList";
 import countTextareaCharacters from "./textarea/charCounter";
 import submitOnHotkey from "./textarea/fastSubmit";
 import restoreLatestPost from "./textarea/restoreLatestPost";
@@ -45,7 +44,6 @@ transformProfiles();
 export {
   setDefaultIcon,
   createFastLoginLinks,
-  addFontsToList,
   countTextareaCharacters,
   selectCodeBox,
   submitOnHotkey,
