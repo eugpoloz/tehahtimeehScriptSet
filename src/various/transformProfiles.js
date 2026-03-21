@@ -3,7 +3,6 @@ import DOMPurify from 'dompurify';
 const transformProfiles = () => {
   const replaceFldContentWithHTML = (parent, selector) => {
     const fldsToReplace = parent.querySelectorAll(selector);
-    console.log("replaceFldContentWithHTML", fldsToReplace);
 
     fldsToReplace.forEach((fld) => {
       if (fld.textContent.includes("<")) {
