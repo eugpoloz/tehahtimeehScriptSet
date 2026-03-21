@@ -27,6 +27,7 @@ import disableProfiles from "./various/disableProfiles";
 import fixRusffReputationIssue from "./various/fixRusffReputation";
 import transformProfiles from './various/transformProfiles';
 import countPostsInTopic from './various/countPostsInTopic';
+import changeFontSize from './various/changeFontSize';
 
 // basic function
 export function enhanceTextarea() {
@@ -47,7 +48,8 @@ export {
   submitOnHotkey,
   disableProfiles,
   addGuestNameClicks,
-  countPostsInTopic
+  countPostsInTopic,
+  changeFontSize
 };
 
 // possible config for reference:
