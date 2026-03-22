@@ -18,7 +18,6 @@ import {
   originalUploadedFirst
 } from "./textarea/refactorEditorButtons";
 
-import setDefaultIcon from "./topic/setDefaultIcon";
 import selectCodeBox from "./topic/selectAndCopy";
 import addGuestNameClicks from "./topic/makeGuestNamesClickable";
 
@@ -40,7 +39,6 @@ transformProfiles();
 
 // module exports
 export {
-  setDefaultIcon,
   createFastLoginLinks,
   countTextareaCharacters,
   selectCodeBox,
@@ -55,7 +53,6 @@ export {
 // possible config for reference:
 
 // bss.enhanceTextarea();
-// bss.setDefaultIcon("http://forumavatars.ru/img/avatars/0019/83/8b/85-1520334341.png" /* ссылка */ );
 // bss.disableProfiles({
 //   profiles: [4],
 //   message: "Don't even think about it!"
