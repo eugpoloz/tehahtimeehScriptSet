@@ -24,7 +24,6 @@ import addGuestNameClicks from "./topic/makeGuestNamesClickable";
 
 import createFastLoginLinks from "./various/createFastLoginLinks";
 import disableProfiles from "./various/disableProfiles";
-import fixRusffReputationIssue from "./various/fixRusffReputation";
 import transformProfiles from './various/transformProfiles';
 import countPostsInTopic from './various/countPostsInTopic';
 import changeFontSize from './various/changeFontSize';
@@ -36,7 +35,6 @@ export function enhanceTextarea() {
 }
 
 // run by default
-fixRusffReputationIssue();
 transformProfiles();
 
 // module exports
