@@ -9,8 +9,8 @@ const transformProfiles = () => {
         const cleanContent = DOMPurify.sanitize(fld.textContent);
 
         fld.innerHTML = cleanContent;
-        fld.dataset.ready = "1";
       }
+      fld.dataset.ready = "1";
     });
   };
 
