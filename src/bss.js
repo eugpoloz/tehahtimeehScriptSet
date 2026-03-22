@@ -27,6 +27,7 @@ import disableProfiles from "./various/disableProfiles";
 import transformProfiles from './various/transformProfiles';
 import countPostsInTopic from './various/countPostsInTopic';
 import changeFontSize from './various/changeFontSize';
+import referQuoteToOriginal from "./topic/referQuoteToOriginal";
 
 // basic function
 export function enhanceTextarea() {
@@ -47,7 +48,8 @@ export {
   disableProfiles,
   addGuestNameClicks,
   countPostsInTopic,
-  changeFontSize
+  changeFontSize,
+  referQuoteToOriginal
 };
 
 // possible config for reference:
