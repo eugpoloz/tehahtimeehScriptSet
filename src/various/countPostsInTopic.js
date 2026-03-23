@@ -210,8 +210,9 @@ const countPostsInTopic = async ({
     // handle posting to topic as game posts
     console.log("countPostsInTopic() >>> tracking this topic");
 
-    // handle form submission
-    const postForm = document.querySelector("#post");
+    // handle form submission from topic page only
+    // because editing takes place somewhere else for now, thankfully
+    const postForm = document.querySelector("#pun-main.multipage #post");
     if (postForm) {
       postForm.addEventListener("submit", function (event) {
         localStorage.setItem(
