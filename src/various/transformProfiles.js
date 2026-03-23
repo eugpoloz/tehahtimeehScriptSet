@@ -6,7 +6,9 @@ const transformProfiles = () => {
 
     fldsToReplace.forEach((fld) => {
       if (fld.textContent.includes("<")) {
-        const cleanContent = DOMPurify.sanitize(fld.textContent);
+        const cleanContent = DOMPurify.sanitize(fld.textContent, {
+          ADD_ATTR: ['target']
+        });
 
         fld.innerHTML = cleanContent;
       }
