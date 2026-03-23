@@ -1,15 +1,19 @@
 const referQuoteToOriginal = () => {
-  const getViewtopicHref = (pid) => `/viewtopic.php?pid=${pid}#p${pid}`;
+  const getViewtopicHref = (pid) => `/viewtopic.php?pid=${pid.slice(1)}#${pid}`;
 
   if (typeof FORUM.topic === "object") {
     // transform quote links
     const posts = document.querySelectorAll(".post");
 
     posts.forEach((post) => {
+      const quoteLink = post.querySelector(".pl-quote a");
+
       const pid = post.getAttribute("id");
       const href = post.querySelector(".pl-quote a").getAttribute("href");
 
-      href.replace("('", `#${pid},`);
+      const updatedHref = href.replace("('", `('#${pid},`);
+
+      quoteLink.setAttribute('href', updatedHref);
     });
   }
 
@@ -21,9 +25,9 @@ const referQuoteToOriginal = () => {
       const [pidWithHash, username] = cite.textContent.split(",");
       const pid = pidWithHash.slice(1);
 
-      const postInTopic = document.querySelector(`#p${pid}.post`);
+      const postInTopic = document.querySelector(`#${pid}.post`);
 
-      cite.innerHTML = `<a class="qc-post-link" href="${postInTopic ? `#p${pid}` : getViewtopicHref(pid)}">${username}</a>`
+      cite.innerHTML = `<a class="qc-post-link" href="${postInTopic ? `#${pid}` : getViewtopicHref(pid)}">${username}</a>`
     });
   }
 };
