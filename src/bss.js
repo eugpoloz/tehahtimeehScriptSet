@@ -23,10 +23,11 @@ import addGuestNameClicks from "./topic/makeGuestNamesClickable";
 
 import createFastLoginLinks from "./various/createFastLoginLinks";
 import disableProfiles from "./various/disableProfiles";
-import transformProfiles from './various/transformProfiles';
-import countPostsInTopic from './various/countPostsInTopic';
-import changeFontSize from './various/changeFontSize';
+import transformProfiles from "./various/transformProfiles";
+import countPostsInTopic from "./various/countPostsInTopic";
+import changeFontSize from "./various/changeFontSize";
 import referQuoteToOriginal from "./topic/referQuoteToOriginal";
+import addFastReactions from "./topic/addFastReactions";
 
 // basic function
 export function enhanceTextarea() {
@@ -47,7 +48,8 @@ export {
   addGuestNameClicks,
   countPostsInTopic,
   changeFontSize,
-  referQuoteToOriginal
+  referQuoteToOriginal,
+  addFastReactions
 };
 
 // possible config for reference:
