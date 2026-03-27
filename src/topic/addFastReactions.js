@@ -10,18 +10,25 @@ const handleFastVote = async (href) => {
     
     if (voteResponse?.error?.message) {
       throw new Error(voteResponse?.error?.message);
-      return;
     }
 
     if(voteResponse?.delta) {
-      const urlParams = url.searchParams;
-      const pid = urlParams.get('id');
-
+      const pid = url.searchParams.get('id');
       const post = document.getElementById(`p${pid}`);
+      const userId = post.dataset.userId;
       const rating = post.querySelector('.post-rating a');
 
       post.classList.add('mylike');
-      rating.textContent = `${Number(rating.textContent + 1)}`;
+
+      const postRating = rating.textContent.split('+').join('');
+      rating.textContent = `+${Number(postRating) + 1}`;
+
+      const userPostReputation = document.querySelectorAll(`.post[data-user-id="${userId}"] .pa-respect span:not(.fld-name)`);
+
+      userPostReputation.forEach(respect => {
+        const userRespect = respect.textContent.split('+').join('');
+        respect.textContent = `+${Number(userRespect) + 1}`;
+      })
     }
   } catch (e) {
     console.error('handleFastVote >>> ERROR!', e?.message);
@@ -37,27 +44,29 @@ const addFastReactions = () => {
   const reputationForm = document.getElementById("rep_form");
   const sendReputationBtn = document.getElementById("reputationButtonSend");
 
-  // remove unnecessary pluses
-  document
-    .querySelectorAll(".post-rating a")
-    .forEach((rating) => (rating.innerText = rating.innerText.split('+').join('')));
+  document.querySelectorAll('.post').forEach(post => {
+    const rating = post.querySelector(".post-rating a");
+    rating.setAttribute('title', 'Быстрый лайк');
 
-  // replace post vote link inner content
-  document.querySelectorAll(".post-vote a").forEach((vote) => {
-    const href = vote.getAttribute("href");
+    // replace post vote link inner content
+    const vote = post.querySelector(".post-vote a");
 
-    vote.setAttribute('title', 'Быстрый лайк');
-    vote.innerHTML = `<span class="vote-name">+</span>`;
+    if (vote) {
+      const href = vote.getAttribute("href");
 
-    const fetchVote = (e) => {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      handleFastVote(href);
+      vote.setAttribute('title', 'Лайк с комментом');
+      vote.innerHTML = `<span class="vote-name">+</span>`;
 
-      e.target?.blur();
-    };
+      const fetchVote = (e) => {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        handleFastVote(href);
 
-    vote.addEventListener("click", fetchVote, { passive: false });
+        e.target?.blur();
+      };
+
+      rating.addEventListener("click", fetchVote, { passive: false });
+    }
   });
 };
 
