@@ -28,22 +28,24 @@ import countPostsInTopic from "./various/countPostsInTopic";
 import changeFontSize from "./various/changeFontSize";
 import referQuoteToOriginal from "./topic/referQuoteToOriginal";
 import addFastReactions from "./topic/addFastReactions";
+import addProfileLinkToPosts from "./various/addProfileLinkToPosts";
 
 // basic function
 export function enhanceTextarea() {
   addCtrlClicks();
   originalUploadedFirst();
+  submitOnHotkey();
+  countTextareaCharacters();
 }
 
 // run by default
 transformProfiles();
+addProfileLinkToPosts();
 
 // module exports
 export {
   createFastLoginLinks,
-  countTextareaCharacters,
   selectCodeBox,
-  submitOnHotkey,
   disableProfiles,
   addGuestNameClicks,
   countPostsInTopic,
