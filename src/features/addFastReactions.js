@@ -31,7 +31,7 @@ const handleFastVote = async (href) => {
       })
     }
   } catch (e) {
-    console.error('handleFastVote >>> ERROR!', e?.message);
+    console.error('[bss] addFastReactions >>> ERROR!', e?.message);
     $.jGrowl(e?.message);
   }
 };
