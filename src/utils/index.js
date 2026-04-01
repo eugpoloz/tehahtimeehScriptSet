@@ -4,3 +4,5 @@ export const viewprofile = document.getElementById('viewprofile-next');
 // которая функция на всех страницах, кроме профиля,
 // и объект (HTMLElement) на профиле, поэтому
 export const hasProfile = typeof profile === "object";
+
+export const hasTopic = typeof FORUM.topic === "object";

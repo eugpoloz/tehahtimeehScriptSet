@@ -25,6 +25,7 @@ import countPostsInTopic from "./features/countPostsInTopic";
 import changeFontSize from "./features/changeFontSize";
 import referQuoteToOriginal from "./features/referQuoteToOriginal";
 import addFastReactions from "./features/addFastReactions";
+import autoReactToPosts from "./features/autoReactToPosts";
 
 // run by default
 transformProfiles();
@@ -41,6 +42,7 @@ export function enhanceTextarea() {
 // enhanceReactions module export
 export function enhanceReactions() {
   addFastReactions();
+  autoReactToPosts();
 }
 
 // module exports
@@ -57,6 +59,7 @@ export {
 // possible config for reference:
 
 // bss.enhanceTextarea();
+// bss.enhanceReactions();
 // bss.disableProfiles({
 //   profiles: [4],
 //   message: "Don't even think about it!"
