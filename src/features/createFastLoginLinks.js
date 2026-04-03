@@ -40,7 +40,7 @@ export default function createFastLoginLinks({
       const loginMap = logins.map(({ id, link, login, password }, i) => {
         const liID = id || `navAdd${i}`;
 
-        return `<li id="${liID}"><a class="js_login" style="cursor: pointer;" data-login="${login}" data-password="${password}">${link}</a></li>`;
+        return `<li id="${liID}"><a class="js_login" data-login="${login}" data-password="${password}">${link}</a></li>`;
       });
 
       const afterEl = document.getElementById(after);
