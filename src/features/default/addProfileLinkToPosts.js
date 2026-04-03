@@ -1,4 +1,4 @@
-import { viewprofile } from "../utils";
+import { viewprofile } from "../../utils";
 
 function addProfileLinkToPosts(forums = [14,15,16,17,5]) {
   const profileName = document.getElementById('profile-name');
