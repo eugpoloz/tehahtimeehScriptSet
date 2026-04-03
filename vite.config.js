@@ -15,6 +15,13 @@ export default defineConfig({
     oxc: {
       charset: "utf-8"
     },
+    rolldownOptions: {
+      output: {
+        generatedCode: {
+          symbols: false
+        }
+      }
+    },
     commonjsOptions: {
       transformMixedEsModules: true
     }
