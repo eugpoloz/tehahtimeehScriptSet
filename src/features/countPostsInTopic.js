@@ -184,7 +184,7 @@ const encodeURIToWin1251 = (str) => {
 const countPostsInTopic = async ({
   forumsToTrack = [],
   fldId = "5",
-  countTopicStarter = false,
+  countTopicStarter = false
 } = {}) => {
   // пока что феноменально тупая версия счетчика: чисто добавляет те посты, что есть
   // TODO:
@@ -234,9 +234,7 @@ const countPostsInTopic = async ({
     }
 
     const latestPost = document.querySelector(
-      countTopicStarter
-        ? ".post.endpost"
-        : ".post.endpost:not(.topicpost)"
+      countTopicStarter ? ".post.endpost" : ".post.endpost:not(.topicpost)"
     );
 
     if (latestPost) {
@@ -290,7 +288,7 @@ const countPostsInTopic = async ({
         method: "POST",
         referrer: window.location.origin + url,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded"
         },
         credentials: "include",
         body: uriEncodedData
@@ -316,18 +314,20 @@ const countPostsInTopic = async ({
 
       window[`UserFld${fldId}`] = updatedCounter;
 
-      const authorsPostsInTopic = document.querySelectorAll(`.post[data-user-id="${UserID}"] .post-author`);
+      const authorsPostsInTopic = document.querySelectorAll(
+        `.post[data-user-id="${UserID}"] .post-author`
+      );
 
-      authorsPostsInTopic.forEach(author => {
+      authorsPostsInTopic.forEach((author) => {
         const counter = author.querySelector(`.pa-fld${fldId}`);
         const previousFld = author.querySelector(`.pa-posts`);
-        
+
         if (counter) {
           counter.innerText = updatedCounter;
         } else {
           const html = `<li class="pa-fld${fldId}" title="Постов:"> ${updatedCounter}</li>`;
-          
-          previousFld.insertAdjacentHTML('afterend', html);
+
+          previousFld.insertAdjacentHTML("afterend", html);
         }
       });
 

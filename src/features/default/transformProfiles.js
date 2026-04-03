@@ -1,4 +1,4 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 const transformProfiles = () => {
   const replaceFldContentWithHTML = (parent, selector) => {
@@ -7,8 +7,8 @@ const transformProfiles = () => {
     fldsToReplace.forEach((fld) => {
       if (fld.textContent.includes("<")) {
         const cleanContent = DOMPurify.sanitize(fld.textContent, {
-          ADD_ATTR: ['target'],
-          ADD_TAGS: ['strong'],
+          ADD_ATTR: ["target"],
+          ADD_TAGS: ["strong"]
         });
 
         fld.innerHTML = cleanContent;
