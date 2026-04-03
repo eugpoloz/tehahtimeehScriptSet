@@ -13,7 +13,7 @@ const referQuoteToOriginal = () => {
 
       const updatedHref = href.replace("('", `('#${pid},`);
 
-      quoteLink.setAttribute('href', updatedHref);
+      quoteLink.setAttribute("href", updatedHref);
     });
   }
 
@@ -27,7 +27,7 @@ const referQuoteToOriginal = () => {
 
       const postInTopic = document.querySelector(`#${pid}.post`);
 
-      cite.innerHTML = `<a class="qc-post-link" href="${postInTopic ? `#${pid}` : getViewtopicHref(pid)}">${username}</a>`
+      cite.innerHTML = `<a class="qc-post-link" href="${postInTopic ? `#${pid}` : getViewtopicHref(pid)}">${username}</a>`;
     });
   }
 };

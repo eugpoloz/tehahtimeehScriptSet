@@ -27,6 +27,6 @@ export default function clickableGuestNames(forum_id) {
       return transformNodes();
     }
   }
-  
+
   return false;
 }

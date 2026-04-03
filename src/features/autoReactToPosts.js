@@ -63,11 +63,13 @@ async function autoReactToPosts() {
         $.jGrowl(ALL_LIKED_TEXT);
       }
 
-      superlikeBtn.removeAttribute('disabled');
+      superlikeBtn.removeAttribute("disabled");
       superlikeBtn.classList.remove("cursor-wait");
     }
 
-    const modmenu = document.querySelector("#topic-modmenu .container") ?? document.querySelector("#topic-feed .container");
+    const modmenu =
+      document.querySelector("#topic-modmenu .container") ??
+      document.querySelector("#topic-feed .container");
 
     superlikeBtn = document.createElement("button");
     superlikeBtn.setAttribute("type", "button");
@@ -75,7 +77,7 @@ async function autoReactToPosts() {
     superlikeBtn.classList.add("superlike");
 
     superlikeBtn.addEventListener("click", (e) => {
-      superlikeBtn.setAttribute('disabled', '');
+      superlikeBtn.setAttribute("disabled", "");
       superlikeBtn.classList.add("cursor-wait");
 
       handleAutoReact();

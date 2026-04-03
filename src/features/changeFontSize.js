@@ -1,6 +1,6 @@
 const changeFontSize = () => {
   const LOCALSTORAGE_SIZE_KEY = "userFontSize";
-  const CSS_VARIABLE_SIZE_KEY = '--dynamic-font-size';
+  const CSS_VARIABLE_SIZE_KEY = "--dynamic-font-size";
 
   try {
     const pun = document.getElementById("pun");
@@ -19,9 +19,12 @@ const changeFontSize = () => {
       console.log("changeFontSize() >>> setDynamicFontSize()", {
         size
       });
-    }
+    };
 
-    const userFontSize = Number(localStorage.getItem(LOCALSTORAGE_SIZE_KEY) ?? getComputedFontSizeFromPost());
+    const userFontSize = Number(
+      localStorage.getItem(LOCALSTORAGE_SIZE_KEY) ??
+        getComputedFontSizeFromPost()
+    );
 
     if (userFontSize) {
       setDynamicFontSize(userFontSize);
