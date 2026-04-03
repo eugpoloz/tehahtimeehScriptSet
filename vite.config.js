@@ -6,7 +6,17 @@ export default defineConfig({
   build: {
     plugins: [commonjs()],
     sourcemap: false,
-    minify: false,
+    minify: 'terser',
+    terserOptions: {
+      mangle: false,
+      module: true,
+      compress: {
+        drop_console: false,
+        drop_debugger: false,
+        dead_code: true,
+        unused: true,
+      },
+    },
     lib: {
       entry: path.resolve(__dirname, "src/bss.js"),
       fileName: (format) => `bss.${format}.js`,
@@ -14,7 +24,7 @@ export default defineConfig({
       name: "bss"
     },
     oxc: {
-      charset: "utf-8"
+      charset: "utf-8",
     },
     commonjsOptions: {
       transformMixedEsModules: true
