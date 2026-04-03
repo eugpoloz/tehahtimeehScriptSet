@@ -10,37 +10,38 @@
   — http://urchoice.rolka.su/profile.php?id=4789
 */
 
-import countTextareaCharacters from "./textarea/charCounter";
-import submitOnHotkey from "./textarea/fastSubmit";
+import countTextareaCharacters from "./features/textarea/charCounter";
+import submitOnHotkey from "./features/textarea/fastSubmit";
+import * as refactorEditorButtons from "./features/textarea/refactorEditorButtons";
 
-import {
-  addCtrlClicks,
-  originalUploadedFirst
-} from "./textarea/refactorEditorButtons";
+import transformProfiles from "./features/default/transformProfiles";
+import addProfileLinkToPosts from "./features/default/addProfileLinkToPosts";
 
-import selectCodeBox from "./topic/selectAndCopy";
-import addGuestNameClicks from "./topic/makeGuestNamesClickable";
-
-import createFastLoginLinks from "./various/createFastLoginLinks";
-import disableProfiles from "./various/disableProfiles";
-import transformProfiles from "./various/transformProfiles";
-import countPostsInTopic from "./various/countPostsInTopic";
-import changeFontSize from "./various/changeFontSize";
-import referQuoteToOriginal from "./topic/referQuoteToOriginal";
-import addFastReactions from "./topic/addFastReactions";
-import addProfileLinkToPosts from "./various/addProfileLinkToPosts";
-
-// basic function
-export function enhanceTextarea() {
-  addCtrlClicks();
-  originalUploadedFirst();
-  submitOnHotkey();
-  countTextareaCharacters();
-}
+import selectCodeBox from "./features/selectAndCopy";
+import addGuestNameClicks from "./features/makeGuestNamesClickable";
+import createFastLoginLinks from "./features/createFastLoginLinks";
+import disableProfiles from "./features/disableProfiles";
+import countPostsInTopic from "./features/countPostsInTopic";
+import changeFontSize from "./features/changeFontSize";
+import referQuoteToOriginal from "./features/referQuoteToOriginal";
+import addFastReactions from "./features/addFastReactions";
 
 // run by default
 transformProfiles();
 addProfileLinkToPosts();
+
+// enhanceTextarea module export
+export function enhanceTextarea() {
+  refactorEditorButtons.addCtrlClicks();
+  refactorEditorButtons.originalUploadedFirst();
+  submitOnHotkey();
+  countTextareaCharacters();
+}
+
+// enhanceReactions module export
+export function enhanceReactions() {
+  addFastReactions();
+}
 
 // module exports
 export {
@@ -50,8 +51,7 @@ export {
   addGuestNameClicks,
   countPostsInTopic,
   changeFontSize,
-  referQuoteToOriginal,
-  addFastReactions
+  referQuoteToOriginal
 };
 
 // possible config for reference:
