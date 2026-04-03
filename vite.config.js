@@ -13,7 +13,7 @@ export default defineConfig({
       formats: ["iife"],
       name: "bss"
     },
-    esbuild: {
+    oxc: {
       charset: "windows-1251"
     },
     commonjsOptions: {
