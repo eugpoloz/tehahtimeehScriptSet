@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
+    target: ["chrome87", "edge88", "firefox78", "safari14"],
     plugins: [commonjs()],
     sourcemap: false,
     minify: 'terser',
