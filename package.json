@@ -1,19 +1,12 @@
 {
   "name": "basic-script-set",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "./dist/bss.umd.js",
-  "module": "./dist/bss.es.js",
-  "exports": {
-    ".": {
-      "import": "./dist/bss.es.js",
-      "require": "./dist/bss.umd.js"
-    }
-  },
+  "main": "./dist/bss.iife.js",
   "dependencies": {
     "vite": "^8.0.3"
   },
