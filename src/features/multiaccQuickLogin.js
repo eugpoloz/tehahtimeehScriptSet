@@ -92,21 +92,24 @@ const handleQuickLogin = async (e) => {
   if (rememberAcc) {
     const decryptedData = await getMultiaccEncryptedData();
 
-    if (decryptedData) {
-      const decryptedDataWithoutCurrentLogin = decryptedData.filter(
+    let decryptedDataWithoutCurrentLogin = [];
+
+    if (decryptedData?.length > 0) {
+      decryptedDataWithoutCurrentLogin = decryptedData.filter(
         (item) => item.login !== login
       );
-      const dataToEncrypt = [
-        { login, password },
-        ...decryptedDataWithoutCurrentLogin
-      ];
-
-      await encryptAndSave({
-        encryptionKey: INDEXED_DB_KEY,
-        localStorageKey: LOCAL_STORAGE_KEY,
-        data: JSON.stringify(dataToEncrypt)
-      });
     }
+
+    const dataToEncrypt = [
+      { login, password },
+      ...decryptedDataWithoutCurrentLogin
+    ];
+
+    await encryptAndSave({
+      encryptionKey: INDEXED_DB_KEY,
+      localStorageKey: LOCAL_STORAGE_KEY,
+      data: JSON.stringify(dataToEncrypt)
+    });
   }
 
   await handleLogin({ login, password });
