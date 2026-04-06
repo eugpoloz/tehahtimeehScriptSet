@@ -10,7 +10,7 @@ export default function createFastLoginLinks({
     function handleFastLoginClick({ target }) {
       if (target instanceof HTMLElement) {
         const { login, password } = target.dataset;
-        
+
         handleLogin({ login, password });
       }
     }
@@ -18,6 +18,11 @@ export default function createFastLoginLinks({
     if (logins.length > 0) {
       const loginMap = logins.map(({ id, link, login, password }, i) => {
         const liID = id || `navAdd${i}`;
+
+        if (typeof link !== "string") {
+          const lang = document.documentElement.lang ?? "ru";
+          link = link[lang];
+        }
 
         return `<li id="${liID}"><a class="js_login" data-login="${login}" data-password="${password}">${link}</a></li>`;
       });
