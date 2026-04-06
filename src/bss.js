@@ -60,6 +60,21 @@ export {
 
 // bss.enhanceTextarea();
 // bss.enhanceReactions();
+// bss.createFastLoginLinks({
+//   logins: [
+//     {
+//       id: 'navreader',
+//       login: 'Curious Frog',
+//       password: 'kvak',
+//       link: { en: 'Reader', ru: 'Читатель'}
+//     },{
+//       id: 'navpr',
+//       login: 'PR Frog',
+//       password: 'kvak',
+//       link: 'Пиар'
+//     }
+//   ]
+// });
 // bss.disableProfiles({
 //   profiles: [4],
 //   message: "Don't even think about it!"
