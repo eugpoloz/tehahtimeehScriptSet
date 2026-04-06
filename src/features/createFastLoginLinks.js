@@ -1,3 +1,5 @@
+import { handleLogin } from "../utils/login";
+
 export default function createFastLoginLinks({
   after = "navlogin",
   logins = []
@@ -8,31 +10,8 @@ export default function createFastLoginLinks({
     function handleFastLoginClick({ target }) {
       if (target instanceof HTMLElement) {
         const { login, password } = target.dataset;
-
-        const formData = new FormData();
-        formData.append("form_sent", "1");
-        formData.append("req_username", login);
-        formData.append("req_password", password);
-        formData.append("login", "Submit");
-
-        const fetchObject = {
-          body: formData,
-          credentials: "include",
-          headers: {
-            "Cache-Control": "max-age=0",
-            "Upgrade-Insecure-Requests": "1"
-          },
-          method: "POST"
-        };
-
-        const data = fetch(
-          `${window.location.origin}/login.php?action=in`,
-          fetchObject
-        ).then((data) => {
-          if (data.status === 200) {
-            window.location.reload();
-          }
-        });
+        
+        handleLogin({ login, password });
       }
     }
 
