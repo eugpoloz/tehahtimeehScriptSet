@@ -1,3 +1,6 @@
+import { handleLogin } from "./login";
+import { handleError } from "./error";
+
 export const viewprofile = document.getElementById("viewprofile-next");
 
 // оказывается, у нас есть глобальная переменная profile,
@@ -6,3 +9,7 @@ export const viewprofile = document.getElementById("viewprofile-next");
 export const hasProfile = typeof profile === "object";
 
 export const hasTopic = typeof FORUM.topic === "object";
+
+export const getLang = () => document.documentElement.lang ?? "ru";
+
+export { handleLogin, handleError };

@@ -1,4 +1,4 @@
-import { handleLogin } from "../utils/login";
+import { getLang, handleLogin } from "../utils";
 
 export default function createFastLoginLinks({
   after = "navlogin",
@@ -20,7 +20,7 @@ export default function createFastLoginLinks({
         const liID = id || `navAdd${i}`;
 
         if (typeof link !== "string") {
-          const lang = document.documentElement.lang ?? "ru";
+          const lang = getLang();
           link = link[lang];
         }
 
