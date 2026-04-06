@@ -1,34 +1,249 @@
-import { getLang } from "../utils";
+import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "../utils";
 
-const multiaccQuickLogin = ({ en: "Re-login", ru: "Перезайти" }) => {
+const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
+const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
+
+const QUICK_LOGIN_FORM_HTML = `
+<form id="quick-login" method="post">
+  <fieldset>
+    <legend class="sr-only">Введите ваше имя и пароль ниже</legend>
+    <div class="fs-box inline">
+      <p class="inputfield required">
+        <label for="fld1">Имя <em>(Обязательно)</em></label>
+        <span class="input">
+          <input type="text" id="fld1" autocomplete="off" name="req_username" size="25" maxlength="25">
+        </span>
+      </p>
+      <p class="inputfield required">
+        <label for="fld2">Пароль <em>(Обязательно)</em></label>
+        <span class="input">
+          <input type="password" id="fld2" name="req_password" autocomplete="off" size="16" maxlength="16">
+        </span>
+      </p>
+    </div>
+  </fieldset>
+
+  <label>
+    <input type="checkbox" name="remember-acc"> <span>Запомнить для быстрого входа</span>
+  </label>
+            
+  <p class="formsubmit">
+    <input type="submit" class="button" name="login" value="Войти">
+  </p>
+</form>
+`;
+
+const MULTIACC_LIST_LOCAL_HTML = `
+<div class="multiacc-list--local">
+  <h4>Локальные профили:</h4>
+  <ul id="multiacc-list-local" class="loading"></ul>
+</div>
+`;
+
+const MULTIACC_LIST_VIP_HTML = `
+<div class="multiacc-list--vip">
+  <h4>Мультиаккаунт:</h4>
+  <ul id="multiacc-list-vip" class="loading"></ul>
+</div>
+`;
+
+const getMultiaccItemHTML = (login) => {
+  let loginHTML = "";
+
+  if (login !== window.UserLogin) {
+    loginHTML = `<a href="javascript:void(0)" class="multiacc-item-login">Зайти</a>, `;
+  }
+
+  return `<li class="multiacc-item" data-login="${login}">
+    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" class="multiacc-item-remove">Удалить</a>)
+  </li>`;
+};
+
+const getMultiaccEncryptedData = async () => {
+  const decryptedDataString = await decryptAndLoad({
+    encryptionKey: INDEXED_DB_KEY,
+    localStorageKey: LOCAL_STORAGE_KEY
+  });
+
+  const decryptedData = !!decryptedDataString
+    ? JSON.parse(decryptedDataString)
+    : null;
+
+  return decryptedData;
+};
+
+const setFormBusy = () => {
+  const form = document.querySelector("#bss-multiacc-quick-login section.form");
+  if (form) {
+    form.classList.add("busy");
+  }
+};
+
+const handleQuickLogin = async (e) => {
+  e.preventDefault();
+  setFormBusy();
+
+  const formData = new FormData(e.target);
+  const login = formData.get("req_username");
+  const password = formData.get("req_password");
+
+  const rememberAcc = formData.get("remember-acc");
+
+  if (rememberAcc) {
+    const decryptedData = await getMultiaccEncryptedData();
+
+    if (decryptedData) {
+      const decryptedDataWithoutCurrentLogin = decryptedData.filter(
+        (item) => item.login !== login
+      );
+      const dataToEncrypt = [
+        { login, password },
+        ...decryptedDataWithoutCurrentLogin
+      ];
+
+      await encryptAndSave({
+        encryptionKey: INDEXED_DB_KEY,
+        localStorageKey: LOCAL_STORAGE_KEY,
+        data: JSON.stringify(dataToEncrypt)
+      });
+    }
+  }
+
+  await handleLogin({ login, password });
+};
+
+const getVIPMultiAccList = async () => {
+  const url = `/profile.php?section=multi&id=${window.UserID}`;
+
+  const profileResponse = await fetch(`${url}&nohead`, {
+    method: "GET",
+    credentials: "include"
+  });
+  const profileHTML = await profileResponse.arrayBuffer().then((buffer) => {
+    const decoder = new TextDecoder("windows-1251"); // Or 'koi8-r'
+    const text = decoder.decode(buffer);
+    return text;
+  });
+
+  const parser = new DOMParser();
+
+  const profile9 = parser.parseFromString(profileHTML, "text/html");
+
+  return profile9.querySelectorAll("#profile9 .list li");
+};
+
+const renderMultiaccList = async () => {
+  const multiaccList = document.getElementById("multiacc-list");
+
+  const isVIP = document.getElementById("pun").classList.contains("isvip");
+
+  if (isVIP) {
+    if (!document.getElementById("multiacc-list-vip")) {
+      multiaccList.insertAdjacentHTML("beforeend", MULTIACC_LIST_VIP_HTML);
+    }
+
+    const multiListVip = document.getElementById("multiacc-list-vip");
+
+    if (multiListVip.innerHTML === "") {
+      const multiList = await getVIPMultiAccList();
+
+      if (multiList && multiListVip) {
+        multiList.forEach((item) => {
+          multiListVip.insertAdjacentElement("beforeend", item);
+
+          const multiVipItemLinks = item.querySelectorAll(
+            "a[href*='section=multi']"
+          );
+
+          if (multiVipItemLinks) {
+            multiVipItemLinks.forEach((link) =>
+              link.addEventListener("click", (e) => {
+                setFormBusy();
+              })
+            );
+          }
+        });
+      }
+
+      multiListVip.classList.remove("loading");
+    }
+  }
+
+  const multiListLocal = document.getElementById("multiacc-list-local");
+  if (multiListLocal.innerHTML === "") {
+    let decryptedData = await getMultiaccEncryptedData();
+
+    if (decryptedData) {
+      decryptedData.forEach((item) => {
+        multiListLocal.innerHTML += getMultiaccItemHTML(item.login);
+      });
+
+      const multiaccLocalItems = multiListLocal.querySelectorAll(
+        ".multiacc-item[data-login]"
+      );
+
+      multiaccLocalItems.forEach((itemElement) => {
+        const removeItem = itemElement.querySelector(".multiacc-item-remove");
+        const loginItem = itemElement.querySelector(".multiacc-item-login");
+
+        const login = itemElement.dataset.login;
+
+        removeItem.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          const updatedData = [...decryptedData].filter(
+            (storedItem) => storedItem.login !== login
+          );
+
+          await encryptAndSave({
+            encryptionKey: INDEXED_DB_KEY,
+            localStorageKey: LOCAL_STORAGE_KEY,
+            data: JSON.stringify(updatedData)
+          });
+          decryptedData = await getMultiaccEncryptedData();
+
+          itemElement.remove();
+        });
+
+        if (loginItem) {
+          loginItem.addEventListener("click", async (e) => {
+            e.preventDefault();
+            setFormBusy();
+
+            const password = decryptedData.find(
+              (storedItem) => storedItem.login === login
+            )?.password;
+
+            await handleLogin({ login, password });
+          });
+        }
+      });
+    }
+
+    multiListLocal.classList.remove("loading");
+  }
+};
+
+const multiaccQuickLogin = () => {
   const lang = getLang();
   const link = { en: "Re-login", ru: "Перезайти" }[lang];
 
-  const redirectUrl = window.location.pathname + window.location.search + window.location.hash;
-  const html = `<div id="bss-multiacc-quick-login" class="bss-multiacc-quick-login" style="display: none;">
-    <form id="login" action="${window.location.origin}/login.php?action=in" method="post">
-			<fieldset>
-				<legend><span>Введите ваше имя и пароль ниже</span></legend>
-				<div class="fs-box inline">
-				<input type="hidden" name="form_sent" value="1">
-				<input type="hidden" name="redirect_url" value="${redirectUrl}">
-				<p class="inputfield required">
-					<label for="fld1">Имя <em>(Обязательно)</em></label><br>
-					<span class="input"><input type="text" id="fld1" name="req_username" size="25" maxlength="25"></span>
-				</p>
-				<p class="inputfield required">
-					<label for="fld2">Пароль <em>(Обязательно)</em></label><br>
-					<span class="input"><input type="password" id="fld2" name="req_password" size="16" maxlength="16"></span>
-				</p>
-			</fieldset>
-			<p class="formsubmit"><input type="submit" class="button" name="login" value="Войти"></p>
-		</form>
+  const html = `<div id="bss-multiacc-quick-login" class="bss-multiacc-quick-login">
+    <div class="container">
+      <div class="wrapper">
+        <h3>Быстрый вход</h3>
+        <section class="form">
+          ${QUICK_LOGIN_FORM_HTML}
+          <article id="multiacc-list">${MULTIACC_LIST_LOCAL_HTML}</article>
+        </section>
+      </div>
+    </div>
   </div>`;
 
   const loginNavlink = document.querySelector("#navlogin a");
   const logoutNavlink = document.getElementById("navlogout");
 
-  const navlinks = document.getElementById('pun-navlinks')
+  const navlinks = document.getElementById("pun-navlinks");
 
   navlinks.insertAdjacentHTML("beforeend", html);
 
@@ -41,14 +256,21 @@ const multiaccQuickLogin = ({ en: "Re-login", ru: "Перезайти" }) => {
     logoutNavlink.insertAdjacentHTML("beforebegin", quickLoginNavlink);
   }
 
-  const quickForm = document.getElementById("bss-multiacc-quick-login");
-
-  document.querySelector(".js_relogin").addEventListener("click", (e) => {
+  document.querySelector(".js_relogin").addEventListener("click", async (e) => {
     e.preventDefault();
-    document.getElementById("bss-multiacc-quick-login").classList.toggle("visible");
+
+    const quickForm = document.getElementById("bss-multiacc-quick-login");
+    if (quickForm) {
+      quickForm.classList.toggle("visible");
+
+      await renderMultiaccList();
+    }
   });
 
-  document.body.insertAdjacentHTML("beforeend", html);
+  const quickLoginForm = document.getElementById("quick-login");
+  if (quickLoginForm) {
+    quickLoginForm.addEventListener("submit", handleQuickLogin);
+  }
 };
 
 export default multiaccQuickLogin;

@@ -1,5 +1,6 @@
 import { handleLogin } from "./login";
 import { handleError } from "./error";
+import { decryptAndLoad, encryptAndSave } from "./crypto";
 
 export const viewprofile = document.getElementById("viewprofile-next");
 
@@ -12,4 +13,4 @@ export const hasTopic = typeof FORUM.topic === "object";
 
 export const getLang = () => document.documentElement.lang ?? "ru";
 
-export { handleLogin, handleError };
+export { handleLogin, handleError, decryptAndLoad, encryptAndSave };
