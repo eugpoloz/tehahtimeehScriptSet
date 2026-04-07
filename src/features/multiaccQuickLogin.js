@@ -274,7 +274,23 @@ const multiaccQuickLogin = () => {
     if (quickForm) {
       quickForm.classList.toggle("visible");
 
-      await renderMultiaccList();
+      const handleClickOutside = (eClickOutside) => {
+        if (
+          !eClickOutside.target.closest("#bss-multiacc-quick-login .wrapper") &&
+          eClickOutside.target !== e.target
+        ) {
+          quickForm.classList.remove("visible");
+          document.removeEventListener("click", handleClickOutside, false);
+        }
+      };
+
+      if (quickForm.classList.contains("visible")) {
+        await renderMultiaccList();
+
+        document.addEventListener("click", handleClickOutside, false);
+      } else {
+        document.removeEventListener("click", handleClickOutside, false);
+      }
     }
   });
 
