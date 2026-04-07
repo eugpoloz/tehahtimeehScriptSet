@@ -1,24 +1,17 @@
 import { handleLogin } from "./login";
-import { handleError } from "./error";
+import { getLoggerModuleName, handleLogs, handleError } from "./logger";
 import { decryptAndLoad, encryptAndSave } from "./crypto";
-import { getResponse, parseHTMLResponse } from "./getResponseParser";
-
-export const viewprofile = document.getElementById("viewprofile-next");
-
-// оказывается, у нас есть глобальная переменная profile,
-// которая функция на всех страницах, кроме профиля,
-// и объект (HTMLElement) на профиле, поэтому
-export const hasProfile = typeof profile === "object";
-
-export const hasTopic = typeof FORUM.topic === "object";
-
-export const getLang = () => document.documentElement.lang ?? "ru";
+import { viewprofile, hasProfile, hasTopic, getLang } from "./DOM";
 
 export {
   handleLogin,
+  getLoggerModuleName,
   handleError,
+  handleLogs,
   decryptAndLoad,
   encryptAndSave,
-  getResponse,
-  parseHTMLResponse
+  viewprofile,
+  hasProfile,
+  hasTopic,
+  getLang
 };

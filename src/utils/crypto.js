@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { handleError } from "./error";
+import { handleError } from "./logger";
 
 const bufferToBase64 = (buffer) =>
   btoa(String.fromCharCode(...new Uint8Array(buffer)));

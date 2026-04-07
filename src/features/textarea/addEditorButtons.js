@@ -1,5 +1,4 @@
 const addEditorButtons = (btnConfig = []) => {
-  console.log("[tehMainReply] addEditorButtons()", btnConfig);
   btnConfig.forEach((btn) => {
     const btnTarget = document.getElementById(btn.target);
 

@@ -1,4 +1,4 @@
-import { handleError } from "./error";
+import { handleError } from "./logger";
 
 const HANDLE_LOGIN_MODULE_NAME = "utils/handleLogin";
 

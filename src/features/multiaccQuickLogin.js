@@ -1,11 +1,5 @@
-import {
-  getLang,
-  handleLogin,
-  decryptAndLoad,
-  encryptAndSave,
-  getResponse,
-  parseHTMLResponse
-} from "../utils";
+import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "../utils";
+import { handleError } from "../utils/logger";
 
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
@@ -123,12 +117,27 @@ const handleQuickLogin = async (e) => {
 };
 
 const getVIPMultiAccList = async () => {
-  const url = `/profile.php?section=multi&id=${window.UserID}`;
+  try {
+    const url = `/profile.php?section=multi&id=${window.UserID}`;
 
-  const profileResponse = await getResponse(url);
-  const profile9 = await parseHTMLResponse(profileResponse);
+    const profileResponse = await await fetch(`${url}&nohead`, {
+      method: "GET",
+      credentials: "include"
+    });
 
-  return profile9.querySelectorAll("#profile9 .list li");
+    const responseHTML = await profileResponse.arrayBuffer().then((buffer) => {
+      const decoder = new TextDecoder("windows-1251"); // Or 'koi8-r'
+      const text = decoder.decode(buffer);
+      return text;
+    });
+
+    const parser = new DOMParser();
+    const profile9 = parser.parseFromString(responseHTML, "text/html");
+
+    return profile9.querySelectorAll("#profile9 .list li");
+  } catch (e) {
+    handleError("footer/handleQuickLogin", e);
+  }
 };
 
 const renderMultiaccList = async () => {
