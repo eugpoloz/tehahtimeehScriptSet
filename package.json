@@ -1,18 +1,26 @@
 {
-  "name": "basic-script-set",
-  "version": "0.3.0",
+  "name": "tehahtimeeh-script-set",
+  "version": "0.4.0",
   "license": "MIT",
+  "type": "module",
   "files": [
     "dist"
   ],
-  "type": "module",
-  "main": "./dist/bss.iife.js",
+  "main": "./dist/teh.html-footer.iife.js",
+  "exports": {
+    "./html-footer": {
+      "import": "./dist/teh.html-footer.iife.js"
+    },
+    "./main-reply": {
+      "import": "./dist/teh.main-reply.iife.js"
+    }
+  },
   "dependencies": {
     "vite": "^8.0.5"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "LIB=htmlFooter vite build && LIB=mainReply vite build",
     "preview": "vite preview"
   },
   "devDependencies": {

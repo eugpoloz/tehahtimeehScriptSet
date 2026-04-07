@@ -10,10 +10,6 @@
   — http://urchoice.rolka.su/profile.php?id=4789
 */
 
-import countTextareaCharacters from "./features/textarea/charCounter";
-import submitOnHotkey from "./features/textarea/fastSubmit";
-import * as refactorEditorButtons from "./features/textarea/refactorEditorButtons";
-
 import transformProfiles from "./features/default/transformProfiles";
 import addProfileLinkToPosts from "./features/default/addProfileLinkToPosts";
 
@@ -31,14 +27,6 @@ import multiaccQuickLogin from "./features/multiaccQuickLogin";
 // run by default
 transformProfiles();
 addProfileLinkToPosts();
-
-// enhanceTextarea module export
-export function enhanceTextarea() {
-  refactorEditorButtons.addCtrlClicks();
-  refactorEditorButtons.originalUploadedFirst();
-  submitOnHotkey();
-  countTextareaCharacters();
-}
 
 // enhanceReactions module export
 export function enhanceReactions() {
