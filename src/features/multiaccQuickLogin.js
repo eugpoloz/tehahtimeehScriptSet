@@ -4,8 +4,11 @@ import { handleError } from "../utils/logger";
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
 
-const QUICK_LOGIN_FORM_HTML = `
-<form id="quick-login" method="post">
+const getQuickLoginFormHTML = () => {
+  const FULL_LOGIN_LINK =
+    GroupID === 3 ? `<a href="/login.php">На страницу логина</a>` : "";
+
+  return `<form id="quick-login" method="post">
   <fieldset>
     <legend class="sr-only">Введите ваше имя и пароль ниже</legend>
     <div class="fs-box inline">
@@ -29,10 +32,10 @@ const QUICK_LOGIN_FORM_HTML = `
   </label>
             
   <p class="formsubmit">
-    <input type="submit" class="button" name="login" value="Войти">
+    <input type="submit" class="button" name="login" value="Войти">${FULL_LOGIN_LINK}
   </p>
-</form>
-`;
+</form>`;
+};
 
 const MULTIACC_LIST_LOCAL_HTML = `
 <div class="multiacc-list--local">
@@ -241,7 +244,7 @@ const multiaccQuickLogin = () => {
       <div class="wrapper">
         <h3>Быстрый вход</h3>
         <section class="form">
-          ${QUICK_LOGIN_FORM_HTML}
+          ${getQuickLoginFormHTML()}
           <article id="multiacc-list">${MULTIACC_LIST_LOCAL_HTML}</article>
         </section>
       </div>
