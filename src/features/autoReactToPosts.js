@@ -1,4 +1,4 @@
-import { hasTopic } from "../utils";
+import { hasTopic, handleError } from "../utils";
 
 const DELAY_MAX = 1300;
 const DELAY_MIN = 700;
@@ -19,8 +19,6 @@ async function autoReactToPosts() {
       const superlikesLength = postsToLike.length;
 
       if (superlikesLength) {
-        console.log("postsToLike", { postsToLike, superlikesLength });
-
         const superlikeNotificationContent = (idx) =>
           `Суперлайк в процессе: ${idx}/${superlikesLength}`;
 
@@ -43,7 +41,7 @@ async function autoReactToPosts() {
               })
             );
           } catch (e) {
-            console.error("[bss] autoReactToPosts >>> ERROR!", e);
+            handleError("footer/autoReactToPosts", e);
           }
 
           await sleep(randomDelay());

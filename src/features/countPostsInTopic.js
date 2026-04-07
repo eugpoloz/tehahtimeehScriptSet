@@ -1,7 +1,12 @@
+import { handleError, handleLogs } from "../utils";
+
+const COUNTER_MODULE_NAME = "footer/countPostsInTopic";
+
 const countPostsInTopic = async ({
   forumsToTrack = [],
   fldId = "5",
-  countTopicStarter = false
+  countTopicStarter = false,
+  debug = false
 } = {}) => {
   // пока что феноменально тупая версия счетчика: чисто добавляет те посты, что есть
   // TODO:
@@ -25,7 +30,11 @@ const countPostsInTopic = async ({
     }
 
     // handle posting to topic as game posts
-    console.log("[bss] countPostsInTopic() >>> tracking this topic");
+    handleLogs({
+      debug,
+      module: COUNTER_MODULE_NAME,
+      message: "tracking this topic"
+    });
 
     // handle form submission from topic page only
     // because editing takes place somewhere else for now, thankfully
@@ -36,17 +45,28 @@ const countPostsInTopic = async ({
           COUNTER_NEW_POST_KEY,
           Math.floor(Date.now() / 1000)
         ); // in seconds
-        console.log("[bss] countPostsInTopic() >>> postForm submitted", {
-          event,
-          localStorage: localStorage.getItem(COUNTER_NEW_POST_KEY)
-        });
+        handleLogs(
+          {
+            debug,
+            module: COUNTER_MODULE_NAME,
+            message: "postForm submitted"
+          },
+          {
+            event,
+            localStorage: localStorage.getItem(COUNTER_NEW_POST_KEY)
+          }
+        );
       });
     }
 
     // handle previously set localStorage flag
     const counterNewPost = localStorage.getItem(COUNTER_NEW_POST_KEY);
     if (!counterNewPost) {
-      console.log("[bss] countPostsInTopic() >>> no counterNewPost, exiting");
+      handleLogs({
+        debug,
+        module: COUNTER_MODULE_NAME,
+        message: "no counterNewPost, exiting"
+      });
       return;
     }
 
@@ -115,13 +135,20 @@ const countPostsInTopic = async ({
         once: true
       });
 
-      console.log(`[bss] countPostsInTopic() >>> fld${fldId}`, {
-        initialCounter,
-        updatedCounter
-      });
+      handleLogs(
+        {
+          debug,
+          module: COUNTER_MODULE_NAME,
+          message: `fld${fldId}`
+        },
+        {
+          initialCounter,
+          updatedCounter
+        }
+      );
     }
   } catch (error) {
-    console.error("[bss] countPostsInTopic() >>> FAILED! Error:", error);
+    handleError(COUNTER_MODULE_NAME, error);
   }
 };
 

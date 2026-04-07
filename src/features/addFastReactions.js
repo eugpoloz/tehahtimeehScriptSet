@@ -1,3 +1,5 @@
+import { handleError } from "../utils";
+
 const handleFastVote = async (href) => {
   try {
     const url = new URL(window.location.origin + href + `&format=json`);
@@ -33,7 +35,7 @@ const handleFastVote = async (href) => {
       });
     }
   } catch (e) {
-    console.error("[bss] addFastReactions >>> ERROR!", e?.message);
+    handleError("footer/addFastReactions", e);
     $.jGrowl(e?.message);
   }
 };

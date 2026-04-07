@@ -1,7 +1,9 @@
-const changeFontSize = () => {
-  const LOCALSTORAGE_SIZE_KEY = "userFontSize";
-  const CSS_VARIABLE_SIZE_KEY = "--dynamic-font-size";
+import { handleError } from "../utils";
 
+const LOCALSTORAGE_SIZE_KEY = "userFontSize";
+const CSS_VARIABLE_SIZE_KEY = "--dynamic-font-size";
+
+const changeFontSize = () => {
   try {
     const pun = document.getElementById("pun");
     const postContent = document.querySelector(".post-content");
@@ -15,10 +17,6 @@ const changeFontSize = () => {
     const setDynamicFontSize = (size) => {
       pun.style.setProperty(CSS_VARIABLE_SIZE_KEY, `${size}px`);
       localStorage.setItem(LOCALSTORAGE_SIZE_KEY, size);
-
-      console.log("changeFontSize() >>> setDynamicFontSize()", {
-        size
-      });
     };
 
     const userFontSize = Number(
@@ -66,7 +64,7 @@ const changeFontSize = () => {
     const btnReset = document.getElementById("text-clear");
     btnReset?.addEventListener("click", resetFontSize);
   } catch (e) {
-    console.error("changeFontSize() >>> FAILED! Error:", e);
+    handleError("footer/changeFontSize", e);
   }
 };
 
