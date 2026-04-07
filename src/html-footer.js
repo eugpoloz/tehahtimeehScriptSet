@@ -25,7 +25,6 @@ import autoReactToPosts from "./features/autoReactToPosts";
 import multiaccQuickLogin from "./features/multiaccQuickLogin";
 
 // run by default
-transformProfiles();
 addProfileLinkToPosts();
 
 // enhanceReactions module export
@@ -43,34 +42,35 @@ export {
   countPostsInTopic,
   changeFontSize,
   referQuoteToOriginal,
-  multiaccQuickLogin
+  multiaccQuickLogin,
+  transformProfiles
 };
 
 // possible config for reference:
 
-// bss.enhanceTextarea();
-// bss.enhanceReactions();
-// bss.createFastLoginLinks({
-//   logins: [
-//     {
-//       id: 'navreader',
-//       login: 'Curious Frog',
-//       password: 'kvak',
-//       link: { en: 'Reader', ru: 'Читатель'}
-//     },{
-//       id: 'navpr',
-//       login: 'PR Frog',
-//       password: 'kvak',
-//       link: 'Пиар'
-//     }
-//   ]
-// });
-// bss.disableProfiles({
-//   profiles: [4],
-//   message: "Don't even think about it!"
-// });
-// bss.countPostsInTopic({
-//   fldId: "5",
-//   forumsToTrack: [7, 8, 16, 18],
-//   countTopicStarter: false
-// });
+//tehFooter.enhanceReactions();
+//tehFooter.createFastLoginLinks({
+//  logins: [
+//    {
+//      id: 'navreader',
+//      login: 'Curious Frog',
+//      password: 'kvak',
+//      link: { en: 'Reader', ru: 'Читатель'}
+//    },{
+//      id: 'navpr',
+//      login: 'PR Frog',
+//      password: 'kvak',
+//      link: 'Пиар'
+//    }
+//  ]
+//});
+//tehFooter.disableProfiles({
+//  profiles: [4],
+//  message: "Don't even think about it!"
+//});
+//tehFooter.countPostsInTopic({
+//  fldId: "5",
+//  forumsToTrack: [7, 8, 16, 18],
+//  countTopicStarter: false
+//});
+//tehFooter.transformProfiles();
