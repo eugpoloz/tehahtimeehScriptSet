@@ -21,7 +21,7 @@ function createPortraits({
   });
 }
 
-export default async function randomPortraitGenerator(pickPortraits) {
+async function generateRandomPortraits(pickPortraits) {
   try {
     const {
       filteredUsers = [], // usernames
@@ -59,6 +59,8 @@ export default async function randomPortraitGenerator(pickPortraits) {
 
     return pickedUsers;
   } catch (error) {
-    handleError("optional/randomPortraitGenerator()", error);
+    handleError("optional/generateRandomPortraits", error);
   }
 }
+
+export default generateRandomPortraits;
