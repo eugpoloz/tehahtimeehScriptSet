@@ -1,16 +1,33 @@
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, build } from "vite";
 
-export default defineConfig({
+const LIB = process.env.LIB ?? "htmlFooter";
+
+// libraries
+const libConfig = {
+  htmlFooter: {
+    entry: "./src/html-footer.js",
+    name: "tehFooter"
+  },
+  mainReply: {
+    entry: "./src/main-reply.js",
+    name: "tehMainReply"
+  }
+};
+
+const currentConfig = libConfig[LIB];
+
+export default defineConfig(() => ({
   build: {
     target: ["chrome87", "edge88", "firefox78", "safari14"],
     sourcemap: false,
     minify: false,
+    emptyOutDir: false,
     lib: {
-      entry: path.resolve(__dirname, "src/bss.js"),
-      fileName: (format) => `bss.${format}.js`,
-      formats: ["iife"],
-      name: "bss"
+      entry: currentConfig.entry,
+      name: currentConfig.name,
+      fileName: (format, entryName) => `teh.${entryName}.${format}.js`,
+      formats: ["iife"]
     },
     oxc: {
       charset: "utf-8"
@@ -26,4 +43,4 @@ export default defineConfig({
       transformMixedEsModules: true
     }
   }
-});
+}));
