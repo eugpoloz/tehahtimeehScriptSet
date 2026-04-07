@@ -10,14 +10,14 @@
   — http://urchoice.rolka.su/profile.php?id=4789
 */
 
-import randomPortraitGenerator from "./features/optional/randomPortraitGenerator";
+import generateRandomPortraits from "./features/optional/generateRandomPortraits";
 
 // module exports
-export { randomPortraitGenerator };
+export { generateRandomPortraits };
 
 // config example
 //
-//tehOptional.randomPortraitGenerator({
+//tehOptional.generateRandomPortraits({
 //  howMany: 4,
 //  group_id: [1, 2, 5],
 //  filteredUsers: ["Hedge Bitch"],
