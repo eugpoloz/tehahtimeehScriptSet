@@ -1,12 +1,12 @@
 "use strict";
 
 /*
-  basicScriptSet
+  tehahtimeehScriptSet/tehFooter
   author: eugpoloz (грандоченька смерти)
   license: MIT
 
   вопросы и поддержка:
-  — https://github.com/eugpoloz/basicScriptSet
+  — https://github.com/eugpoloz/tehahtimeehScriptSet
   — http://urchoice.rolka.su/profile.php?id=4789
 */
 
