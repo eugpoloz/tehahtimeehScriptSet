@@ -15,7 +15,6 @@ export const handleLogin = async ({ login, password } = {}) => {
     formData.append("req_username", login);
     formData.append("req_password", password);
     formData.append("redirect_url", redirectUrl);
-    formData.append("login", "Submit");
 
     const response = await fetch(
       `${window.location.origin}/login.php?action=in`,
@@ -30,11 +29,8 @@ export const handleLogin = async ({ login, password } = {}) => {
       }
     );
 
-    console.log(`${HANDLE_LOGIN_MODULE_NAME} >>> response`, response);
-
     if (response.status === 200) {
-      window.location.href = response.url ?? redirectUrl;
-      window.location.reload();
+      window.location.replace(redirectUrl);
       return;
     } else {
       throw new Error(`Failed to login: ${response.statusText}`);
