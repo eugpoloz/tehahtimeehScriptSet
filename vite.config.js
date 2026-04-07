@@ -12,6 +12,10 @@ const libConfig = {
   mainReply: {
     entry: "./src/main-reply.js",
     name: "tehMainReply"
+  },
+  optional: {
+    entry: "./src/optional.js",
+    name: "tehOptional"
   }
 };
 

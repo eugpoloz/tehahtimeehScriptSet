@@ -564,7 +564,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:^4.18.1":
+"lodash-es@npm:4.18.1":
   version: 4.18.1
   resolution: "lodash-es@npm:4.18.1"
   checksum: 10/8bfad225ef09ef42b04283cdaf7830efcc2ba29ae41b56501c74422155ee1ccaa1f0f6e8319def3451a1fe54dec501c8e4bee622bae2b2d98ac993731e0a5cce
@@ -932,7 +932,7 @@ __metadata:
   dependencies:
     dompurify: "npm:^3.3.3"
     idb: "npm:^8.0.3"
-    lodash-es: "npm:^4.18.1"
+    lodash-es: "npm:4.18.1"
     prettier: "npm:^3.8.1"
     vite: "npm:^8.0.5"
   languageName: unknown
