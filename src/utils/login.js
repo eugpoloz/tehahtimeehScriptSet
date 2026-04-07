@@ -1,3 +1,7 @@
+import { handleError } from "./error";
+
+const HANDLE_LOGIN_MODULE_NAME = "utils/handleLogin";
+
 export const handleLogin = async ({ login, password } = {}) => {
   if (!login || !password) {
     return;
@@ -26,13 +30,16 @@ export const handleLogin = async ({ login, password } = {}) => {
       }
     );
 
+    console.log(`${HANDLE_LOGIN_MODULE_NAME} >>> response`, response);
+
     if (response.status === 200) {
-      window.location.replace(redirectUrl);
+      window.location.href = response.url ?? redirectUrl;
+      window.location.reload();
       return;
     } else {
-      throw new Error(`[bss] Failed to login: ${response.statusText}`);
+      throw new Error(`Failed to login: ${response.statusText}`);
     }
   } catch (error) {
-    handleError("utils/handleLogin", error);
+    handleError(HANDLE_LOGIN_MODULE_NAME, error);
   }
 };

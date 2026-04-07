@@ -25,7 +25,7 @@ async function getOrCreateKey(keyName) {
         false,
         ["encrypt", "decrypt"]
       );
-  
+
       await db.put(STORE_NAME, key, keyName);
     }
 
