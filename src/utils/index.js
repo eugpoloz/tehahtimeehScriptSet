@@ -1,6 +1,7 @@
 import { handleLogin } from "./login";
 import { handleError } from "./error";
 import { decryptAndLoad, encryptAndSave } from "./crypto";
+import { getResponse, parseHTMLResponse } from "./getResponseParser";
 
 export const viewprofile = document.getElementById("viewprofile-next");
 
@@ -13,4 +14,11 @@ export const hasTopic = typeof FORUM.topic === "object";
 
 export const getLang = () => document.documentElement.lang ?? "ru";
 
-export { handleLogin, handleError, decryptAndLoad, encryptAndSave };
+export {
+  handleLogin,
+  handleError,
+  decryptAndLoad,
+  encryptAndSave,
+  getResponse,
+  parseHTMLResponse
+};

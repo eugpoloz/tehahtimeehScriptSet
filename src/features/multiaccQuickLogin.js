@@ -1,4 +1,11 @@
-import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "../utils";
+import {
+  getLang,
+  handleLogin,
+  decryptAndLoad,
+  encryptAndSave,
+  getResponse,
+  parseHTMLResponse
+} from "../utils";
 
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
@@ -118,19 +125,8 @@ const handleQuickLogin = async (e) => {
 const getVIPMultiAccList = async () => {
   const url = `/profile.php?section=multi&id=${window.UserID}`;
 
-  const profileResponse = await fetch(`${url}&nohead`, {
-    method: "GET",
-    credentials: "include"
-  });
-  const profileHTML = await profileResponse.arrayBuffer().then((buffer) => {
-    const decoder = new TextDecoder("windows-1251"); // Or 'koi8-r'
-    const text = decoder.decode(buffer);
-    return text;
-  });
-
-  const parser = new DOMParser();
-
-  const profile9 = parser.parseFromString(profileHTML, "text/html");
+  const profileResponse = await getResponse(url);
+  const profile9 = await parseHTMLResponse(profileResponse);
 
   return profile9.querySelectorAll("#profile9 .list li");
 };
