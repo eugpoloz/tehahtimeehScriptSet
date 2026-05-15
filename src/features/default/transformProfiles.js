@@ -2,9 +2,9 @@ import DOMPurify from "dompurify";
 import { hasTopic } from "../../utils";
 
 const handleOnlineIndicators = (post) => {
-  const isOnline = post
-    .querySelector(".post-author")
-    .classList.contains("online");
+  const postAuthor = post.querySelector(".post-author");
+
+  const isOnline = postAuthor.classList.contains("online");
 
   const paOnline = post.querySelector(".pa-online");
   const paLastVisit = post.querySelector(".pa-last-visit");
@@ -18,12 +18,12 @@ const handleOnlineIndicators = (post) => {
     }"`;
     const status = isOnline ? "on" : "off";
 
-    const html = `<li class="pa-online" data-ready="1" data-online=${status} title=${title}></li>`;
+    const html = `<div class="pa-online" data-ready="1" data-online=${status} title=${title}></div>`;
 
     paOnline?.remove();
     paLastVisit?.remove();
 
-    post.querySelector(".pa-posts").insertAdjacentHTML("beforebegin", html);
+    postAuthor.insertAdjacentHTML("beforeend", html);
   }
 };
 
