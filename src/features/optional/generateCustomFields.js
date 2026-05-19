@@ -131,6 +131,18 @@ const generateCustomFields = async ({
     return;
   }
 
+  const initialContainer = document.createElement("div");
+  initialContainer.innerHTML = formFld.value;
+
+  fieldset
+    .querySelector(".fs-box")
+    .insertAdjacentHTML(
+      "afterbegin",
+      `<article class="teh-customFld" id="custom-flds" hidden></article>`
+    );
+
+  const customFldsContainer = document.getElementById("custom-flds");
+
   const refreshCustomizationFld = () => {
     const inputsArr = Array.from(customFldsContainer.querySelectorAll("input"));
 
@@ -165,18 +177,6 @@ const generateCustomFields = async ({
 
     formFld.value = updatedContents.trimEnd();
   };
-
-  const initialContainer = document.createElement("div");
-  initialContainer.innerHTML = formFld.value;
-
-  fieldset
-    .querySelector(".fs-box")
-    .insertAdjacentHTML(
-      "afterbegin",
-      `<article class="teh-customFld" id="custom-flds" hidden></article>`
-    );
-
-  const customFldsContainer = document.getElementById("custom-flds");
 
   config.forEach((configFld) => {
     if (!configFld.userAccess && !access.hasFullAccess) {
