@@ -1,4 +1,10 @@
-import { hasProfile, isProperWindow } from "../../utils";
+import {
+  hasProfile,
+  isProperWindow,
+  isAMS,
+  handleError,
+  handleLogs
+} from "../../utils";
 
 const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
 
@@ -8,13 +14,8 @@ const getImgSrc = (container, proxy) => {
   return proxy && src.startsWith(proxy) ? src.split(proxy)[1] : src;
 };
 
-const getPreview = (mask, contents) => {
-  if (!contents) {
-    return "";
-  }
-
-  return !!mask ? mask(contents) : contents;
-};
+const getMaxLength = (maxlength) =>
+  !!maxlength ? `maxlength=${maxlength}` : "";
 
 const fieldConfig = [
   {
@@ -58,31 +59,76 @@ const fieldConfig = [
   }
 ];
 
-const generateCustomFields = ({
+const generateCustomFields = async ({
   fldId = "1",
   config = fieldConfig,
   proxy = "https://external-content.duckduckgo.com/iu/?u=",
+  // Персонажи, Персонажи в архиве
+  userAccessGroups = ["5", "7"],
   debug = true
 } = {}) => {
   const profileForm = document.getElementById("profile8");
 
   if (!isProperWindow || !hasProfile || !profileForm) {
     return;
-    // TODO: clean up event listeners?
   }
 
+  let profileGroupID;
+
+  const profileId = new URLSearchParams(window.location.search).get("id");
+  if (profileId !== UserID) {
+    // get user data from API for access controls
+    try {
+      const data = await fetch(
+        `${window.location.origin}/api.php?method=users.get&fields=user_id,username,group_id&limit=200&user_id=${profileId}`
+      );
+
+      const response = await data.json();
+
+      let { users } = response.response;
+
+      profileGroupID = users[0].group_id;
+    } catch (e) {
+      handleError(CUSTOMFLDS_MODULE_NAME, e);
+    }
+  } else {
+    profileGroupID = GroupID;
+  }
+
+  const access = {
+    hasUserAccess: ["1", "2", ...userAccessGroups].some(
+      (groupId) => groupId === profileGroupID
+    ),
+    hasFullAccess: ["1", "2"].some((groupId) => groupId === profileGroupID)
+  };
+
+  // lets see
+  handleLogs(
+    {
+      debug,
+      module: CUSTOMFLDS_MODULE_NAME,
+      message: "custom fld access"
+    },
+    {
+      profileId,
+      profileGroupID,
+      access
+    }
+  );
+
   const fldSelector = `[name="form[fld${fldId}]"]`;
-  const hasFullAccess = document
-    .querySelector("#pun")
-    .classList.contains("isadmin");
 
   const formFld = profileForm.querySelector(fldSelector);
   const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
 
-  if (!hasFullAccess) {
+  if (!isAMS) {
     fieldset.querySelector(".areafield").setAttribute("hidden", "");
   } else {
     formFld.setAttribute("readonly", "");
+  }
+
+  if (!access.hasUserAccess) {
+    return;
   }
 
   const refreshCustomizationFld = () => {
@@ -102,10 +148,14 @@ const generateCustomFields = ({
       configFld.inputs.forEach((input, i) => {
         const currentValue = sectionInputsArr[i].value;
 
-        fldContents += getPreview(
-          input.mask,
-          input.type === "img" ? proxy + currentValue : currentValue
-        );
+        if (!currentValue) {
+          return;
+        }
+
+        const proxifiedValue =
+          input.type === "img" ? proxy + currentValue : currentValue;
+
+        fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
       });
 
       updatedContents += !!fldContents
@@ -129,7 +179,7 @@ const generateCustomFields = ({
   const customFldsContainer = document.getElementById("custom-flds");
 
   config.forEach((configFld) => {
-    if (!configFld.userAccess && GroupID > 2) {
+    if (!configFld.userAccess && !access.hasFullAccess) {
       return;
     }
 
@@ -167,14 +217,14 @@ const generateCustomFields = ({
         `<label>
           <span>${input.label}</span>
           <br/>
-          <input type="text" maxlength=${input.maxlength ? input.maxlength : undefined} />
+          <input type="text" ${getMaxLength(input.maxlength)} />
         </label>`
       );
 
       // create & insert initial preview
       previewContainer.insertAdjacentHTML(
         "beforeend",
-        getPreview(input.mask, contents)
+        input.mask?.(contents) ?? contents
       );
 
       const labelNode = fieldContainer.querySelectorAll("label")[i];
