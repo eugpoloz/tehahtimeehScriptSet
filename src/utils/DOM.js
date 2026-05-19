@@ -11,4 +11,11 @@ const getLang = () => document.documentElement.lang ?? "ru";
 
 const isProperWindow = window.self === window.top && !window.opener;
 
-export { viewprofile, hasProfile, hasTopic, getLang, isProperWindow };
+const isAMS = () => {
+  const amsClasses = ["isadmin", "ismoderator"];
+  const punEl = document.getElementById("pun");
+
+  return amsClasses.some((cls) => punEl.classList.contains(cls));
+};
+
+export { viewprofile, hasProfile, hasTopic, getLang, isProperWindow, isAMS };

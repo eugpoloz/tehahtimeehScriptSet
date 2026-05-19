@@ -6,7 +6,8 @@ import {
   hasProfile,
   hasTopic,
   getLang,
-  isProperWindow
+  isProperWindow,
+  isAMS
 } from "./DOM";
 
 export {
@@ -20,5 +21,6 @@ export {
   hasProfile,
   hasTopic,
   getLang,
-  isProperWindow
+  isProperWindow,
+  isAMS
 };
