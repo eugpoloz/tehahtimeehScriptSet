@@ -1,7 +1,13 @@
 import { handleLogin } from "./login";
 import { getLoggerModuleName, handleLogs, handleError } from "./logger";
 import { decryptAndLoad, encryptAndSave } from "./crypto";
-import { viewprofile, hasProfile, hasTopic, getLang } from "./DOM";
+import {
+  viewprofile,
+  hasProfile,
+  hasTopic,
+  getLang,
+  isProperWindow
+} from "./DOM";
 
 export {
   handleLogin,
@@ -13,5 +19,6 @@ export {
   viewprofile,
   hasProfile,
   hasTopic,
-  getLang
+  getLang,
+  isProperWindow
 };

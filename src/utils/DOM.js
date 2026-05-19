@@ -9,4 +9,6 @@ const hasTopic = typeof FORUM.topic === "object";
 
 const getLang = () => document.documentElement.lang ?? "ru";
 
-export { viewprofile, hasProfile, hasTopic, getLang };
+const isProperWindow = window.self === window.top && !window.opener;
+
+export { viewprofile, hasProfile, hasTopic, getLang, isProperWindow };
