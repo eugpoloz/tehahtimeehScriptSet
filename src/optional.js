@@ -11,9 +11,10 @@
 */
 
 import generateRandomPortraits from "./features/optional/generateRandomPortraits";
+import generateCustomFields from "./features/optional/generateCustomFields";
 
 // module exports
-export { generateRandomPortraits };
+export { generateCustomFields, generateRandomPortraits };
 
 // config example
 //
