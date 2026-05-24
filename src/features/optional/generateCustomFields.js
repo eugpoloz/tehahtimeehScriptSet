@@ -23,8 +23,13 @@ const fieldConfig = [
     inputs: [
       {
         label: "Иконка",
+        name: "icon",
         type: "img",
-        mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`
+        mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`,
+        options: [
+          "https://cdn.imgchest.com/files/7b7d928ec1eb.png",
+          "https://cdn.imgchest.com/files/5bf991bab422.png"
+        ]
       }
     ],
     userAccess: true
@@ -34,11 +39,17 @@ const fieldConfig = [
     inputs: [
       {
         label: "Плашка",
+        name: "plashka",
         type: "img",
-        mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`
+        mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
+        options: [
+          "https://cdn.imgchest.com/files/c37f246a483c.png",
+          "https://cdn.imgchest.com/files/dd7a83b76718.png"
+        ]
       },
       {
         label: "Текст плашки",
+        name: "plashka-txt",
         type: "text",
         mask: (text) => `<p>${text}</p>`
       }
@@ -49,7 +60,7 @@ const fieldConfig = [
     name: "admin",
     inputs: [
       {
-        label: "Дополнительный статус",
+        label: "Дополнительный статус АМС",
         type: "text",
         maxlength: "38",
         mask: (text) => `<span>${text}</span>`
@@ -214,14 +225,14 @@ const generateCustomFields = async ({
           ? getImgSrc(initialFldContainer, proxy)
           : (initialFldContainer?.innerText ?? "");
 
+      const inputId = `input_${input.name}`;
       // create label & input
       fieldContainer.insertAdjacentHTML(
         "beforeend",
-        `<label>
-          <span>${input.label}</span>
-          <br/>
-          <input type="text" ${getMaxLength(input.maxlength)} />
-        </label>`
+        `<div data-fld-container-for="${inputId}">
+          <label for="${inputId}">${input.label}</label>
+          <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} />
+        </div>`
       );
 
       // create & insert initial preview
@@ -230,8 +241,9 @@ const generateCustomFields = async ({
         input.mask?.(contents) ?? contents
       );
 
-      const labelNode = fieldContainer.querySelectorAll("label")[i];
-      const inputNode = labelNode.querySelector("input");
+      const inputNode = fieldContainer.querySelector(
+        `[data-fld-container-for="${inputId}"] #${inputId}`
+      );
       const previewNode = Array.from(previewContainer.childNodes)[i];
 
       // set input value & event listener?
