@@ -121,10 +121,9 @@ const generateCustomFields = async ({
   const formFld = profileForm.querySelector(fldSelector);
   const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
 
+  formFld.setAttribute("readonly", "");
   if (!isAMS) {
     fieldset.querySelector(".areafield").setAttribute("hidden", "");
-  } else {
-    formFld.setAttribute("readonly", "");
   }
 
   if (!access.hasUserAccess) {
@@ -149,6 +148,10 @@ const generateCustomFields = async ({
     let updatedContents = "";
 
     config.forEach((configFld, i) => {
+      if (!configFld.userAccess && !access.hasFullAccess) {
+        return;
+      }
+
       let fldContents = "";
 
       const sectionInputsArr = Array.from(
