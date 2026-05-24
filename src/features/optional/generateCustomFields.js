@@ -27,8 +27,12 @@ const fieldConfig = [
         type: "img",
         mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`,
         options: [
-          "https://cdn.imgchest.com/files/7b7d928ec1eb.png",
-          "https://cdn.imgchest.com/files/5bf991bab422.png"
+          {
+            value: "https://cdn.imgchest.com/files/7b7d928ec1eb.png"
+          },
+          {
+            value: "https://cdn.imgchest.com/files/5bf991bab422.png"
+          }
         ]
       }
     ],
@@ -43,8 +47,12 @@ const fieldConfig = [
         type: "img",
         mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
         options: [
-          "https://cdn.imgchest.com/files/c37f246a483c.png",
-          "https://cdn.imgchest.com/files/dd7a83b76718.png"
+          {
+            value: "https://cdn.imgchest.com/files/c37f246a483c.png"
+          },
+          {
+            value: "https://cdn.imgchest.com/files/dd7a83b76718.png"
+          }
         ]
       },
       {
@@ -154,7 +162,9 @@ const generateCustomFields = async ({
   const customFldsContainer = document.getElementById("custom-flds");
 
   const refreshCustomizationFld = () => {
-    const inputsArr = Array.from(customFldsContainer.querySelectorAll("input"));
+    const inputsArr = Array.from(
+      customFldsContainer.querySelectorAll(`input[type="text"]`)
+    );
 
     let updatedContents = "";
 
@@ -168,7 +178,7 @@ const generateCustomFields = async ({
       const sectionInputsArr = Array.from(
         document
           .getElementById(`custom-fld-${configFld.name}`)
-          .querySelectorAll("input")
+          .querySelectorAll(`input[type="text"]`)
       );
 
       configFld.inputs.forEach((input, i) => {
@@ -218,6 +228,20 @@ const generateCustomFields = async ({
     const fieldContainer = document.getElementById(sectionFldsId);
     const previewContainer = document.getElementById(sectionPreviewId);
 
+    // lets see
+    // handleLogs(
+    //   {
+    //     debug,
+    //     module: CUSTOMFLDS_MODULE_NAME,
+    //     message: "containers created"
+    //   },
+    //   {
+    //     section,
+    //     fieldContainer,
+    //     previewContainer
+    //   }
+    // );
+
     // create fields from config
     configFld.inputs.forEach((input, i) => {
       const contents =
@@ -225,12 +249,34 @@ const generateCustomFields = async ({
           ? getImgSrc(initialFldContainer, proxy)
           : (initialFldContainer?.innerText ?? "");
 
+      let optionsHTML = "";
+      if (input.options) {
+        input.options.forEach((option) => {
+          const optionLabel =
+            input.type === "img" ? proxy + option.value : option.value;
+
+          const dataAttr =
+            input.name === configFld.name
+              ? ` data-custom-fld="${configFld.name}"`
+              : "";
+
+          const html = `<label>
+            <span${dataAttr}>${input.mask?.(optionLabel) ?? optionLabel}</span>
+            <input type="radio" name="${input.name}" value="${option.value}" />
+          </label>`;
+
+          optionsHTML += html;
+        });
+      }
+
       const inputId = `input_${input.name}`;
+
       // create label & input
       fieldContainer.insertAdjacentHTML(
         "beforeend",
-        `<div data-fld-container-for="${inputId}">
-          <label for="${inputId}">${input.label}</label>
+        `<div>
+          <strong>${input.label}</strong>
+          ${optionsHTML.length ? `<div>${optionsHTML}</div>` : ""}
           <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} />
         </div>`
       );
@@ -241,15 +287,39 @@ const generateCustomFields = async ({
         input.mask?.(contents) ?? contents
       );
 
-      const inputNode = fieldContainer.querySelector(
-        `[data-fld-container-for="${inputId}"] #${inputId}`
-      );
       const previewNode = Array.from(previewContainer.childNodes)[i];
+      const inputContainer = fieldContainer.querySelector(
+        `div:has(#${inputId})`
+      );
+      const inputNode = document.getElementById(inputId);
+
+      // handle options
+      const optionNodesArr = Array.from(
+        inputContainer.querySelectorAll(`input[type="radio"]`)
+      );
+      const selectExistingOption = (value) => {
+        if (!input.options) {
+          return;
+        }
+
+        const selectedOption = fieldContainer.querySelector(
+          `input[type="radio"][value="${value}"]`
+        );
+        if (selectedOption) {
+          selectedOption.checked = true;
+        } else {
+          optionNodesArr.forEach((optionInputNode) => {
+            optionInputNode.checked = false;
+          });
+        }
+      };
 
       // set input value & event listener?
       inputNode.value = contents;
-      const handleInputChange = (e) => {
-        // refresh preview
+      selectExistingOption(contents);
+
+      // refresh preview
+      const updatePreviewOnInputChange = (value) => {
         switch (input.type) {
           case "img":
             const previewImg =
@@ -257,17 +327,38 @@ const generateCustomFields = async ({
                 ? previewNode
                 : previewNode.querySelector("img");
 
-            previewImg.setAttribute("src", e.target.value);
+            previewImg.setAttribute("src", value);
             break;
           case "text":
           default:
-            previewNode.innerHTML = e.target.value;
+            previewNode.innerHTML = value;
             break;
         }
-
-        refreshCustomizationFld();
       };
-      inputNode.addEventListener("change", handleInputChange, true);
+
+      const handleTextInputChange = (e) => {
+        updatePreviewOnInputChange(e.target.value);
+        refreshCustomizationFld();
+
+        selectExistingOption(e.target.value);
+      };
+      inputNode.addEventListener("change", handleTextInputChange, true);
+
+      if (input.options) {
+        const handleRadioInputChange = (e) => {
+          inputNode.value = e.target.value;
+
+          updatePreviewOnInputChange(e.target.value);
+          refreshCustomizationFld();
+        };
+        optionNodesArr.forEach((optionInputNode) => {
+          optionInputNode.addEventListener(
+            "change",
+            handleRadioInputChange,
+            true
+          );
+        });
+      }
     });
   });
 
