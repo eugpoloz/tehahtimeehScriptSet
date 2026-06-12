@@ -1,7 +1,7 @@
 import debounce from "lodash-es/debounce";
 
 export default function countCharacters(counterText = "Знаков в сообщении") {
-  const counterId = "bss-charcounter";
+  const counterId = "teh-charcounter";
 
   const html = `<div id=${counterId} class="charcounter">${counterText}: <strong class="count">0</strong></div>`;
 
@@ -23,8 +23,8 @@ export default function countCharacters(counterText = "Знаков в сооб�
     );
 
     if (textarea instanceof HTMLTextAreaElement) {
-      const bssTarget = document.querySelector("#bss-target");
-      bssTarget?.insertAdjacentHTML("beforeend", html);
+      const tehTarget = document.querySelector("#teh-target");
+      tehTarget?.insertAdjacentHTML("beforeend", html);
 
       if (typeof FORUM.topic === "object") {
         const id = window.location.search.substr(4);

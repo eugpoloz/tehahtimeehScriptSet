@@ -77,7 +77,7 @@ const getMultiaccEncryptedData = async () => {
 };
 
 const setFormBusy = () => {
-  const form = document.querySelector("#bss-multiacc-quick-login section.form");
+  const form = document.querySelector("#teh-multiacc-quick-login section.form");
   if (form) {
     form.classList.add("busy");
   }
@@ -239,7 +239,7 @@ const multiaccQuickLogin = () => {
   const lang = getLang();
   const link = { en: "Re-login", ru: "Перезайти" }[lang];
 
-  const html = `<div id="bss-multiacc-quick-login" class="bss-multiacc-quick-login">
+  const html = `<div id="teh-multiacc-quick-login" class="teh-multiacc-quick-login">
     <div class="container">
       <div class="wrapper">
         <h3>Быстрый вход</h3>
@@ -270,13 +270,13 @@ const multiaccQuickLogin = () => {
   document.querySelector(".js_relogin").addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const quickForm = document.getElementById("bss-multiacc-quick-login");
+    const quickForm = document.getElementById("teh-multiacc-quick-login");
     if (quickForm) {
       quickForm.classList.toggle("visible");
 
       const handleClickOutside = (eClickOutside) => {
         if (
-          !eClickOutside.target.closest("#bss-multiacc-quick-login .wrapper") &&
+          !eClickOutside.target.closest("#teh-multiacc-quick-login .wrapper") &&
           eClickOutside.target !== e.target
         ) {
           quickForm.classList.remove("visible");
