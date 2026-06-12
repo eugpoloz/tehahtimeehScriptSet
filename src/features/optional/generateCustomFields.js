@@ -92,9 +92,10 @@ const generateCustomFields = async ({
   const profileId = new URLSearchParams(window.location.search).get("id");
   if (profileId !== UserID) {
     // get user data from API for access controls
+    // TODO: check if this is in any way relevant actually???
     try {
       const data = await fetch(
-        `${window.location.origin}/api.php?method=users.get&fields=user_id,username,group_id&limit=200&user_id=${profileId}`
+        `${window.location.origin}/api.php?method=users.get&fields=user_id,username,group_id&limit=1&user_id=${profileId}`
       );
 
       const response = await data.json();
