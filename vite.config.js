@@ -24,11 +24,20 @@ const libConfig = {
       mainReply: NAMESPACE
     }
   },
-  optional: {
-    entry: "./src/optional.js",
+  generateCustomFields: {
+    entry: "./src/features/optional/generateCustomFields.js",
     emptyOutDir: false,
+    name: `${NAMESPACE}.generateCustomFields`,
     globals: {
-      optional: NAMESPACE
+      generateCustomFields: NAMESPACE
+    }
+  },
+  generateRandomPortraits: {
+    entry: "./src/features/optional/generateRandomPortraits.js",
+    emptyOutDir: false,
+    name: `${NAMESPACE}.generateRandomPortraits`,
+    globals: {
+      generateRandomPortraits: NAMESPACE
     }
   }
 };
@@ -43,7 +52,7 @@ export default defineConfig(() => ({
     emptyOutDir: currentConfig.emptyOutDir,
     lib: {
       entry: currentConfig.entry,
-      name: NAMESPACE,
+      name: currentConfig.name ?? NAMESPACE,
       fileName: (format, entryName) => `teh.${entryName}.${format}.js`,
       formats: ["iife"]
     },
@@ -52,7 +61,7 @@ export default defineConfig(() => ({
     },
     rolldownOptions: {
       output: {
-        name: NAMESPACE,
+        name: currentConfig.name ?? NAMESPACE,
         extend: true,
         globals: currentConfig.globals ?? {},
         generatedCode: {
