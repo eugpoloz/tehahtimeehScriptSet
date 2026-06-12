@@ -12,11 +12,11 @@ export default function submitPostOnHotkey() {
       }
 
       textarea.addEventListener("keydown", checkClicked);
+
+      const tehTarget = document.querySelector("#teh-target");
+      const html = `<div id="teh-fastsubmit" class="fastsubmit">Для быстрой отправки нажмите <strong><kbd>Ctrl</kbd>+<kbd>Enter</kbd></strong> (<strong><kbd>Cmd</kbd>+<kbd>Enter</kbd></strong> для Mac).</div>`;
+
+      tehTarget?.insertAdjacentHTML("afterbegin", html);
     }
-
-    const bssTarget = document.querySelector("#bss-target");
-    const html = `<div id="bss-fastsubmit" class="fastsubmit">Для быстрой отправки нажмите <strong>Ctrl+Enter</strong> (<strong>Cmd+Enter</strong>).</div>`;
-
-    bssTarget?.insertAdjacentHTML("afterbegin", html);
   }
 }
