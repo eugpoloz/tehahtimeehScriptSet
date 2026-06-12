@@ -1,10 +1,4 @@
-import {
-  hasProfile,
-  isProperWindow,
-  isAMS,
-  handleError,
-  handleLogs
-} from "../../utils";
+import { hasProfile, isProperWindow, isAMS, handleError } from "../../utils";
 
 const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
 
@@ -59,6 +53,7 @@ const fieldConfig = [
         label: "Текст плашки",
         name: "plashka-txt",
         type: "text",
+        maxlength: "50",
         mask: (text) => `<p>${text}</p>`
       }
     ],
@@ -71,7 +66,7 @@ const fieldConfig = [
         label: "Дополнительный статус АМС",
         type: "text",
         maxlength: "38",
-        mask: (text) => `<span>${text}</span>`
+        mask: (text) => `<p>${text}</p>`
       }
     ],
     userAccess: false
@@ -120,20 +115,6 @@ const generateCustomFields = async ({
     ),
     hasFullAccess: ["1", "2"].some((groupId) => groupId === profileGroupID)
   };
-
-  // lets see
-  handleLogs(
-    {
-      debug,
-      module: CUSTOMFLDS_MODULE_NAME,
-      message: "custom fld access"
-    },
-    {
-      profileId,
-      profileGroupID,
-      access
-    }
-  );
 
   const fldSelector = `[name="form[fld${fldId}]"]`;
 
@@ -228,26 +209,12 @@ const generateCustomFields = async ({
     const fieldContainer = document.getElementById(sectionFldsId);
     const previewContainer = document.getElementById(sectionPreviewId);
 
-    // lets see
-    // handleLogs(
-    //   {
-    //     debug,
-    //     module: CUSTOMFLDS_MODULE_NAME,
-    //     message: "containers created"
-    //   },
-    //   {
-    //     section,
-    //     fieldContainer,
-    //     previewContainer
-    //   }
-    // );
-
     // create fields from config
     configFld.inputs.forEach((input, i) => {
       const contents =
         input.type === "img"
           ? getImgSrc(initialFldContainer, proxy)
-          : (initialFldContainer?.innerText ?? "");
+          : (initialFldContainer?.querySelector("p").innerHTML ?? "");
 
       let optionsHTML = "";
       if (input.options) {
