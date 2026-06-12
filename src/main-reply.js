@@ -1,15 +1,5 @@
 "use strict";
 
-/*
-  tehahtimeehScriptSet/tehMainReply
-  author: eugpoloz (грандоченька смерти)
-  license: MIT
-
-  вопросы и поддержка:
-  — https://github.com/eugpoloz/tehahtimeehScriptSet
-  — http://urchoice.rolka.su/profile.php?id=4789
-*/
-
 import countTextareaCharacters from "./features/textarea/charCounter";
 import submitOnHotkey from "./features/textarea/fastSubmit";
 import * as refactorEditorButtons from "./features/textarea/refactorEditorButtons";
@@ -24,9 +14,9 @@ export { submitOnHotkey, countTextareaCharacters, addEditorButtons };
 
 // config example
 //
-//tehMainReply.submitOnHotkey();
-//tehMainReply.countTextareaCharacters();
-//tehMainReply.addEditorButtons([
+//teh.submitOnHotkey();
+//teh.countTextareaCharacters();
+//teh.addEditorButtons([
 //  {
 //    target: "button-strike",
 //    id: "button-indent",

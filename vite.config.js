@@ -1,21 +1,35 @@
 import path from "path";
 import { defineConfig, build } from "vite";
 
-const LIB = process.env.LIB ?? "htmlFooter";
+const LIB = process.env.LIB ?? "core";
+const NAMESPACE = "teh";
 
 // libraries
 const libConfig = {
+  core: {
+    entry: "./src/core.js",
+    emptyOutDir: true
+  },
   htmlFooter: {
     entry: "./src/html-footer.js",
-    name: "tehFooter"
+    emptyOutDir: false,
+    globals: {
+      footer: NAMESPACE
+    }
   },
   mainReply: {
     entry: "./src/main-reply.js",
-    name: "tehMainReply"
+    emptyOutDir: false,
+    globals: {
+      mainReply: NAMESPACE
+    }
   },
   optional: {
     entry: "./src/optional.js",
-    name: "tehOptional"
+    emptyOutDir: false,
+    globals: {
+      optional: NAMESPACE
+    }
   }
 };
 
@@ -25,11 +39,11 @@ export default defineConfig(() => ({
   build: {
     target: ["chrome87", "edge88", "firefox78", "safari14"],
     sourcemap: false,
-    minify: false,
-    emptyOutDir: false,
+    minify: true,
+    emptyOutDir: currentConfig.emptyOutDir,
     lib: {
       entry: currentConfig.entry,
-      name: currentConfig.name,
+      name: NAMESPACE,
       fileName: (format, entryName) => `teh.${entryName}.${format}.js`,
       formats: ["iife"]
     },
@@ -38,8 +52,14 @@ export default defineConfig(() => ({
     },
     rolldownOptions: {
       output: {
+        name: NAMESPACE,
+        extend: true,
+        globals: currentConfig.globals ?? {},
         generatedCode: {
           symbols: false
+        },
+        comments: {
+          legal: true
         }
       }
     },

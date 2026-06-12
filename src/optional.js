@@ -1,15 +1,5 @@
 "use strict";
 
-/*
-  tehahtimeehScriptSet/tehOptional
-  author: eugpoloz (грандоченька смерти)
-  license: MIT
-
-  вопросы и поддержка:
-  — https://github.com/eugpoloz/tehahtimeehScriptSet
-  — http://urchoice.rolka.su/profile.php?id=4789
-*/
-
 import generateRandomPortraits from "./features/optional/generateRandomPortraits";
 import generateCustomFields from "./features/optional/generateCustomFields";
 
@@ -18,7 +8,7 @@ export { generateCustomFields, generateRandomPortraits };
 
 // config example
 //
-//tehOptional.generateRandomPortraits({
+//teh.generateRandomPortraits({
 //  howMany: 4,
 //  group_id: [1, 2, 5],
 //  filteredUsers: ["Hedge Bitch"],
