@@ -1,15 +1,5 @@
 "use strict";
 
-/*
-  tehahtimeehScriptSet/tehFooter
-  author: eugpoloz (грандоченька смерти)
-  license: MIT
-
-  вопросы и поддержка:
-  — https://github.com/eugpoloz/tehahtimeehScriptSet
-  — http://urchoice.rolka.su/profile.php?id=4789
-*/
-
 import transformProfiles from "./features/default/transformProfiles";
 import addProfileLinkToPosts from "./features/default/addProfileLinkToPosts";
 
@@ -48,8 +38,8 @@ export {
 
 // possible config for reference:
 
-//tehFooter.enhanceReactions();
-//tehFooter.createFastLoginLinks({
+//teh.enhanceReactions();
+//teh.createFastLoginLinks({
 //  logins: [
 //    {
 //      id: 'navreader',
@@ -64,13 +54,13 @@ export {
 //    }
 //  ]
 //});
-//tehFooter.disableProfiles({
+//teh.disableProfiles({
 //  profiles: [4],
 //  message: "Don't even think about it!"
 //});
-//tehFooter.countPostsInTopic({
+//teh.countPostsInTopic({
 //  fldId: "5",
 //  forumsToTrack: [7, 8, 16, 18],
 //  countTopicStarter: false
 //});
-//tehFooter.transformProfiles();
+//teh.transformProfiles();
