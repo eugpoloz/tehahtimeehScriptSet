@@ -1,3 +1,5 @@
+import { getSubject } from "../../utils/DOM";
+
 const defineWebComponents = () => {
   class ThemeSubject extends HTMLElement {
     constructor() {
@@ -25,12 +27,7 @@ const defineWebComponents = () => {
           .map((node) => node.textContent)
           .join("\n");
       } else {
-        const input = document.querySelector('input[name="req_subject"]');
-        const h1 = document.querySelector("#pun-main h1");
-
-        const episodeSubject = (input ? input.value : h1.textContent).split(
-          /[|/\\\\]/
-        );
+        const episodeSubject = getSubject(this).split(/[|/\\\\]/);
 
         content =
           episodeSubject.length > 1
