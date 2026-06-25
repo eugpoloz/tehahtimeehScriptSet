@@ -1,6 +1,6 @@
 {
   "name": "tehahtimeeh-script-set",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -12,14 +12,15 @@
     "./html-footer": "./dist/teh.html-footer.iife.js",
     "./main-reply": "./dist/teh.main-reply.iife.js",
     "./generateRandomPortraits": "./dist/teh.generateRandomPortraits.iife.js",
-    "./generateCustomFields": "./dist/teh.generateCustomFields.iife.js"
+    "./generateCustomFields": "./dist/teh.generateCustomFields.iife.js",
+    "./defineWebComponents": "./dist/teh.defineWebComponents.iife.js"
   },
   "dependencies": {
     "vite": "^8.0.5"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && LIB=htmlFooter vite build && LIB=mainReply vite build && LIB=generateRandomPortraits vite build && LIB=generateCustomFields vite build",
+    "build": "vite build && LIB=htmlFooter vite build && LIB=mainReply vite build && LIB=generateRandomPortraits vite build && LIB=generateCustomFields vite build && LIB=defineWebComponents vite build",
     "preview": "vite preview"
   },
   "devDependencies": {

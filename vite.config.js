@@ -39,6 +39,14 @@ const libConfig = {
     globals: {
       generateRandomPortraits: NAMESPACE
     }
+  },
+  defineWebComponents: {
+    entry: "./src/features/optional/defineWebComponents.js",
+    emptyOutDir: false,
+    name: `${NAMESPACE}.defineWebComponents`,
+    globals: {
+      defineWebComponents: NAMESPACE
+    }
   }
 };
 
