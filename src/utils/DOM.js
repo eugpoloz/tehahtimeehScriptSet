@@ -17,3 +17,19 @@ export const isAMS = () => {
 
   return amsClasses.some((cls) => punEl.classList.contains(cls));
 };
+
+export const getSubject = (webComponent) => {
+  const punbbId = document.querySelector(".punbb").getAttribute("id");
+
+  switch (punbbId) {
+    case "pun-edit":
+    case "pun-post":
+      return document.querySelector("input[name='req_subject']").value;
+    case "pun-searchposts":
+      return webComponent
+        .closest(".post")
+        .querySelector("h3 a[href^=viewtopic]").innerText;
+    default:
+      return document.querySelector("#pun-main h1").textContent;
+  }
+};
