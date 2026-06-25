@@ -9,7 +9,7 @@ const base64ToBuffer = (base64) =>
 const DB_NAME = "tehahtimeehScriptSetDB";
 const STORE_NAME = "keys";
 
-async function getOrCreateKey(keyName) {
+export async function getOrCreateKey(keyName) {
   try {
     const db = await openDB(DB_NAME, 1, {
       upgrade(db) {
@@ -35,7 +35,7 @@ async function getOrCreateKey(keyName) {
   }
 }
 
-async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
+export async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
   try {
     const key = await getOrCreateKey(encryptionKey);
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -57,7 +57,7 @@ async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
   }
 }
 
-async function decryptAndLoad({ encryptionKey, localStorageKey }) {
+export async function decryptAndLoad({ encryptionKey, localStorageKey }) {
   try {
     const bundle = JSON.parse(localStorage.getItem(localStorageKey));
 
@@ -78,5 +78,3 @@ async function decryptAndLoad({ encryptionKey, localStorageKey }) {
     handleError("utils/crypto/decryptAndLoad", error);
   }
 }
-
-export { getOrCreateKey, encryptAndSave, decryptAndLoad };
