@@ -1,26 +1,4 @@
-import { handleLogin } from "./login";
-import { getLoggerModuleName, handleLogs, handleError } from "./logger";
-import { decryptAndLoad, encryptAndSave } from "./crypto";
-import {
-  viewprofile,
-  hasProfile,
-  hasTopic,
-  getLang,
-  isProperWindow,
-  isAMS
-} from "./DOM";
-
-export {
-  handleLogin,
-  getLoggerModuleName,
-  handleError,
-  handleLogs,
-  decryptAndLoad,
-  encryptAndSave,
-  viewprofile,
-  hasProfile,
-  hasTopic,
-  getLang,
-  isProperWindow,
-  isAMS
-};
+export * from "./crypto";
+export * from "./DOM";
+export * from "./logger";
+export * from "./login";
