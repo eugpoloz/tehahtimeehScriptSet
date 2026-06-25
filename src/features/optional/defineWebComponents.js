@@ -1,0 +1,53 @@
+const defineWebComponents = () => {
+  class ThemeSubject extends HTMLElement {
+    constructor() {
+      super();
+
+      this.attachShadow({ mode: "open", slotAssignment: "manual" });
+
+      this.shadowRoot.innerHTML = `
+        <style>p { margin-block: 0; }</style>
+        <p><slot id="subject">Название эпизода</slot></p>
+      `;
+    }
+
+    connectedCallback() {
+      this.updateSlots();
+    }
+
+    updateSlots() {
+      const subject = this.shadowRoot.getElementById("subject");
+
+      let content = "";
+
+      if (this.childNodes.length > 0) {
+        content = Array.from(this.childNodes)
+          .map((node) => node.textContent)
+          .join("\n");
+      } else {
+        const input = document.querySelector('input[name="req_subject"]');
+        const h1 = document.querySelector("#pun-main h1");
+
+        const episodeSubject = (input ? input.value : h1.textContent).split(
+          /[|/\\\\]/
+        );
+
+        content =
+          episodeSubject.length > 1
+            ? episodeSubject[1]
+            : episodeSubject.textContent;
+      }
+
+      this.innerHTML = "";
+
+      const slotNode = document.createTextNode(content.trim());
+      this.appendChild(slotNode);
+
+      subject.assign(slotNode);
+    }
+  }
+
+  customElements.define("theme-subject", ThemeSubject);
+};
+
+export default defineWebComponents;
