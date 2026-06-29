@@ -23,6 +23,10 @@ const fieldConfig = [
         mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`,
         options: [
           {
+            label: "<i class='material-symbols-sharp'>close</i>",
+            value: ""
+          },
+          {
             value: "https://cdn.imgchest.com/files/7b7d928ec1eb.png"
           },
           {
@@ -42,6 +46,10 @@ const fieldConfig = [
         type: "img",
         mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
         options: [
+          {
+            label: "<i class='material-symbols-sharp'>close</i>",
+            value: ""
+          },
           {
             value: "https://cdn.imgchest.com/files/c37f246a483c.png"
           },
@@ -249,7 +257,9 @@ const generateCustomFields = async ({
           const getOptionLabel = () => {
             switch (input.type) {
               case "img":
-                return proxy + option.value;
+                return option.value
+                  ? proxy + option.value
+                  : (option.label ?? option.value);
               default:
                 return option.label ?? option.value;
             }
@@ -261,9 +271,14 @@ const generateCustomFields = async ({
               ? ` data-custom-fld="${configFld.name}"`
               : "";
 
+          const optionLabelHTML =
+            !!option.value && !!input.mask
+              ? input.mask?.(optionLabel)
+              : optionLabel;
+
           const html = `<label>
-            <span${dataAttr}>${input.mask?.(optionLabel) ?? optionLabel}</span>
-            <input type="radio" name="${input.name}" value="${option.value}" />
+            <span${dataAttr}>${optionLabelHTML}</span>
+            <input type="radio" name="${input.name}" value="${option.value}"/>
           </label>`;
 
           optionsHTML += html;
@@ -278,22 +293,29 @@ const generateCustomFields = async ({
       // create label & input
       fieldContainer.insertAdjacentHTML(
         "beforeend",
-        `<div>
+        `<div id="${inputId}_fldContainer">
           <strong>${input.label}</strong>
           ${optionsHTML.length ? `<div>${optionsHTML}</div>` : ""}
           <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} ${isHiddenInput}/>
         </div>`
       );
 
-      // create & insert initial preview
-      previewContainer.insertAdjacentHTML(
-        "beforeend",
-        input.mask?.(contents) ?? contents
-      );
+      switch (input.type) {
+        case "text":
+        case "img":
+          // create & insert initial preview
+          previewContainer.insertAdjacentHTML(
+            "beforeend",
+            input.mask?.(contents) ?? contents
+          );
+          break;
+        default:
+          break;
+      }
 
       const previewNode = Array.from(previewContainer.childNodes)[i];
       const inputContainer = fieldContainer.querySelector(
-        `div:has(#${inputId})`
+        `div:has(> #${inputId})`
       );
       const inputNode = document.getElementById(inputId);
 
@@ -306,9 +328,10 @@ const generateCustomFields = async ({
           return;
         }
 
-        const selectedOption = fieldContainer.querySelector(
+        const selectedOption = inputContainer.querySelector(
           `input[type="radio"][value="${value}"]`
         );
+
         if (selectedOption) {
           selectedOption.checked = true;
         } else {
