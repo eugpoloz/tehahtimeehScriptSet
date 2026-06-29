@@ -56,6 +56,26 @@ const fieldConfig = [
         type: "text",
         maxlength: "50",
         mask: (text) => `<p>${text}</p>`
+      },
+      {
+        label: "Расположение текста плашки",
+        name: "justify",
+        type: "className",
+        options: [
+          {
+            label: "Слева",
+            value: "justify-start"
+          },
+          {
+            label: "По центру",
+            value: ""
+          },
+          {
+            label: "Справа",
+            value: "justify-end"
+          }
+        ],
+        strict: true
       }
     ],
     userAccess: true
@@ -134,6 +154,7 @@ const generateCustomFields = async ({
       }
 
       let fldContents = "";
+      let fldClassNames = "";
 
       const sectionInputsArr = Array.from(
         document
@@ -144,24 +165,37 @@ const generateCustomFields = async ({
       configFld.inputs.forEach((input, i) => {
         const currentValue = sectionInputsArr[i].value;
 
-        if (!currentValue) {
-          return;
-        }
-
         switch (input.type) {
           case "img":
+            if (!currentValue) {
+              return;
+            }
+
             const proxifiedValue = proxy + currentValue;
 
             fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
             break;
           case "text":
+            if (!currentValue) {
+              return;
+            }
+            
             fldContents += input.mask?.(currentValue) ?? currentValue;
+            break;
+          case "className":
+            fldClassNames += fldClassNames.length
+              ? " " + currentValue
+              : currentValue;
             break;
         }
       });
 
+      const fldClassNamesStr = fldClassNames.length
+        ? ` class="${fldClassNames.trim()}"`
+        : "";
+
       updatedContents += !!fldContents
-        ? `<div data-custom-fld="${configFld.name}">${fldContents}</div>\n`
+        ? `<div data-custom-fld="${configFld.name}"${fldClassNamesStr}>${fldContents}</div>\n`
         : "";
     });
 
@@ -202,6 +236,8 @@ const generateCustomFields = async ({
             return getImgSrc(initialFldContainer, proxy);
           case "text":
             return initialFldContainer?.querySelector("p").innerHTML ?? "";
+          case "className":
+            return initialFldContainer?.classList.toString() ?? "";
         }
       };
 
@@ -215,7 +251,7 @@ const generateCustomFields = async ({
               case "img":
                 return proxy + option.value;
               default:
-                return option.value;
+                return option.label ?? option.value;
             }
           };
           const optionLabel = getOptionLabel();
@@ -236,7 +272,8 @@ const generateCustomFields = async ({
 
       const inputId = `input_${input.name}`;
 
-      const isHiddenInput = !isAMS && input.options?.length ? "hidden" : "";
+      const isHiddenInput =
+        input.options?.length && (!isAMS() || input.strict) ? "hidden" : "";
 
       // create label & input
       fieldContainer.insertAdjacentHTML(
@@ -297,8 +334,16 @@ const generateCustomFields = async ({
             previewImg.setAttribute("src", value);
             break;
           case "text":
-          default:
             previewNode.innerHTML = value;
+            break;
+          case "className":
+            if (previewContainer.classList.length) {
+              previewContainer.removeAttribute("class");
+            }
+
+            if (value.length) {
+              previewContainer.classList.add(value);
+            }
             break;
         }
       };
