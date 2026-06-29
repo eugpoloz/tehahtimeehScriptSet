@@ -1,4 +1,5 @@
-import { hasProfile, isProperWindow, isAMS, handleError } from "../../utils";
+import { handleError } from "../../utils/logger";
+import { hasProfile, isProperWindow, isAMS } from "../../utils/DOM";
 
 const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
 
@@ -78,7 +79,7 @@ const generateCustomFields = async ({
   config = fieldConfig,
   proxy = "https://external-content.duckduckgo.com/iu/?u=",
   // Персонажи, Персонажи в архиве
-  userAccessGroups = ["5", "7"],
+  userAccessGroups = [5, 7],
   debug = true
 } = {}) => {
   const profileForm = document.getElementById("profile8");
@@ -87,34 +88,11 @@ const generateCustomFields = async ({
     return;
   }
 
-  let profileGroupID;
-
-  const profileId = new URLSearchParams(window.location.search).get("id");
-  if (profileId !== UserID) {
-    // get user data from API for access controls
-    // TODO: check if this is in any way relevant actually???
-    try {
-      const data = await fetch(
-        `${window.location.origin}/api.php?method=users.get&fields=user_id,username,group_id&limit=1&user_id=${profileId}`
-      );
-
-      const response = await data.json();
-
-      let { users } = response.response;
-
-      profileGroupID = users[0].group_id;
-    } catch (e) {
-      handleError(CUSTOMFLDS_MODULE_NAME, e);
-    }
-  } else {
-    profileGroupID = GroupID;
-  }
-
   const access = {
-    hasUserAccess: ["1", "2", ...userAccessGroups].some(
-      (groupId) => groupId === profileGroupID
+    hasUserAccess: [1, 2, ...userAccessGroups].some(
+      (groupId) => groupId === GroupID
     ),
-    hasFullAccess: ["1", "2"].some((groupId) => groupId === profileGroupID)
+    hasFullAccess: [1, 2].some((groupId) => groupId === GroupID)
   };
 
   const fldSelector = `[name="form[fld${fldId}]"]`;
@@ -245,7 +223,7 @@ const generateCustomFields = async ({
         `<div>
           <strong>${input.label}</strong>
           ${optionsHTML.length ? `<div>${optionsHTML}</div>` : ""}
-          <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} />
+          <input type="text" id="${inputId}" ${!isAMS && input.options ? "hidden" : ""}${getMaxLength(input.maxlength)} />
         </div>`
       );
 
