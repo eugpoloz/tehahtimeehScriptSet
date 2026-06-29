@@ -194,7 +194,6 @@ const generateCustomFields = async ({
             fldClassNames += fldClassNames.length
               ? " " + currentValue
               : currentValue;
-            break;
         }
       });
 
@@ -300,17 +299,19 @@ const generateCustomFields = async ({
         </div>`
       );
 
+      // create & insert initial preview
       switch (input.type) {
+        case "className":
+          if (contents.length) {
+            previewContainer.classList.add(contents);
+          }
+          break;
         case "text":
         case "img":
-          // create & insert initial preview
           previewContainer.insertAdjacentHTML(
             "beforeend",
             input.mask?.(contents) ?? contents
           );
-          break;
-        default:
-          break;
       }
 
       const previewNode = Array.from(previewContainer.childNodes)[i];
@@ -367,7 +368,6 @@ const generateCustomFields = async ({
             if (value.length) {
               previewContainer.classList.add(value);
             }
-            break;
         }
       };
 
