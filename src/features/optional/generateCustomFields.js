@@ -148,10 +148,16 @@ const generateCustomFields = async ({
           return;
         }
 
-        const proxifiedValue =
-          input.type === "img" ? proxy + currentValue : currentValue;
+        switch (input.type) {
+          case "img":
+            const proxifiedValue = proxy + currentValue;
 
-        fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
+            fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
+            break;
+          case "text":
+            fldContents += input.mask?.(currentValue) ?? currentValue;
+            break;
+        }
       });
 
       updatedContents += !!fldContents
@@ -190,16 +196,29 @@ const generateCustomFields = async ({
 
     // create fields from config
     configFld.inputs.forEach((input, i) => {
-      const contents =
-        input.type === "img"
-          ? getImgSrc(initialFldContainer, proxy)
-          : (initialFldContainer?.querySelector("p").innerHTML ?? "");
+      const getContents = () => {
+        switch (input.type) {
+          case "img":
+            return getImgSrc(initialFldContainer, proxy);
+          case "text":
+            return initialFldContainer?.querySelector("p").innerHTML ?? "";
+        }
+      };
+
+      const contents = getContents();
 
       let optionsHTML = "";
       if (input.options) {
         input.options.forEach((option) => {
-          const optionLabel =
-            input.type === "img" ? proxy + option.value : option.value;
+          const getOptionLabel = () => {
+            switch (input.type) {
+              case "img":
+                return proxy + option.value;
+              default:
+                return option.value;
+            }
+          };
+          const optionLabel = getOptionLabel();
 
           const dataAttr =
             input.name === configFld.name
@@ -217,13 +236,15 @@ const generateCustomFields = async ({
 
       const inputId = `input_${input.name}`;
 
+      const isHiddenInput = !isAMS && input.options?.length ? "hidden" : "";
+
       // create label & input
       fieldContainer.insertAdjacentHTML(
         "beforeend",
         `<div>
           <strong>${input.label}</strong>
           ${optionsHTML.length ? `<div>${optionsHTML}</div>` : ""}
-          <input type="text" id="${inputId}" ${!isAMS && input.options ? "hidden" : ""}${getMaxLength(input.maxlength)} />
+          <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} ${isHiddenInput}/>
         </div>`
       );
 
