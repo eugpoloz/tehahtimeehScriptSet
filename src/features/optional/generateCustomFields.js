@@ -1,6 +1,8 @@
 import { handleError } from "../../utils/logger";
 import { hasProfile, isProperWindow, isAMS } from "../../utils/DOM";
 
+import prefetchUserCollection from "./prefetchUserCollection";
+
 const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
 
 const getImgSrc = (container, proxy) => {
@@ -32,7 +34,8 @@ const fieldConfig = [
           {
             value: "https://cdn.imgchest.com/files/5bf991bab422.png"
           }
-        ]
+        ],
+        collection: true
       }
     ],
     userAccess: true
@@ -56,7 +59,8 @@ const fieldConfig = [
           {
             value: "https://cdn.imgchest.com/files/dd7a83b76718.png"
           }
-        ]
+        ],
+        collection: true
       },
       {
         label: "Текст плашки",
@@ -137,6 +141,16 @@ const generateCustomFields = async ({
     return;
   }
 
+  const shouldPrefetchCollection = config.some((config) =>
+    config.inputs.some((input) => input.collection)
+  );
+
+  if (shouldPrefetchCollection) {
+    console.log("generateCustomFields", { shouldPrefetchCollection });
+
+    // prefetchUserCollection();
+  }
+
   const initialContainer = document.createElement("div");
   initialContainer.innerHTML = formFld.value;
 
@@ -187,7 +201,7 @@ const generateCustomFields = async ({
             if (!currentValue) {
               return;
             }
-            
+
             fldContents += input.mask?.(currentValue) ?? currentValue;
             break;
           case "className":
@@ -250,8 +264,14 @@ const generateCustomFields = async ({
 
       const contents = getContents();
 
+      console.log("generateCustomFields", { contents });
+
       let optionsHTML = "";
       if (input.options) {
+        // if (input.collection) {
+        //   // get collection data here
+        // }
+
         input.options.forEach((option) => {
           const getOptionLabel = () => {
             switch (input.type) {
@@ -307,10 +327,19 @@ const generateCustomFields = async ({
           }
           break;
         case "text":
-        case "img":
           previewContainer.insertAdjacentHTML(
             "beforeend",
             input.mask?.(contents) ?? contents
+          );
+          break;
+        case "img":
+          const proxifiedContents = contents.length
+            ? proxy + contents
+            : contents;
+
+          previewContainer.insertAdjacentHTML(
+            "beforeend",
+            input.mask?.(proxifiedContents) ?? proxifiedContents
           );
       }
 
@@ -355,7 +384,7 @@ const generateCustomFields = async ({
                 ? previewNode
                 : previewNode.querySelector("img");
 
-            previewImg.setAttribute("src", value);
+            previewImg.setAttribute("src", value.length ? proxy + value : "");
             break;
           case "text":
             previewNode.innerHTML = value;
