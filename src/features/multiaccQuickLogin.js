@@ -123,7 +123,7 @@ const getVIPMultiAccList = async () => {
   try {
     const url = `/profile.php?section=multi&id=${window.UserID}`;
 
-    const profileResponse = await await fetch(`${url}&nohead`, {
+    const profileResponse = await fetch(`${url}&nohead`, {
       method: "GET",
       credentials: "include"
     });
