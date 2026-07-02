@@ -24,6 +24,14 @@ const libConfig = {
       mainReply: NAMESPACE
     }
   },
+  webComponents: {
+    entry: "./src/web-components.js",
+    emptyOutDir: false,
+    name: `${NAMESPACE}.webComponents`,
+    globals: {
+      webComponents: NAMESPACE
+    }
+  },
   generateCustomFields: {
     entry: "./src/features/optional/generateCustomFields.js",
     emptyOutDir: false,
@@ -38,14 +46,6 @@ const libConfig = {
     name: `${NAMESPACE}.generateRandomPortraits`,
     globals: {
       generateRandomPortraits: NAMESPACE
-    }
-  },
-  defineWebComponents: {
-    entry: "./src/features/optional/defineWebComponents.js",
-    emptyOutDir: false,
-    name: `${NAMESPACE}.defineWebComponents`,
-    globals: {
-      defineWebComponents: NAMESPACE
     }
   }
 };
