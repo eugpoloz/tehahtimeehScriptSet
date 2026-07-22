@@ -53,7 +53,7 @@ const files = {
     "@teh/utils": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^8.1.0"
+    "vite": "^8.1.5"
   }
 }
 `,
