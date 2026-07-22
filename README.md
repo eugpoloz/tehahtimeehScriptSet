@@ -17,6 +17,7 @@ scripts/
   multiacc-quick-login/      # → teh.multiaccQuickLogin.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
+  new-script.mjs             # used by `make new-script`
 ```
 
 ## Commands
@@ -33,7 +34,10 @@ make generate-random-portraits
 make multiacc-quick-login
 make clean     # remove scripts/*/dist
 make typecheck # JSDoc / checkJs via tsc --noEmit
+make new-script NAME=my-feature  # scaffold a new scripts/* package
 ```
+
+`NAME` must be kebab-case. That creates `scripts/<name>/`, wires Makefile + README, and runs `yarn install`. Export/global name is derived as camelCase (`my-feature` → `teh.myFeature`).
 
 Outputs land in each script package's `dist/` folder.
 
