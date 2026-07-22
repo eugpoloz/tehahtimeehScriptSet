@@ -1,4 +1,4 @@
-.PHONY: install build clean typecheck \
+.PHONY: install build clean typecheck new-script \
 	core html-footer main-reply web-components \
 	generate-custom-fields generate-random-portraits multiacc-quick-login
 
@@ -7,6 +7,12 @@ install:
 
 typecheck:
 	yarn typecheck
+
+new-script:
+ifndef NAME
+	$(error NAME is required. Usage: make new-script NAME=my-feature)
+endif
+	node tooling/new-script.mjs "$(NAME)"
 
 # core first so consumers that expect window.teh exist in docs/load order
 core:
