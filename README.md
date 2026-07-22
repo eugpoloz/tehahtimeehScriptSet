@@ -15,6 +15,7 @@ scripts/
   generate-custom-fields/    # → teh.generateCustomFields.iife.js
   generate-random-portraits/ # → teh.generateRandomPortraits.iife.js
   multiacc-quick-login/      # → teh.multiaccQuickLogin.iife.js
+  count-posts-in-topic/                    # → teh.countPostsInTopic.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
   new-script.mjs             # used by `make new-script`
@@ -32,6 +33,7 @@ make web-components
 make generate-custom-fields
 make generate-random-portraits
 make multiacc-quick-login
+make count-posts-in-topic
 make clean     # remove scripts/*/dist
 make typecheck # JSDoc / checkJs via tsc --noEmit
 make new-script NAME=my-feature  # scaffold a new scripts/* package

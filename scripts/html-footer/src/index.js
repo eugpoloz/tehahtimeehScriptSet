@@ -1,20 +1,15 @@
 "use strict";
 
 import transformProfiles from "./features/default/transformProfiles";
-import addProfileLinkToPosts from "./features/default/addProfileLinkToPosts";
 
 import selectCodeBox from "./features/selectAndCopy";
 import addGuestNameClicks from "./features/makeGuestNamesClickable";
 import createFastLoginLinks from "./features/createFastLoginLinks";
 import disableProfiles from "./features/disableProfiles";
-import countPostsInTopic from "./features/countPostsInTopic";
 import changeFontSize from "./features/changeFontSize";
 import referQuoteToOriginal from "./features/referQuoteToOriginal";
 import addFastReactions from "./features/addFastReactions";
 import autoReactToPosts from "./features/autoReactToPosts";
-
-// run by default
-addProfileLinkToPosts();
 
 // enhanceReactions module export
 export function enhanceReactions() {
@@ -28,7 +23,6 @@ export {
   selectCodeBox,
   disableProfiles,
   addGuestNameClicks,
-  countPostsInTopic,
   changeFontSize,
   referQuoteToOriginal,
   transformProfiles
@@ -55,10 +49,5 @@ export {
 //teh.disableProfiles({
 //  profiles: [4],
 //  message: "Don't even think about it!"
-//});
-//teh.countPostsInTopic({
-//  fldId: "5",
-//  forumsToTrack: [7, 8, 16, 18],
-//  countTopicStarter: false
 //});
 //teh.transformProfiles();
