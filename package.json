@@ -13,8 +13,8 @@
     "format": "prettier --write \"lib/**/*.{js,json}\" \"scripts/**/*.{js,json}\" \"tooling/**/*.{js,mjs}\" \"*.{js,json,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "prettier": "^3.8.4",
-    "typescript": "^6.0.3"
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2"
   },
   "prettier": {
     "tabWidth": 2,
