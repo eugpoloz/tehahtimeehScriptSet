@@ -35,7 +35,7 @@ try {
 const files = {
   "package.json": `{
   "name": "@teh/${kebab}",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "MIT",
   "type": "module",
   "files": [
