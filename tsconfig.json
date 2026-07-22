@@ -14,6 +14,6 @@
       "@teh/utils": ["./lib/utils/index.js"]
     }
   },
-  "include": ["lib/**/*.js", "globals.d.ts"],
+  "include": ["lib/**/*.js", "scripts/core/src/**/*.js", "globals.d.ts"],
   "exclude": ["**/dist/**", "node_modules"]
 }

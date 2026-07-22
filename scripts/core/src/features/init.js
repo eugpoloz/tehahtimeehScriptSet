@@ -1,13 +1,17 @@
+/**
+ * Ensures `window.teh` exists and returns it.
+ * Load `@teh/core` before other packages that attach onto this namespace.
+ *
+ * @returns {TehNamespace}
+ */
 function init() {
-  const globalRef = typeof globalThis !== "undefined" ? globalThis : window;
-
-  if (!globalRef.teh) {
-    globalRef.teh = {};
+  if (!window.teh) {
+    window.teh = {};
   }
 
-  console.info("tehahtimeehScriptSet initialized", globalRef.teh);
+  console.info("tehahtimeehScriptSet initialized", window.teh);
 
-  return globalRef.teh;
+  return window.teh;
 }
 
 export default init;
