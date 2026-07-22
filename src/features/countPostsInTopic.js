@@ -109,7 +109,9 @@ const countPostsInTopic = async ({
           } else {
             const html = `<li class="pa-fld${fldId}" title="Постов:"> ${updatedCounter}</li>`;
 
-            nextFldSelector.insertAdjacentHTML("beforebegin", html);
+            author
+              .querySelector(nextFldSelector)
+              .insertAdjacentHTML("beforebegin", html);
           }
         });
 
