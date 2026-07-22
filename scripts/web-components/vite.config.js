@@ -4,6 +4,5 @@ export default createIifeConfig({
   entry: "./src/index.js",
   fileName: "web-components",
   name: "teh.webComponents",
-  emptyOutDir: true,
   globals: { webComponents: "teh" }
 });

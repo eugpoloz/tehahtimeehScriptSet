@@ -1,8 +1,8 @@
-.PHONY: install build clean typecheck format new-script \
-	core html-footer main-reply web-components \
-	generate-custom-fields generate-random-portraits multiacc-quick-login \
-	count-posts-in-topic \
-	enhance-reactions
+SCRIPTS := $(shell find scripts -mindepth 1 -maxdepth 1 -type d | sed 's|^scripts/||' | sort)
+OTHER_SCRIPTS := $(filter-out core,$(SCRIPTS))
+JOBS ?= $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
+
+.PHONY: install build clean typecheck format new-script $(SCRIPTS)
 
 install:
 	yarn install
@@ -19,35 +19,12 @@ ifndef NAME
 endif
 	node tooling/new-script.mjs "$(NAME)"
 
-# core first so consumers that expect window.teh exist in docs/load order
-core:
-	yarn workspace @teh/core build
+# core first; remaining packages build in parallel
+build: core
+	$(MAKE) -j$(JOBS) $(OTHER_SCRIPTS)
 
-html-footer:
-	yarn workspace @teh/html-footer build
-
-main-reply:
-	yarn workspace @teh/main-reply build
-
-web-components:
-	yarn workspace @teh/web-components build
-
-generate-custom-fields:
-	yarn workspace @teh/generate-custom-fields build
-
-generate-random-portraits:
-	yarn workspace @teh/generate-random-portraits build
-
-multiacc-quick-login:
-	yarn workspace @teh/multiacc-quick-login build
-
-count-posts-in-topic:
-	yarn workspace @teh/count-posts-in-topic build
-
-
-enhance-reactions:
-	yarn workspace @teh/enhance-reactions build
-build: core html-footer main-reply web-components generate-custom-fields generate-random-portraits multiacc-quick-login count-posts-in-topic enhance-reactions
+$(SCRIPTS):
+	yarn workspace @teh/$@ build
 
 clean:
-	rm -rf scripts/*/dist
+	rm -rf dist
