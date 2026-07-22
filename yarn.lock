@@ -261,11 +261,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/multiacc-quick-login@workspace:scripts/multiacc-quick-login":
+  version: 0.0.0-use.local
+  resolution: "@teh/multiacc-quick-login@workspace:scripts/multiacc-quick-login"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    idb: "npm:^8.0.3"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@teh/utils@workspace:*, @teh/utils@workspace:lib/utils":
   version: 0.0.0-use.local
   resolution: "@teh/utils@workspace:lib/utils"
-  dependencies:
-    idb: "npm:^8.0.3"
   languageName: unknown
   linkType: soft
 

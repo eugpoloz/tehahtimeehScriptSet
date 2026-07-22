@@ -14,6 +14,7 @@ scripts/
   web-components/            # @teh/web-components → teh.web-components.iife.js
   generate-custom-fields/    # → teh.generateCustomFields.iife.js
   generate-random-portraits/ # → teh.generateRandomPortraits.iife.js
+  multiacc-quick-login/      # → teh.multiaccQuickLogin.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
 ```
@@ -29,6 +30,7 @@ make main-reply
 make web-components
 make generate-custom-fields
 make generate-random-portraits
+make multiacc-quick-login
 make clean     # remove scripts/*/dist
 make typecheck # JSDoc / checkJs via tsc --noEmit
 ```
