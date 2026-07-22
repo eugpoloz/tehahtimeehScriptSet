@@ -2,8 +2,7 @@ import { createIifeConfig } from "../../tooling/vite-iife.config.js";
 
 export default createIifeConfig({
   entry: "./src/index.js",
-  fileName: "generateCustomFields",
+  fileName: "generate-custom-fields",
   name: "teh.generateCustomFields",
-  emptyOutDir: true,
   globals: { generateCustomFields: "teh" }
 });

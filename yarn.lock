@@ -218,7 +218,6 @@ __metadata:
   resolution: "@teh/core@workspace:scripts/core"
   dependencies:
     "@teh/utils": "workspace:*"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -227,7 +226,6 @@ __metadata:
   resolution: "@teh/count-posts-in-topic@workspace:scripts/count-posts-in-topic"
   dependencies:
     "@teh/utils": "workspace:*"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -236,7 +234,6 @@ __metadata:
   resolution: "@teh/enhance-reactions@workspace:scripts/enhance-reactions"
   dependencies:
     "@teh/utils": "workspace:*"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -245,7 +242,6 @@ __metadata:
   resolution: "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields"
   dependencies:
     "@teh/utils": "workspace:*"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -255,7 +251,6 @@ __metadata:
   dependencies:
     "@teh/utils": "workspace:*"
     lodash-es: "npm:^4.18.1"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -265,7 +260,6 @@ __metadata:
   dependencies:
     "@teh/utils": "workspace:*"
     dompurify: "npm:^3.4.12"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -275,7 +269,6 @@ __metadata:
   dependencies:
     "@teh/utils": "workspace:*"
     lodash-es: "npm:^4.18.1"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -285,7 +278,6 @@ __metadata:
   dependencies:
     "@teh/utils": "workspace:*"
     idb: "npm:^8.0.3"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -300,7 +292,6 @@ __metadata:
   resolution: "@teh/web-components@workspace:scripts/web-components"
   dependencies:
     "@teh/utils": "workspace:*"
-    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 
@@ -1163,6 +1154,7 @@ __metadata:
   dependencies:
     prettier: "npm:^3.9.6"
     typescript: "npm:^7.0.2"
+    vite: "npm:^8.1.5"
   languageName: unknown
   linkType: soft
 

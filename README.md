@@ -12,11 +12,11 @@ scripts/
   html-footer/               # @teh/html-footer → teh.html-footer.iife.js
   main-reply/                # @teh/main-reply → teh.main-reply.iife.js
   web-components/            # @teh/web-components → teh.web-components.iife.js
-  generate-custom-fields/    # → teh.generateCustomFields.iife.js
-  generate-random-portraits/ # → teh.generateRandomPortraits.iife.js
-  multiacc-quick-login/      # → teh.multiaccQuickLogin.iife.js
-  count-posts-in-topic/                    # → teh.countPostsInTopic.iife.js
-  enhance-reactions/                    # → teh.enhanceReactions.iife.js
+  generate-custom-fields/    # → teh.generate-custom-fields.iife.js
+  generate-random-portraits/ # → teh.generate-random-portraits.iife.js
+  multiacc-quick-login/      # → teh.multiacc-quick-login.iife.js
+  count-posts-in-topic/      # → teh.count-posts-in-topic.iife.js
+  enhance-reactions/         # → teh.enhance-reactions.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
   new-script.mjs             # used by `make new-script`
@@ -26,25 +26,17 @@ tooling/
 
 ```bash
 make install   # yarn install
-make build     # build all IIFEs (core first)
-make core      # build a single package
-make html-footer
-make main-reply
-make web-components
-make generate-custom-fields
-make generate-random-portraits
-make multiacc-quick-login
-make count-posts-in-topic
-make enhance-reactions
-make clean     # remove scripts/*/dist
+make build     # build all IIFEs (core first, then the rest in parallel)
+make <script>  # build a single package (e.g. make html-footer)
+make clean     # remove root dist/
 make typecheck # JSDoc / checkJs via tsc --noEmit
 make format    # prettier --write
 make new-script NAME=my-feature  # scaffold a new scripts/* package
 ```
 
-`NAME` must be kebab-case. That creates `scripts/<name>/`, wires Makefile + README, and runs `yarn install`. Export/global name is derived as camelCase (`my-feature` → `teh.myFeature`).
+`NAME` must be kebab-case. That creates `scripts/<name>/`, updates the README layout, and runs `yarn install`. Global export is camelCase (`my-feature` → `teh.myFeature`); the dist file is kebab (`teh.my-feature.iife.js`). Makefile targets are discovered from `scripts/*/`.
 
-Outputs land in each script package's `dist/` folder.
+Outputs land in the root `dist/` folder.
 
 ## Type safety (without TypeScript sources)
 

@@ -4,6 +4,5 @@ export default createIifeConfig({
   entry: "./src/index.js",
   fileName: "html-footer",
   name: "teh",
-  emptyOutDir: true,
   globals: { footer: "teh" }
 });
