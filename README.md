@@ -30,6 +30,13 @@ make web-components
 make generate-custom-fields
 make generate-random-portraits
 make clean     # remove scripts/*/dist
+make typecheck # JSDoc / checkJs via tsc --noEmit
 ```
 
 Outputs land in each script package's `dist/` folder.
+
+## Type safety (without TypeScript sources)
+
+Sources stay `.js`. Types come from JSDoc + `globals.d.ts`; `make typecheck` runs `tsc --noEmit` (`allowJs` / `checkJs` / `noEmit`).
+
+Currently `tsconfig.json` includes **`lib/**` only** so the check stays green. To opt scripts in later, add `"scripts/**/*.js"` to `include` and fix reported issues gradually (or add `// @ts-check` per file).
