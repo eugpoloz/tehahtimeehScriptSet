@@ -1,5 +1,5 @@
-import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "@teh/utils";
-import { handleError } from "@teh/utils";
+import { getLang, handleLogin, handleError } from "@teh/utils";
+import { decryptAndLoad, encryptAndSave } from "./helpers/crypto";
 
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
@@ -301,3 +301,7 @@ const multiaccQuickLogin = () => {
 };
 
 export default multiaccQuickLogin;
+
+// config example
+//
+// teh.multiaccQuickLogin();

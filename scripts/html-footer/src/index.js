@@ -12,7 +12,6 @@ import changeFontSize from "./features/changeFontSize";
 import referQuoteToOriginal from "./features/referQuoteToOriginal";
 import addFastReactions from "./features/addFastReactions";
 import autoReactToPosts from "./features/autoReactToPosts";
-import multiaccQuickLogin from "./features/multiaccQuickLogin";
 
 // run by default
 addProfileLinkToPosts();
@@ -32,7 +31,6 @@ export {
   countPostsInTopic,
   changeFontSize,
   referQuoteToOriginal,
-  multiaccQuickLogin,
   transformProfiles
 };
 

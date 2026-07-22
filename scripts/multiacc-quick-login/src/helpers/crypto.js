@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { handleError } from "./logger";
+import { handleError } from "@teh/utils";
 
 /**
  * @param {Uint8Array | ArrayBuffer} buffer
@@ -44,7 +44,7 @@ export async function getOrCreateKey(keyName) {
 
     return key;
   } catch (error) {
-    handleError("utils/crypto/getOrCreateKey", error);
+    handleError("multiacc-quick-login/crypto/getOrCreateKey", error);
   }
 }
 
@@ -79,7 +79,7 @@ export async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
     };
     localStorage.setItem(localStorageKey, JSON.stringify(bundle));
   } catch (error) {
-    handleError("utils/crypto/encryptAndSave", error);
+    handleError("multiacc-quick-login/crypto/encryptAndSave", error);
   }
 }
 
@@ -115,6 +115,6 @@ export async function decryptAndLoad({ encryptionKey, localStorageKey }) {
 
     return new TextDecoder().decode(decrypted);
   } catch (error) {
-    handleError("utils/crypto/decryptAndLoad", error);
+    handleError("multiacc-quick-login/crypto/decryptAndLoad", error);
   }
 }

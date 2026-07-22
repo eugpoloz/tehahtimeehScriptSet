@@ -7,9 +7,6 @@
   "exports": {
     ".": "./index.js"
   },
-  "dependencies": {
-    "idb": "^8.0.3"
-  },
   "scripts": {
     "build": "true"
   }
