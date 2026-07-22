@@ -3,19 +3,10 @@
 "use strict";
 
 import { version } from "../package.json";
+import init from "./features/init";
+import { popoverHintPolyfill } from "./polyfills/popoverHint";
 
-function initCore() {
-  const globalRef = typeof globalThis !== "undefined" ? globalThis : window;
+popoverHintPolyfill();
+init();
 
-  if (!globalRef.teh) {
-    globalRef.teh = {};
-  }
-
-  console.info("tehahtimeehScriptSet initialized", globalRef.teh);
-
-  return globalRef.teh;
-}
-
-export { initCore, version };
-
-initCore();
+export { init, version };
