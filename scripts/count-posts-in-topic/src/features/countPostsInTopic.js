@@ -1,6 +1,6 @@
 import { handleError, handleLogs } from "@teh/utils";
 
-const COUNTER_MODULE_NAME = "footer/countPostsInTopic";
+const COUNTER_MODULE_NAME = "countPostsInTopic";
 
 const countPostsInTopic = async ({
   forumsToTrack = [],

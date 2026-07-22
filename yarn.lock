@@ -222,6 +222,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/count-posts-in-topic@workspace:scripts/count-posts-in-topic":
+  version: 0.0.0-use.local
+  resolution: "@teh/count-posts-in-topic@workspace:scripts/count-posts-in-topic"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields":
   version: 0.0.0-use.local
   resolution: "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields"
