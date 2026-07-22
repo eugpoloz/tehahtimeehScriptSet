@@ -1,4 +1,4 @@
-import { getSubject } from "../../utils/DOM";
+import { getSubject } from "@teh/utils";
 
 class ThemeSubject extends HTMLElement {
   constructor() {

@@ -1,4 +1,4 @@
-import { handleError } from "../utils";
+import { handleError } from "@teh/utils";
 
 const handleFastVote = async (href) => {
   try {

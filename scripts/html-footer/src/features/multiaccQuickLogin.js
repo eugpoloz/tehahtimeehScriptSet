@@ -1,5 +1,5 @@
-import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "../utils";
-import { handleError } from "../utils/logger";
+import { getLang, handleLogin, decryptAndLoad, encryptAndSave } from "@teh/utils";
+import { handleError } from "@teh/utils";
 
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";

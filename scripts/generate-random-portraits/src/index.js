@@ -1,5 +1,5 @@
 import shuffle from "lodash-es/shuffle";
-import { handleError } from "../../utils";
+import { handleError } from "@teh/utils";
 
 /** This creates HTML markup for the portraits.
  */

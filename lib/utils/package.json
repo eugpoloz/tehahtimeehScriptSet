@@ -1,0 +1,16 @@
+{
+  "name": "@teh/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "idb": "^8.0.3"
+  },
+  "scripts": {
+    "build": "true"
+  }
+}

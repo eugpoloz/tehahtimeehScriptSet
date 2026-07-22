@@ -1,4 +1,4 @@
-import { handleError } from "../utils";
+import { handleError } from "@teh/utils";
 
 const LOCALSTORAGE_SIZE_KEY = "userFontSize";
 const CSS_VARIABLE_SIZE_KEY = "--dynamic-font-size";

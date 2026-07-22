@@ -1,4 +1,4 @@
-import { hasTopic, handleError } from "../utils";
+import { hasTopic, handleError } from "@teh/utils";
 
 const DELAY_MAX = 1300;
 const DELAY_MIN = 700;
