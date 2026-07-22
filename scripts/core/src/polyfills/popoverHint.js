@@ -1,6 +1,8 @@
 /**
  * Safari fallback when `popover="hint"` is unsupported (treated as manual).
  * Closes other open hints before a `popovertarget` click opens a new one.
+ *
+ * @returns {void}
  */
 export function popoverHintPolyfill() {
   const probe = document.createElement("div");
@@ -29,7 +31,7 @@ export function popoverHintPolyfill() {
 
       for (const openHint of document.querySelectorAll('[popover="hint"]')) {
         if (openHint !== popover && openHint.matches(":popover-open")) {
-          openHint.hidePopover();
+          /** @type {HTMLElement} */ (openHint).hidePopover();
         }
       }
     },
