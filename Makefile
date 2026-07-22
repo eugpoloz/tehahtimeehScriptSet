@@ -1,4 +1,4 @@
-.PHONY: install build clean typecheck new-script \
+.PHONY: install build clean typecheck format new-script \
 	core html-footer main-reply web-components \
 	generate-custom-fields generate-random-portraits multiacc-quick-login \
 	count-posts-in-topic
@@ -8,6 +8,9 @@ install:
 
 typecheck:
 	yarn typecheck
+
+format:
+	yarn format
 
 new-script:
 ifndef NAME
@@ -37,9 +40,9 @@ generate-random-portraits:
 multiacc-quick-login:
 	yarn workspace @teh/multiacc-quick-login build
 
-
 count-posts-in-topic:
 	yarn workspace @teh/count-posts-in-topic build
+
 build: core html-footer main-reply web-components generate-custom-fields generate-random-portraits multiacc-quick-login count-posts-in-topic
 
 clean:

@@ -36,6 +36,7 @@ make multiacc-quick-login
 make count-posts-in-topic
 make clean     # remove scripts/*/dist
 make typecheck # JSDoc / checkJs via tsc --noEmit
+make format    # prettier --write
 make new-script NAME=my-feature  # scaffold a new scripts/* package
 ```
 
@@ -47,4 +48,4 @@ Outputs land in each script package's `dist/` folder.
 
 Sources stay `.js`. Types come from JSDoc + `globals.d.ts`; `make typecheck` runs `tsc --noEmit` (`allowJs` / `checkJs` / `noEmit`).
 
-Currently `tsconfig.json` includes **`lib/**` only** so the check stays green. To opt scripts in later, add `"scripts/**/*.js"` to `include` and fix reported issues gradually (or add `// @ts-check` per file).
+Currently `tsconfig.json` includes **`lib/**`only** so the check stays green. To opt scripts in later, add`"scripts/\*_/_.js"`to`include`and fix reported issues gradually (or add`// @ts-check` per file).

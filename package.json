@@ -9,7 +9,8 @@
   "scripts": {
     "build": "make build",
     "clean": "make clean",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"lib/**/*.{js,json}\" \"scripts/**/*.{js,json}\" \"tooling/**/*.{js,mjs}\" \"*.{js,json,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
     "prettier": "^3.8.4",
