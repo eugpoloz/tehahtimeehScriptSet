@@ -62,7 +62,8 @@ const replaceFldContentWithHTML = (parent, selector) => {
     if (fld.textContent.includes("<")) {
       const cleanContent = DOMPurify.sanitize(fld.textContent, {
         ADD_ATTR: ["target"],
-        ADD_TAGS: ["strong"]
+        ADD_TAGS: ["strong"],
+        IN_PLACE: true
       });
 
       fld.innerHTML = cleanContent;

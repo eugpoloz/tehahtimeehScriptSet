@@ -1,7 +1,6 @@
 "use strict";
 
-import transformProfiles from "./features/default/transformProfiles";
-
+import transformProfiles from "./features/transformProfiles";
 import selectCodeBox from "./features/selectAndCopy";
 import addGuestNameClicks from "./features/makeGuestNamesClickable";
 import createFastLoginLinks from "./features/createFastLoginLinks";
