@@ -8,14 +8,6 @@ import createFastLoginLinks from "./features/createFastLoginLinks";
 import disableProfiles from "./features/disableProfiles";
 import changeFontSize from "./features/changeFontSize";
 import referQuoteToOriginal from "./features/referQuoteToOriginal";
-import addFastReactions from "./features/addFastReactions";
-import autoReactToPosts from "./features/autoReactToPosts";
-
-// enhanceReactions module export
-export function enhanceReactions() {
-  addFastReactions();
-  autoReactToPosts();
-}
 
 // module exports
 export {
@@ -30,7 +22,6 @@ export {
 
 // possible config for reference:
 
-//teh.enhanceReactions();
 //teh.createFastLoginLinks({
 //  logins: [
 //    {

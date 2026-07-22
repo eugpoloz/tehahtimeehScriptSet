@@ -1,7 +1,8 @@
 .PHONY: install build clean typecheck format new-script \
 	core html-footer main-reply web-components \
 	generate-custom-fields generate-random-portraits multiacc-quick-login \
-	count-posts-in-topic
+	count-posts-in-topic \
+	enhance-reactions
 
 install:
 	yarn install
@@ -43,7 +44,10 @@ multiacc-quick-login:
 count-posts-in-topic:
 	yarn workspace @teh/count-posts-in-topic build
 
-build: core html-footer main-reply web-components generate-custom-fields generate-random-portraits multiacc-quick-login count-posts-in-topic
+
+enhance-reactions:
+	yarn workspace @teh/enhance-reactions build
+build: core html-footer main-reply web-components generate-custom-fields generate-random-portraits multiacc-quick-login count-posts-in-topic enhance-reactions
 
 clean:
 	rm -rf scripts/*/dist

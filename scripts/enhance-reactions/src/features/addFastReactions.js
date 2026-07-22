@@ -35,7 +35,7 @@ const handleFastVote = async (href) => {
       });
     }
   } catch (e) {
-    handleError("footer/addFastReactions", e);
+    handleError("enhance-reactions/addFastReactions", e);
     $.jGrowl(e?.message);
   }
 };

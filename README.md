@@ -16,6 +16,7 @@ scripts/
   generate-random-portraits/ # → teh.generateRandomPortraits.iife.js
   multiacc-quick-login/      # → teh.multiaccQuickLogin.iife.js
   count-posts-in-topic/                    # → teh.countPostsInTopic.iife.js
+  enhance-reactions/                    # → teh.enhanceReactions.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
   new-script.mjs             # used by `make new-script`
@@ -34,6 +35,7 @@ make generate-custom-fields
 make generate-random-portraits
 make multiacc-quick-login
 make count-posts-in-topic
+make enhance-reactions
 make clean     # remove scripts/*/dist
 make typecheck # JSDoc / checkJs via tsc --noEmit
 make format    # prettier --write
