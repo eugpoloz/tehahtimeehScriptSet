@@ -2,7 +2,7 @@
 
 "use strict";
 
-import { name, version } from "../package.json";
+import { version } from "../package.json";
 
 function initCore() {
   const globalRef = typeof globalThis !== "undefined" ? globalThis : window;
@@ -11,14 +11,7 @@ function initCore() {
     globalRef.teh = {};
   }
 
-  const pkgName = name
-    .split("-")
-    .map((str, i) =>
-      i === 0 ? str : str.charAt(0).toUpperCase() + str.slice(1)
-    )
-    .join("");
-
-  console.info(`${pkgName} initialized`, globalRef.teh);
+  console.info("tehahtimeehScriptSet initialized", globalRef.teh);
 
   return globalRef.teh;
 }

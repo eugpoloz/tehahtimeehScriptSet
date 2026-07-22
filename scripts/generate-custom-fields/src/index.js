@@ -1,7 +1,5 @@
-import { handleError } from "../../utils/logger";
-import { hasProfile, isProperWindow, isAMS } from "../../utils/DOM";
-
-import prefetchUserCollection from "./prefetchUserCollection";
+import { handleError } from "@teh/utils";
+import { hasProfile, isProperWindow, isAMS } from "@teh/utils";
 
 const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
 

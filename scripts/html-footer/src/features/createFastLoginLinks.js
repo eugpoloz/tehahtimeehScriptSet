@@ -1,4 +1,4 @@
-import { getLang, handleLogin } from "../utils";
+import { getLang, handleLogin } from "@teh/utils";
 
 export default function createFastLoginLinks({
   after = "navlogin",

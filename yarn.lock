@@ -213,6 +213,71 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teh/core@workspace:scripts/core":
+  version: 0.0.0-use.local
+  resolution: "@teh/core@workspace:scripts/core"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@teh/generate-custom-fields@workspace:scripts/generate-custom-fields":
+  version: 0.0.0-use.local
+  resolution: "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@teh/generate-random-portraits@workspace:scripts/generate-random-portraits":
+  version: 0.0.0-use.local
+  resolution: "@teh/generate-random-portraits@workspace:scripts/generate-random-portraits"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    lodash-es: "npm:^4.18.1"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@teh/html-footer@workspace:scripts/html-footer":
+  version: 0.0.0-use.local
+  resolution: "@teh/html-footer@workspace:scripts/html-footer"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    dompurify: "npm:^3.4.12"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@teh/main-reply@workspace:scripts/main-reply":
+  version: 0.0.0-use.local
+  resolution: "@teh/main-reply@workspace:scripts/main-reply"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    lodash-es: "npm:^4.18.1"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@teh/utils@workspace:*, @teh/utils@workspace:lib/utils":
+  version: 0.0.0-use.local
+  resolution: "@teh/utils@workspace:lib/utils"
+  dependencies:
+    idb: "npm:^8.0.3"
+  languageName: unknown
+  linkType: soft
+
+"@teh/web-components@workspace:scripts/web-components":
+  version: 0.0.0-use.local
+  resolution: "@teh/web-components@workspace:scripts/web-components"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    vite: "npm:^8.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@tybys/wasm-util@npm:^0.10.3":
   version: 0.10.3
   resolution: "@tybys/wasm-util@npm:0.10.3"
@@ -926,15 +991,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tehahtimeeh-script-set@workspace:.":
+"tehahtimeeh-monorepo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "tehahtimeeh-script-set@workspace:."
+  resolution: "tehahtimeeh-monorepo@workspace:."
   dependencies:
-    dompurify: "npm:^3.4.12"
-    idb: "npm:^8.0.3"
-    lodash-es: "npm:^4.18.1"
     prettier: "npm:^3.8.4"
-    vite: "npm:^8.1.0"
   languageName: unknown
   linkType: soft
 

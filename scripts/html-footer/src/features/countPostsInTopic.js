@@ -1,4 +1,4 @@
-import { handleError, handleLogs } from "../utils";
+import { handleError, handleLogs } from "@teh/utils";
 
 const COUNTER_MODULE_NAME = "footer/countPostsInTopic";
 

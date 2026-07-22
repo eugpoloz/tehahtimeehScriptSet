@@ -1,0 +1,23 @@
+{
+  "name": "@teh/web-components",
+  "version": "0.6.0",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/teh.web-components.iife.js",
+  "exports": {
+    ".": "./dist/teh.web-components.iife.js"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "@teh/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^8.1.0"
+  }
+}

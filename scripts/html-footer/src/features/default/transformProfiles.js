@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { hasTopic } from "../../utils";
+import { hasTopic } from "@teh/utils";
 
 const handleOnlineIndicators = (post) => {
   const postAuthor = post.querySelector(".post-author");
