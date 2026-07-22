@@ -1,5 +1,16 @@
+/**
+ * Registers a custom element that replaces `DD.MM.YYYY` text with a computed age.
+ * Uses `window[varKey]` as “today” when set (e.g. in-game date), otherwise `new Date()`.
+ *
+ * @param {string} tagName Custom element tag to define.
+ * @param {string} [varKey] Window key for an override “today” date.
+ * @returns {void}
+ */
 function defineAgeFromBirthday(tagName, varKey = "GAME_LATEST_DATE") {
   class AgeFromBirthday extends HTMLElement {
+    /** @type {MutationObserver | undefined} */
+    _observer;
+
     constructor() {
       super();
     }
@@ -12,7 +23,7 @@ function defineAgeFromBirthday(tagName, varKey = "GAME_LATEST_DATE") {
         // Wait for the HTML parser to append the text node child
         this._observer = new MutationObserver(() => {
           if (this.textContent.trim()) {
-            this._observer.disconnect(); // Clean up memory instantly
+            /** @type {MutationObserver} */ (this._observer).disconnect(); // Clean up memory instantly
             this._renderAge();
           }
         });
@@ -28,14 +39,21 @@ function defineAgeFromBirthday(tagName, varKey = "GAME_LATEST_DATE") {
       }
     }
 
+    /** @returns {void} */
     _renderAge() {
       const parts = this.textContent.trim().split(".");
       if (parts.length !== 3) return;
 
       const [day, month, year] = parts;
-      const dob = new Date(year, month, day);
+      const dob = new Date(
+        /** @type {number} */ (/** @type {unknown} */ (year)),
+        /** @type {number} */ (/** @type {unknown} */ (month)),
+        /** @type {number} */ (/** @type {unknown} */ (day))
+      );
 
-      const today = window[varKey] ? new Date(window[varKey]) : new Date();
+      const today = /** @type {any} */ (window)[varKey]
+        ? new Date(/** @type {any} */ (window)[varKey])
+        : new Date();
 
       let age = today.getFullYear() - dob.getFullYear();
       const monthDiff = today.getMonth() - dob.getMonth();
@@ -49,9 +67,17 @@ function defineAgeFromBirthday(tagName, varKey = "GAME_LATEST_DATE") {
 
       const suffix = this.hasAttribute("data-suffix");
 
-      this.innerHTML = suffix ? `${age} ${this._getSuffix(age)}` : age;
+      this.innerHTML = /** @type {string} */ (
+        /** @type {unknown} */ (suffix ? `${age} ${this._getSuffix(age)}` : age)
+      );
     }
 
+    /**
+     * Russian year-word inflection for a given age.
+     *
+     * @param {number} age
+     * @returns {string}
+     */
     _getSuffix(age) {
       const lastDigit = age % 10;
       const lastTwoDigits = age % 100;

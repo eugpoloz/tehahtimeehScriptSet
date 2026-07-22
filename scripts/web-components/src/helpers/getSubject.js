@@ -1,5 +1,7 @@
 /**
- * @param {Element} webComponent
+ * Resolves the current topic/post subject for a web component’s page context.
+ *
+ * @param {Element} webComponent Host element used to locate nearby post markup.
  * @returns {string | null}
  */
 export const getSubject = (webComponent) => {

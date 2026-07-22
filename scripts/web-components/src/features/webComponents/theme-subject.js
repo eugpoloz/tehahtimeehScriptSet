@@ -1,23 +1,31 @@
 import { getSubject } from "../../helpers/getSubject";
 
+/**
+ * Displays the episode/theme subject: light-DOM children if present,
+ * otherwise the relevant part of the forum subject line.
+ */
 class ThemeSubject extends HTMLElement {
   constructor() {
     super();
 
     this.attachShadow({ mode: "open", slotAssignment: "manual" });
 
-    this.shadowRoot.innerHTML = `
+    /** @type {ShadowRoot} */ (this.shadowRoot).innerHTML = `
         <style>p { margin-block: 0; }</style>
         <p><slot id="subject">Название эпизода</slot></p>
       `;
   }
 
+  /** @returns {void} */
   connectedCallback() {
     this.updateSlots();
   }
 
+  /** @returns {void} */
   updateSlots() {
-    const subject = this.shadowRoot.getElementById("subject");
+    const subject = /** @type {HTMLSlotElement} */ (
+      /** @type {ShadowRoot} */ (this.shadowRoot).getElementById("subject")
+    );
 
     let content = "";
 
@@ -26,12 +34,12 @@ class ThemeSubject extends HTMLElement {
         .map((node) => node.textContent)
         .join("\n");
     } else {
-      const episodeSubject = getSubject(this).split(/[|/\\\\]/);
+      const episodeSubject = /** @type {string} */ (getSubject(this)).split(
+        /[|/\\\\]/
+      );
 
       content =
-        episodeSubject.length > 1
-          ? episodeSubject[1]
-          : episodeSubject.textContent;
+        episodeSubject.length > 1 ? episodeSubject[1] : episodeSubject[0];
     }
 
     this.innerHTML = "";
