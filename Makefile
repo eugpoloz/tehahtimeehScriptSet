@@ -1,9 +1,12 @@
-.PHONY: install build clean \
+.PHONY: install build clean typecheck \
 	core html-footer main-reply web-components \
 	generate-custom-fields generate-random-portraits
 
 install:
 	yarn install
+
+typecheck:
+	yarn typecheck
 
 # core first so consumers that expect window.teh exist in docs/load order
 core:

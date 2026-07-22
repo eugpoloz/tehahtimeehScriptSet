@@ -8,10 +8,12 @@
   ],
   "scripts": {
     "build": "make build",
-    "clean": "make clean"
+    "clean": "make clean",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "prettier": "^3.8.4"
+    "prettier": "^3.8.4",
+    "typescript": "^6.0.3"
   },
   "prettier": {
     "tabWidth": 2,
