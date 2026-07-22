@@ -9,8 +9,10 @@
 
 import { version } from "../package.json";
 import init from "./features/init";
+import gnu from "./features/gnu-terry-pratchett";
 import { popoverHintPolyfill } from "./polyfills/popoverHint";
 
+gnu();
 popoverHintPolyfill();
 init();
 
