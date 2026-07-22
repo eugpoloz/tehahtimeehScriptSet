@@ -5,6 +5,7 @@ const COUNTER_MODULE_NAME = "footer/countPostsInTopic";
 const countPostsInTopic = async ({
   forumsToTrack = [],
   fldId = "5",
+  nextFldSelector = ".pa-posts",
   countTopicStarter = false,
   debug = false
 } = {}) => {
@@ -102,14 +103,13 @@ const countPostsInTopic = async ({
 
         authorsPostsInTopic.forEach((author) => {
           const counter = author.querySelector(`.pa-fld${fldId}`);
-          const previousFld = author.querySelector(`.pa-posts`);
 
           if (counter) {
             counter.innerText = updatedCounter;
           } else {
             const html = `<li class="pa-fld${fldId}" title="Постов:"> ${updatedCounter}</li>`;
 
-            previousFld.insertAdjacentHTML("afterend", html);
+            nextFldSelector.insertAdjacentHTML("beforebegin", html);
           }
         });
 
