@@ -231,6 +231,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/enhance-reactions@workspace:scripts/enhance-reactions":
+  version: 0.0.0-use.local
+  resolution: "@teh/enhance-reactions@workspace:scripts/enhance-reactions"
+  dependencies:
+    "@teh/utils": "workspace:*"
+    vite: "npm:^8.1.5"
+  languageName: unknown
+  linkType: soft
+
 "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields":
   version: 0.0.0-use.local
   resolution: "@teh/generate-custom-fields@workspace:scripts/generate-custom-fields"
