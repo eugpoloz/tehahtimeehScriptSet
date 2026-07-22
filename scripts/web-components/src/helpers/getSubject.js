@@ -20,8 +20,7 @@ export const getSubject = (webComponent) => {
         )
       ).innerText;
     default:
-      return /** @type {HTMLElement} */ (
-        document.querySelector("#pun-main h1")
-      ).textContent;
+      return /** @type {HTMLElement} */ (document.querySelector("#pun-main h1"))
+        .textContent;
   }
 };

@@ -61,9 +61,7 @@ export async function getOrCreateKey(keyName) {
  */
 export async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
   try {
-    const key = /** @type {CryptoKey} */ (
-      await getOrCreateKey(encryptionKey)
-    );
+    const key = /** @type {CryptoKey} */ (await getOrCreateKey(encryptionKey));
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(data);
 
@@ -104,9 +102,7 @@ export async function decryptAndLoad({ encryptionKey, localStorageKey }) {
     const iv = base64ToBuffer(bundle.iv);
     const data = base64ToBuffer(bundle.data);
 
-    const key = /** @type {CryptoKey} */ (
-      await getOrCreateKey(encryptionKey)
-    );
+    const key = /** @type {CryptoKey} */ (await getOrCreateKey(encryptionKey));
     const decrypted = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
