@@ -13,7 +13,11 @@ function createPortraits({
   return users.forEach((user, idx) => {
     const { username, user_id, avatar } = user;
 
-    const html = `<a href="/profile.php?id=${user_id}"><img src="${avatar ? window.location.origin + avatar : placeholder}" alt="${username}" title="${username}" /></a>`;
+    const popoverId = `portrait-tooltip-${user_id}`;
+    const html = `<a href="/profile.php?id=${user_id}" interestfor="${popoverId}">
+      <img src="${avatar ? window.location.origin + avatar : placeholder}" alt="${username}" />
+      <span class="tooltip" popover="hint" id="${popoverId}" role="tooltip">${username}</span>
+    </a>`;
 
     if (portraitNodeList?.[idx]) {
       portraitNodeList[idx].innerHTML = html;
@@ -27,7 +31,7 @@ async function generateRandomPortraits(pickPortraits) {
       filteredUsers = [], // usernames
       group_id = [1, 2], // ids of groups to pick
       howMany = 3, // now many portraits to pick
-      placeholder = "http://placehold.it/65x65", // any placeholder image
+      placeholder = "https://placehold.co/65x65", // any placeholder image
       selector
     } = pickPortraits;
 
