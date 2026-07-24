@@ -12,6 +12,7 @@
     "dev": "yarn run -T vite build --watch"
   },
   "dependencies": {
-    "@teh/utils": "workspace:*"
+    "@teh/utils": "workspace:*",
+    "interestfor": "^1.0.8"
   }
 }
