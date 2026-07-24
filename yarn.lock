@@ -218,6 +218,7 @@ __metadata:
   resolution: "@teh/core@workspace:scripts/core"
   dependencies:
     "@teh/utils": "workspace:*"
+    interestfor: "npm:^1.0.8"
   languageName: unknown
   linkType: soft
 
@@ -649,6 +650,13 @@ __metadata:
   version: 8.0.3
   resolution: "idb@npm:8.0.3"
   checksum: 10/e2beccb0be7c6af562a5e92b209363358571a770aecdc68e891d1141d994d8f1e8f34b79dafa309ed7467d0f4df2b7b4c15f67cfd0611100282bfc3d85f9c73c
+  languageName: node
+  linkType: hard
+
+"interestfor@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "interestfor@npm:1.0.8"
+  checksum: 10/71615f566bfde6e17537603c6827d1ee233b6f83ffd1e99d70a9094a323f0b81fc80383dc969044bf96c55e394995327ffb66cb35041a366862a745ec58390c5
   languageName: node
   linkType: hard
 

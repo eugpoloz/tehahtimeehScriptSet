@@ -1,6 +1,6 @@
 /**
  * Safari fallback when `popover="hint"` is unsupported (treated as manual).
- * Closes other open hints before a `popovertarget` click opens a new one.
+ * Closes other open hints before a new hint opens (click or interest/hover).
  *
  * @returns {void}
  */
@@ -12,20 +12,17 @@ export function popoverHintPolyfill() {
   }
 
   document.addEventListener(
-    "click",
+    "beforetoggle",
     (event) => {
-      const trigger =
-        event.target instanceof Element
-          ? event.target.closest("[popovertarget]")
-          : null;
-      if (!trigger) {
+      if (event.newState !== "open") {
         return;
       }
 
-      const popover = document.getElementById(
-        trigger.getAttribute("popovertarget") ?? ""
-      );
-      if (!popover || popover.getAttribute("popover") !== "hint") {
+      const popover = event.target;
+      if (
+        !(popover instanceof HTMLElement) ||
+        popover.getAttribute("popover") !== "hint"
+      ) {
         return;
       }
 
