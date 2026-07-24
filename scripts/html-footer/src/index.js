@@ -40,4 +40,10 @@ export {
 //  profiles: [4],
 //  message: "Don't even think about it!"
 //});
-//teh.transformProfiles();
+//teh.transformProfiles({
+//  userStatus: {
+//    online: 'Онлайн',
+//    offline: 'Трогает траву'
+//  },
+//  fieldsWithTitle: ['.pa-posts', '.pa-fld4', '.pa-respect']
+//});
