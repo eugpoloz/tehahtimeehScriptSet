@@ -1,17 +1,15 @@
-import { handleError } from "@teh/utils";
-import { hasProfile, isProperWindow, isAMS } from "@teh/utils";
+"use strict";
 
-const CUSTOMFLDS_MODULE_NAME = "optional/generateCustomFields";
+import generateCustomFieldsFeature from "./features/generateCustomFields";
 
-const getImgSrc = (container, proxy) => {
-  const src = container?.querySelector("img")?.getAttribute("src") ?? "";
+/**
+ * @typedef {import("./features/generateCustomFields.js").CustomFieldOption} CustomFieldOption
+ * @typedef {import("./features/generateCustomFields.js").CustomFieldInput} CustomFieldInput
+ * @typedef {import("./features/generateCustomFields.js").CustomFieldSection} CustomFieldSection
+ * @typedef {import("./features/generateCustomFields.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions
+ */
 
-  return proxy && src.startsWith(proxy) ? src.split(proxy)[1] : src;
-};
-
-const getMaxLength = (maxlength) =>
-  !!maxlength ? `maxlength=${maxlength}` : "";
-
+/** @type {CustomFieldSection[]} */
 const fieldConfig = [
   {
     name: "icon", // [data-custom-fld="${name}"]
@@ -104,327 +102,109 @@ const fieldConfig = [
   }
 ];
 
-const generateCustomFields = async ({
-  fldId = "1",
-  config = fieldConfig,
-  proxy = "https://external-content.duckduckgo.com/iu/?u=",
+/** @type {GenerateCustomFieldsOptions} */
+const defaultOptions = {
+  fldId: "1",
+  collectionFldId: "5",
+  config: fieldConfig,
+  proxy: "https://external-content.duckduckgo.com/iu/?u=",
   // Персонажи, Персонажи в архиве
-  userAccessGroups = [5, 7],
-  debug = true
-} = {}) => {
-  const profileForm = document.getElementById("profile8");
-
-  if (!isProperWindow || !hasProfile || !profileForm) {
-    return;
-  }
-
-  const access = {
-    hasUserAccess: [1, 2, ...userAccessGroups].some(
-      (groupId) => groupId === GroupID
-    ),
-    hasFullAccess: [1, 2].some((groupId) => groupId === GroupID)
-  };
-
-  const fldSelector = `[name="form[fld${fldId}]"]`;
-
-  const formFld = profileForm.querySelector(fldSelector);
-  const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
-
-  formFld.setAttribute("readonly", "");
-  if (!isAMS) {
-    fieldset.querySelector(".areafield").setAttribute("hidden", "");
-  }
-
-  if (!access.hasUserAccess) {
-    return;
-  }
-
-  const shouldPrefetchCollection = config.some((config) =>
-    config.inputs.some((input) => input.collection)
-  );
-
-  if (shouldPrefetchCollection) {
-    console.log("generateCustomFields", { shouldPrefetchCollection });
-
-    // prefetchUserCollection();
-  }
-
-  const initialContainer = document.createElement("div");
-  initialContainer.innerHTML = formFld.value;
-
-  fieldset
-    .querySelector(".fs-box")
-    .insertAdjacentHTML(
-      "afterbegin",
-      `<article class="teh-customFld" id="custom-flds" hidden></article>`
-    );
-
-  const customFldsContainer = document.getElementById("custom-flds");
-
-  const refreshCustomizationFld = () => {
-    const inputsArr = Array.from(
-      customFldsContainer.querySelectorAll(`input[type="text"]`)
-    );
-
-    let updatedContents = "";
-
-    config.forEach((configFld, i) => {
-      if (!configFld.userAccess && !access.hasFullAccess) {
-        return;
-      }
-
-      let fldContents = "";
-      let fldClassNames = "";
-
-      const sectionInputsArr = Array.from(
-        document
-          .getElementById(`custom-fld-${configFld.name}`)
-          .querySelectorAll(`input[type="text"]`)
-      );
-
-      configFld.inputs.forEach((input, i) => {
-        const currentValue = sectionInputsArr[i].value;
-
-        switch (input.type) {
-          case "img":
-            if (!currentValue) {
-              return;
-            }
-
-            const proxifiedValue = proxy + currentValue;
-
-            fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
-            break;
-          case "text":
-            if (!currentValue) {
-              return;
-            }
-
-            fldContents += input.mask?.(currentValue) ?? currentValue;
-            break;
-          case "className":
-            fldClassNames += fldClassNames.length
-              ? " " + currentValue
-              : currentValue;
-        }
-      });
-
-      const fldClassNamesStr = fldClassNames.length
-        ? ` class="${fldClassNames.trim()}"`
-        : "";
-
-      updatedContents += !!fldContents
-        ? `<div data-custom-fld="${configFld.name}"${fldClassNamesStr}>${fldContents}</div>\n`
-        : "";
-    });
-
-    formFld.value = updatedContents.trimEnd();
-  };
-
-  config.forEach((configFld) => {
-    if (!configFld.userAccess && !access.hasFullAccess) {
-      return;
-    }
-
-    const initialFldContainer = initialContainer.querySelector(
-      `[data-custom-fld=${configFld.name}]`
-    );
-
-    const sectionId = `custom-fld-${configFld.name}`;
-    const sectionFldsId = sectionId + "_flds";
-    const sectionPreviewId = sectionId + "_preview";
-
-    const fldHTML = `<section class="teh-customFld__section" id="${sectionId}">
-      <div id="${sectionFldsId}" class="teh-customFld__fields"></div>
-      <div class="teh-customFld__preview">
-        <div id="${sectionPreviewId}" data-custom-fld="${configFld.name}"></div>
-      </div>
-    </section>`;
-
-    customFldsContainer.insertAdjacentHTML("beforeend", fldHTML);
-
-    const section = document.getElementById(sectionId);
-    const fieldContainer = document.getElementById(sectionFldsId);
-    const previewContainer = document.getElementById(sectionPreviewId);
-
-    // create fields from config
-    configFld.inputs.forEach((input, i) => {
-      const getContents = () => {
-        switch (input.type) {
-          case "img":
-            return getImgSrc(initialFldContainer, proxy);
-          case "text":
-            return initialFldContainer?.querySelector("p").innerHTML ?? "";
-          case "className":
-            return initialFldContainer?.classList.toString() ?? "";
-        }
-      };
-
-      const contents = getContents();
-
-      console.log("generateCustomFields", { contents });
-
-      let optionsHTML = "";
-      if (input.options) {
-        // if (input.collection) {
-        //   // get collection data here
-        // }
-
-        input.options.forEach((option) => {
-          const getOptionLabel = () => {
-            switch (input.type) {
-              case "img":
-                return option.value
-                  ? proxy + option.value
-                  : (option.label ?? option.value);
-              default:
-                return option.label ?? option.value;
-            }
-          };
-          const optionLabel = getOptionLabel();
-
-          const dataAttr =
-            input.name === configFld.name
-              ? ` data-custom-fld="${configFld.name}"`
-              : "";
-
-          const optionLabelHTML =
-            !!option.value && !!input.mask
-              ? input.mask?.(optionLabel)
-              : optionLabel;
-
-          const html = `<label>
-            <span${dataAttr}>${optionLabelHTML}</span>
-            <input type="radio" name="${input.name}" value="${option.value}"/>
-          </label>`;
-
-          optionsHTML += html;
-        });
-      }
-
-      const inputId = `input_${input.name}`;
-
-      const isHiddenInput =
-        input.options?.length && (!isAMS() || input.strict) ? "hidden" : "";
-
-      // create label & input
-      fieldContainer.insertAdjacentHTML(
-        "beforeend",
-        `<div id="${inputId}_fldContainer">
-          <strong>${input.label}</strong>
-          ${optionsHTML.length ? `<div>${optionsHTML}</div>` : ""}
-          <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} ${isHiddenInput}/>
-        </div>`
-      );
-
-      // create & insert initial preview
-      switch (input.type) {
-        case "className":
-          if (contents.length) {
-            previewContainer.classList.add(contents);
-          }
-          break;
-        case "text":
-          previewContainer.insertAdjacentHTML(
-            "beforeend",
-            input.mask?.(contents) ?? contents
-          );
-          break;
-        case "img":
-          const proxifiedContents = contents.length
-            ? proxy + contents
-            : contents;
-
-          previewContainer.insertAdjacentHTML(
-            "beforeend",
-            input.mask?.(proxifiedContents) ?? proxifiedContents
-          );
-      }
-
-      const previewNode = Array.from(previewContainer.childNodes)[i];
-      const inputContainer = fieldContainer.querySelector(
-        `div:has(> #${inputId})`
-      );
-      const inputNode = document.getElementById(inputId);
-
-      // handle options
-      const optionNodesArr = Array.from(
-        inputContainer.querySelectorAll(`input[type="radio"]`)
-      );
-      const selectExistingOption = (value) => {
-        if (!input.options) {
-          return;
-        }
-
-        const selectedOption = inputContainer.querySelector(
-          `input[type="radio"][value="${value}"]`
-        );
-
-        if (selectedOption) {
-          selectedOption.checked = true;
-        } else {
-          optionNodesArr.forEach((optionInputNode) => {
-            optionInputNode.checked = false;
-          });
-        }
-      };
-
-      // set input value & event listener?
-      inputNode.value = contents;
-      selectExistingOption(contents);
-
-      // refresh preview
-      const updatePreviewOnInputChange = (value) => {
-        switch (input.type) {
-          case "img":
-            const previewImg =
-              previewNode.nodeName === "IMG"
-                ? previewNode
-                : previewNode.querySelector("img");
-
-            previewImg.setAttribute("src", value.length ? proxy + value : "");
-            break;
-          case "text":
-            previewNode.innerHTML = value;
-            break;
-          case "className":
-            if (previewContainer.classList.length) {
-              previewContainer.removeAttribute("class");
-            }
-
-            if (value.length) {
-              previewContainer.classList.add(value);
-            }
-        }
-      };
-
-      const handleTextInputChange = (e) => {
-        updatePreviewOnInputChange(e.target.value);
-        refreshCustomizationFld();
-
-        selectExistingOption(e.target.value);
-      };
-      inputNode.addEventListener("change", handleTextInputChange, true);
-
-      if (input.options) {
-        const handleRadioInputChange = (e) => {
-          inputNode.value = e.target.value;
-
-          updatePreviewOnInputChange(e.target.value);
-          refreshCustomizationFld();
-        };
-        optionNodesArr.forEach((optionInputNode) => {
-          optionInputNode.addEventListener(
-            "change",
-            handleRadioInputChange,
-            true
-          );
-        });
-      }
-    });
-  });
-
-  customFldsContainer.removeAttribute("hidden");
+  userAccessGroups: [5, 7],
+  debug: true
 };
 
+/**
+ * @param {Partial<GenerateCustomFieldsOptions>} [options]
+ * @returns {Promise<void>}
+ */
+const generateCustomFields = (options = {}) =>
+  generateCustomFieldsFeature({
+    ...defaultOptions,
+    ...options
+  });
+
 export default generateCustomFields;
+
+// possible config for reference:
+//
+// teh.generateCustomFields({
+//   fldId: "1",
+//   collectionFldId: "5", // form[fld2] = URL or <a class="treasury" href="/pages/…">
+//   proxy: "https://external-content.duckduckgo.com/iu/?u=",
+//   userAccessGroups: [5, 7], // Персонажи, Персонажи в архиве
+//   debug: true,
+//   config: [
+//     {
+//       name: "icon",
+//       userAccess: true,
+//       inputs: [
+//         {
+//           label: "Иконка",
+//           name: "icon",
+//           type: "img",
+//           collection: true, // → [data-collection="icon"] on the personal page
+//           mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`,
+//           options: [
+//             {
+//               label: "<i class='material-symbols-sharp'>close</i>",
+//               value: ""
+//             },
+//             { value: "https://cdn.imgchest.com/files/7b7d928ec1eb.png" },
+//             { value: "https://cdn.imgchest.com/files/5bf991bab422.png" }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       name: "plashka",
+//       userAccess: true,
+//       inputs: [
+//         {
+//           label: "Плашка",
+//           name: "plashka",
+//           type: "img",
+//           collection: true, // → [data-collection="plashka"]
+//           mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
+//           options: [
+//             {
+//               label: "<i class='material-symbols-sharp'>close</i>",
+//               value: ""
+//             },
+//             { value: "https://cdn.imgchest.com/files/c37f246a483c.png" },
+//             { value: "https://cdn.imgchest.com/files/dd7a83b76718.png" }
+//           ]
+//         },
+//         {
+//           label: "Текст плашки",
+//           name: "plashka-txt",
+//           type: "text",
+//           maxlength: "50",
+//           mask: (text) => `<p>${text}</p>`
+//         },
+//         {
+//           label: "Расположение текста плашки",
+//           name: "justify",
+//           type: "className",
+//           strict: true,
+//           options: [
+//             { label: "Слева", value: "justify-start" },
+//             { label: "По центру", value: "" },
+//             { label: "Справа", value: "justify-end" }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       name: "admin",
+//       userAccess: false,
+//       inputs: [
+//         {
+//           label: "Дополнительный статус АМС",
+//           type: "text",
+//           maxlength: "38",
+//           mask: (text) => `<p>${text}</p>`
+//         }
+//       ]
+//     }
+//   ]
+// });
