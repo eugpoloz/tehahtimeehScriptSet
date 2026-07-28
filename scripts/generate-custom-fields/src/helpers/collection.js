@@ -1,14 +1,9 @@
 import { handleError } from "@teh/utils";
 import { CUSTOMFLDS_MODULE_NAME } from "../const";
 
-export const getImgSrc = (container, proxy) => {
-  const src = container?.querySelector("img")?.getAttribute("src") ?? "";
-
-  return proxy && src.startsWith(proxy) ? src.split(proxy)[1] : src;
-};
-
-export const getMaxLength = (maxlength) =>
-  !!maxlength ? `maxlength=${maxlength}` : "";
+/**
+ * @typedef {import("../types.js").CustomFieldOption} CustomFieldOption
+ */
 
 /**
  * @param {string} [raw]
@@ -47,34 +42,47 @@ export const parseDataFromHTML = (root, selector) => {
     .filter(Boolean);
 };
 
+/** @type {Map<string, Promise<Document | null>>} */
+const collectionPageCache = new Map();
+
 /**
  * @param {string} pageUrl
  * @returns {Promise<Document | null>}
  */
 export const loadCollectionPage = async (pageUrl) => {
-  try {
-    const res = await fetch(pageUrl, { credentials: "same-origin" });
-    if (!res.ok) {
-      throw new Error(`collection fetch failed: ${res.status}`);
-    }
+  if (!collectionPageCache.has(pageUrl)) {
+    collectionPageCache.set(
+      pageUrl,
+      (async () => {
+        try {
+          const res = await fetch(pageUrl, { credentials: "same-origin" });
+          if (!res.ok) {
+            throw new Error(`collection fetch failed: ${res.status}`);
+          }
 
-    return new DOMParser().parseFromString(await res.text(), "text/html");
-  } catch (error) {
-    handleError(CUSTOMFLDS_MODULE_NAME, error);
-    return null;
+          return new DOMParser().parseFromString(await res.text(), "text/html");
+        } catch (error) {
+          handleError(CUSTOMFLDS_MODULE_NAME, error);
+          collectionPageCache.delete(pageUrl);
+          return null;
+        }
+      })()
+    );
   }
+
+  return collectionPageCache.get(pageUrl) ?? null;
 };
 
 /**
- * @param {import("../features/generateCustomFields.js").CustomFieldOption} option
+ * @param {CustomFieldOption} option
  * @returns {string}
  */
 const getOptionValueKey = (option) => option?.value ?? "";
 
 /**
- * @param {import("../features/generateCustomFields.js").CustomFieldOption[]} [baseOptions]
+ * @param {CustomFieldOption[]} [baseOptions]
  * @param {string[]} [collectionUrls]
- * @returns {import("../features/generateCustomFields.js").CustomFieldOption[]}
+ * @returns {CustomFieldOption[]}
  */
 export const mergeOptionsWithCollection = (
   baseOptions = [],

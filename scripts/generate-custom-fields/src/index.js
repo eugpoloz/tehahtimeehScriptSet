@@ -3,10 +3,10 @@
 import generateCustomFieldsFeature from "./features/generateCustomFields";
 
 /**
- * @typedef {import("./features/generateCustomFields.js").CustomFieldOption} CustomFieldOption
- * @typedef {import("./features/generateCustomFields.js").CustomFieldInput} CustomFieldInput
- * @typedef {import("./features/generateCustomFields.js").CustomFieldSection} CustomFieldSection
- * @typedef {import("./features/generateCustomFields.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions
+ * @typedef {import("./types.js").CustomFieldOption} CustomFieldOption
+ * @typedef {import("./types.js").CustomFieldInput} CustomFieldInput
+ * @typedef {import("./types.js").CustomFieldSection} CustomFieldSection
+ * @typedef {import("./types.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions
  */
 
 /** @type {CustomFieldSection[]} */
