@@ -149,14 +149,20 @@ const generateCustomFields = async ({
   const initialContainer = document.createElement("div");
   initialContainer.innerHTML = formFld.value;
 
+  const containerId = `custom-flds-${fldId}`;
+
   fieldset
     .querySelector(".fs-box")
     .insertAdjacentHTML(
       "afterbegin",
-      `<article class="teh-customFld" id="custom-flds" hidden></article>`
+      `<article class="teh-customFld" id="${containerId}" hidden></article>`
     );
 
-  const customFldsContainer = document.getElementById("custom-flds");
+  const customFldsContainer = document.getElementById(containerId);
+
+  const getSectionId = (sectionName) => `custom-fld-${fldId}-${sectionName}`;
+  const getInputId = (inputName) => `input_${fldId}_${inputName}`;
+  const getRadioName = (inputName) => `fld${fldId}_${inputName}`;
 
   const refreshCustomizationFld = () => {
     let updatedContents = "";
@@ -170,8 +176,8 @@ const generateCustomFields = async ({
       let fldClassNames = "";
 
       const sectionInputsArr = Array.from(
-        document
-          .getElementById(`custom-fld-${configFld.name}`)
+        customFldsContainer
+          .querySelector(`#${getSectionId(configFld.name)}`)
           .querySelectorAll(`input[type="text"]`)
       );
 
@@ -223,7 +229,7 @@ const generateCustomFields = async ({
       `[data-custom-fld=${configFld.name}]`
     );
 
-    const sectionId = `custom-fld-${configFld.name}`;
+    const sectionId = getSectionId(configFld.name);
     const sectionFldsId = sectionId + "_flds";
     const sectionPreviewId = sectionId + "_preview";
 
@@ -236,8 +242,12 @@ const generateCustomFields = async ({
 
     customFldsContainer.insertAdjacentHTML("beforeend", fldHTML);
 
-    const fieldContainer = document.getElementById(sectionFldsId);
-    const previewContainer = document.getElementById(sectionPreviewId);
+    const fieldContainer = customFldsContainer.querySelector(
+      `#${sectionFldsId}`
+    );
+    const previewContainer = customFldsContainer.querySelector(
+      `#${sectionPreviewId}`
+    );
 
     // create fields from config
     configFld.inputs.forEach((input, i) => {
@@ -271,6 +281,8 @@ const generateCustomFields = async ({
           : []
       );
 
+      const radioName = getRadioName(input.name);
+
       let optionsHTML = "";
       if (resolvedOptions.length) {
         resolvedOptions.forEach((option) => {
@@ -298,14 +310,14 @@ const generateCustomFields = async ({
 
           const html = `<label>
             <span${dataAttr}>${optionLabelHTML}</span>
-            <input type="radio" name="${input.name}" value="${option.value}"/>
+            <input type="radio" name="${radioName}" value="${option.value}"/>
           </label>`;
 
           optionsHTML += html;
         });
       }
 
-      const inputId = `input_${input.name}`;
+      const inputId = getInputId(input.name);
 
       const isHiddenInput =
         resolvedOptions.length && (!isAMS() || input.strict) ? "hidden" : "";
@@ -348,7 +360,7 @@ const generateCustomFields = async ({
       const inputContainer = fieldContainer.querySelector(
         `div:has(> #${inputId})`
       );
-      const inputNode = document.getElementById(inputId);
+      const inputNode = fieldContainer.querySelector(`#${inputId}`);
 
       // handle options
       const optionNodesArr = Array.from(

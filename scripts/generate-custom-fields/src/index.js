@@ -93,6 +93,7 @@ const fieldConfig = [
     inputs: [
       {
         label: "Дополнительный статус АМС",
+        name: "admin",
         type: "text",
         maxlength: "38",
         mask: (text) => `<p>${text}</p>`
@@ -127,9 +128,17 @@ export default generateCustomFields;
 
 // possible config for reference:
 //
+// teh.generateCustomFields(); // defaults → form[fld1]
+//
+// teh.generateCustomFields({
+//   fldId: "3",
+//   collectionFldId: "5",
+//   config: [/* another field’s sections */]
+// });
+//
 // teh.generateCustomFields({
 //   fldId: "1",
-//   collectionFldId: "5", // form[fld2] = URL or <a class="treasury" href="/pages/…">
+//   collectionFldId: "5", // form[fld5] = URL or <a class="treasury" href="/pages/…">
 //   proxy: "https://external-content.duckduckgo.com/iu/?u=",
 //   userAccessGroups: [5, 7], // Персонажи, Персонажи в архиве
 //   debug: true,
@@ -200,6 +209,7 @@ export default generateCustomFields;
 //       inputs: [
 //         {
 //           label: "Дополнительный статус АМС",
+//           name: "admin",
 //           type: "text",
 //           maxlength: "38",
 //           mask: (text) => `<p>${text}</p>`
