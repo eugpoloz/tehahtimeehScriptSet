@@ -17,8 +17,13 @@ const handleFastVote = async (href) => {
     if (voteResponse?.delta) {
       const pid = url.searchParams.get("id");
       const post = document.getElementById(`p${pid}`);
+      const rating = post?.querySelector(".post-rating a");
+
+      if (!post || !rating) {
+        return;
+      }
+
       const userId = post.dataset.userId;
-      const rating = post.querySelector(".post-rating a");
 
       post.classList.add("mylike");
 
@@ -41,23 +46,25 @@ const handleFastVote = async (href) => {
 };
 
 const addFastReactions = () => {
-  if (typeof FORUM.topic !== "object") {
-    return;
-  }
+  try {
+    if (typeof FORUM.topic !== "object") {
+      return;
+    }
 
-  const reputationForm = document.getElementById("rep_form");
-  const sendReputationBtn = document.getElementById("reputationButtonSend");
+    document.querySelectorAll(".post").forEach((post) => {
+      const rating = post.querySelector(".post-rating a");
+      const vote = post.querySelector(".post-vote a");
 
-  document.querySelectorAll(".post").forEach((post) => {
-    const rating = post.querySelector(".post-rating a");
-    rating.setAttribute("title", "Быстрый лайк");
+      if (!rating || !vote) {
+        return;
+      }
 
-    // replace post vote link inner content
-    const vote = post.querySelector(".post-vote a");
-
-    if (vote) {
       const href = vote.getAttribute("href");
+      if (!href) {
+        return;
+      }
 
+      rating.setAttribute("title", "Быстрый лайк");
       vote.setAttribute("title", "Лайк с комментом");
       vote.innerHTML = `<span class="vote-name">+</span>`;
 
@@ -70,8 +77,10 @@ const addFastReactions = () => {
       };
 
       rating.addEventListener("click", fetchVote, { passive: false });
-    }
-  });
+    });
+  } catch (error) {
+    handleError("enhance-reactions/addFastReactions", error);
+  }
 };
 
 export default addFastReactions;
