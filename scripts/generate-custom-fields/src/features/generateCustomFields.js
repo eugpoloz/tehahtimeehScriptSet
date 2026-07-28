@@ -2,52 +2,24 @@ import { handleLogs } from "@teh/utils";
 import { hasProfile, isProperWindow, isAMS } from "@teh/utils";
 import { CUSTOMFLDS_MODULE_NAME } from "../const";
 import {
-  getImgSrc,
   getMaxLength,
   getCollectionPageHref,
   parseDataFromHTML,
   loadCollectionPage,
   mergeOptionsWithCollection,
-  getCollectionName
-} from "../helpers/collection";
+  getCollectionName,
+  setClassTokens,
+  readInputContents,
+  maskInputValue,
+  getOptionLabel,
+  updatePreview
+} from "../helpers";
 
 /**
- * @typedef {object} CustomFieldOption
- * @property {string} [label] Visible label HTML (used when value is empty or for non-img types).
- * @property {string} [value] Stored value (image URL for `img`, class name for `className`, etc.).
- */
-
-/**
- * @typedef {"img" | "text" | "className"} CustomFieldInputType
- */
-
-/**
- * @typedef {object} CustomFieldInput
- * @property {string} label Field label shown in the editor UI.
- * @property {string} [name] Input name; also used as `data-collection` when `collection` is `true`.
- * @property {CustomFieldInputType} type How the value is read/written into the custom field HTML.
- * @property {(value: string) => string} [mask] Wraps the value for preview / saved HTML.
- * @property {CustomFieldOption[]} [options] Built-in radio options (defaults before collection merge).
- * @property {boolean | string} [collection] Load extra options from `[data-collection]` on the personal page. `true` uses `name`; a string sets the collection key explicitly.
- * @property {string} [maxlength] Max length for free-text inputs.
- * @property {boolean} [strict] When true, hide the free-text input even for AMS (options only).
- */
-
-/**
- * @typedef {object} CustomFieldSection
- * @property {string} name Section key written as `[data-custom-fld="${name}"]`.
- * @property {CustomFieldInput[]} inputs Controls rendered for this section.
- * @property {boolean} userAccess Whether non-admin character groups may edit this section.
- */
-
-/**
- * @typedef {object} GenerateCustomFieldsOptions
- * @property {string} fldId Profile field that stores the generated custom-field HTML.
- * @property {string} collectionFldId Profile field with the personal page URL or `<a href="…">`.
- * @property {CustomFieldSection[]} config Field sections to render.
- * @property {string} proxy Image proxy prefix applied to img URLs in preview/saved HTML.
- * @property {number[]} userAccessGroups Extra group IDs (beyond AMS) allowed to use the editor.
- * @property {boolean} [debug] Enable debug logging.
+ * @typedef {import("../types.js").CustomFieldOption} CustomFieldOption
+ * @typedef {import("../types.js").CustomFieldInput} CustomFieldInput
+ * @typedef {import("../types.js").CustomFieldSection} CustomFieldSection
+ * @typedef {import("../types.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions
  */
 
 /**
@@ -69,32 +41,40 @@ const generateCustomFields = async ({
     return;
   }
 
+  const currentGroupId = Number(GroupID);
   const access = {
     hasUserAccess: [1, 2, ...userAccessGroups].some(
-      (groupId) => groupId === GroupID
+      (groupId) => groupId === currentGroupId
     ),
-    hasFullAccess: [1, 2].some((groupId) => groupId === GroupID)
+    hasFullAccess: [1, 2].some((groupId) => groupId === currentGroupId)
   };
-
-  const fldSelector = `[name="form[fld${fldId}]"]`;
-
-  const formFld = profileForm.querySelector(fldSelector);
-  const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
-
-  formFld.setAttribute("readonly", "");
-  if (!isAMS) {
-    fieldset.querySelector(".areafield").setAttribute("hidden", "");
-  }
 
   if (!access.hasUserAccess) {
     return;
   }
 
+  const fldSelector = `[name="form[fld${fldId}]"]`;
+  const formFld = profileForm.querySelector(fldSelector);
+  const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
+  const fsBox = fieldset?.querySelector(".fs-box");
+
+  if (!formFld || !fieldset || !fsBox) {
+    return;
+  }
+
+  formFld.setAttribute("readonly", "");
+  if (!isAMS()) {
+    fieldset.querySelector(".areafield")?.setAttribute("hidden", "");
+  }
+
+  const canEditSection = (section) =>
+    section.userAccess || access.hasFullAccess;
+
   /** @type {Map<string, string[]>} */
   const collectionOptionsByName = new Map();
 
-  const collectionInputs = config.flatMap((configFld) =>
-    configFld.inputs
+  const collectionInputs = config.flatMap((section) =>
+    section.inputs
       .map((input) => ({
         input,
         collectionName: getCollectionName(input.collection, input.name)
@@ -150,15 +130,17 @@ const generateCustomFields = async ({
   initialContainer.innerHTML = formFld.value;
 
   const containerId = `custom-flds-${fldId}`;
+  document.getElementById(containerId)?.remove();
 
-  fieldset
-    .querySelector(".fs-box")
-    .insertAdjacentHTML(
-      "afterbegin",
-      `<article class="teh-customFld" id="${containerId}" hidden></article>`
-    );
+  fsBox.insertAdjacentHTML(
+    "afterbegin",
+    `<article class="teh-customFld" id="${containerId}" hidden></article>`
+  );
 
   const customFldsContainer = document.getElementById(containerId);
+  if (!customFldsContainer) {
+    return;
+  }
 
   const getSectionId = (sectionName) => `custom-fld-${fldId}-${sectionName}`;
   const getInputId = (inputName) => `input_${fldId}_${inputName}`;
@@ -167,45 +149,40 @@ const generateCustomFields = async ({
   const refreshCustomizationFld = () => {
     let updatedContents = "";
 
-    config.forEach((configFld) => {
-      if (!configFld.userAccess && !access.hasFullAccess) {
+    config.forEach((section) => {
+      if (!canEditSection(section)) {
         return;
       }
 
       let fldContents = "";
       let fldClassNames = "";
 
+      const sectionEl = customFldsContainer.querySelector(
+        `#${getSectionId(section.name)}`
+      );
+      if (!sectionEl) {
+        return;
+      }
+
       const sectionInputsArr = Array.from(
-        customFldsContainer
-          .querySelector(`#${getSectionId(configFld.name)}`)
-          .querySelectorAll(`input[type="text"]`)
+        sectionEl.querySelectorAll(`input[type="text"]`)
       );
 
-      configFld.inputs.forEach((input, i) => {
-        const currentValue = sectionInputsArr[i].value;
+      section.inputs.forEach((input, i) => {
+        const currentValue = sectionInputsArr[i]?.value ?? "";
 
-        switch (input.type) {
-          case "img":
-            if (!currentValue) {
-              return;
-            }
-
-            const proxifiedValue = proxy + currentValue;
-
-            fldContents += input.mask?.(proxifiedValue) ?? proxifiedValue;
-            break;
-          case "text":
-            if (!currentValue) {
-              return;
-            }
-
-            fldContents += input.mask?.(currentValue) ?? currentValue;
-            break;
-          case "className":
-            fldClassNames += fldClassNames.length
-              ? " " + currentValue
-              : currentValue;
+        if (input.type === "className") {
+          fldClassNames += fldClassNames.length
+            ? " " + currentValue
+            : currentValue;
+          return;
         }
+
+        if (!currentValue) {
+          return;
+        }
+
+        fldContents += maskInputValue(input, currentValue, proxy);
       });
 
       const fldClassNamesStr = fldClassNames.length
@@ -213,34 +190,35 @@ const generateCustomFields = async ({
         : "";
 
       updatedContents += !!fldContents
-        ? `<div data-custom-fld="${configFld.name}"${fldClassNamesStr}>${fldContents}</div>\n`
+        ? `<div data-custom-fld="${section.name}"${fldClassNamesStr}>${fldContents}</div>\n`
         : "";
     });
 
     formFld.value = updatedContents.trimEnd();
   };
 
-  config.forEach((configFld) => {
-    if (!configFld.userAccess && !access.hasFullAccess) {
+  config.forEach((section) => {
+    if (!canEditSection(section)) {
       return;
     }
 
     const initialFldContainer = initialContainer.querySelector(
-      `[data-custom-fld=${configFld.name}]`
+      `[data-custom-fld="${section.name}"]`
     );
 
-    const sectionId = getSectionId(configFld.name);
+    const sectionId = getSectionId(section.name);
     const sectionFldsId = sectionId + "_flds";
     const sectionPreviewId = sectionId + "_preview";
 
-    const fldHTML = `<section class="teh-customFld__section" id="${sectionId}">
-      <div id="${sectionFldsId}" class="teh-customFld__fields"></div>
-      <div class="teh-customFld__preview">
-        <div id="${sectionPreviewId}" data-custom-fld="${configFld.name}"></div>
-      </div>
-    </section>`;
-
-    customFldsContainer.insertAdjacentHTML("beforeend", fldHTML);
+    customFldsContainer.insertAdjacentHTML(
+      "beforeend",
+      `<section class="teh-customFld__section" id="${sectionId}">
+        <div id="${sectionFldsId}" class="teh-customFld__fields"></div>
+        <div class="teh-customFld__preview">
+          <div id="${sectionPreviewId}" data-custom-fld="${section.name}"></div>
+        </div>
+      </section>`
+    );
 
     const fieldContainer = customFldsContainer.querySelector(
       `#${sectionFldsId}`
@@ -249,20 +227,12 @@ const generateCustomFields = async ({
       `#${sectionPreviewId}`
     );
 
-    // create fields from config
-    configFld.inputs.forEach((input, i) => {
-      const getContents = () => {
-        switch (input.type) {
-          case "img":
-            return getImgSrc(initialFldContainer, proxy);
-          case "text":
-            return initialFldContainer?.querySelector("p").innerHTML ?? "";
-          case "className":
-            return initialFldContainer?.classList.toString() ?? "";
-        }
-      };
+    if (!fieldContainer || !previewContainer) {
+      return;
+    }
 
-      const contents = getContents();
+    section.inputs.forEach((input) => {
+      const contents = readInputContents(input, initialFldContainer, proxy);
 
       handleLogs(
         {
@@ -286,43 +256,35 @@ const generateCustomFields = async ({
       let optionsHTML = "";
       if (resolvedOptions.length) {
         resolvedOptions.forEach((option) => {
-          const getOptionLabel = () => {
-            switch (input.type) {
-              case "img":
-                return option.value
-                  ? proxy + option.value
-                  : (option.label ?? option.value);
-              default:
-                return option.label ?? option.value;
-            }
-          };
-          const optionLabel = getOptionLabel();
+          const optionValue = option.value ?? "";
+          const optionLabel = getOptionLabel(
+            input,
+            optionValue,
+            option.label,
+            proxy
+          );
 
           const dataAttr =
-            input.name === configFld.name
-              ? ` data-custom-fld="${configFld.name}"`
+            input.name === section.name
+              ? ` data-custom-fld="${section.name}"`
               : "";
 
           const optionLabelHTML =
-            !!option.value && !!input.mask
+            !!optionValue && !!input.mask
               ? input.mask?.(optionLabel)
               : optionLabel;
 
-          const html = `<label>
+          optionsHTML += `<label>
             <span${dataAttr}>${optionLabelHTML}</span>
-            <input type="radio" name="${radioName}" value="${option.value}"/>
+            <input type="radio" name="${radioName}" value="${optionValue}"/>
           </label>`;
-
-          optionsHTML += html;
         });
       }
 
       const inputId = getInputId(input.name);
-
       const isHiddenInput =
         resolvedOptions.length && (!isAMS() || input.strict) ? "hidden" : "";
 
-      // create label & input
       fieldContainer.insertAdjacentHTML(
         "beforeend",
         `<div id="${inputId}_fldContainer">
@@ -332,47 +294,52 @@ const generateCustomFields = async ({
         </div>`
       );
 
-      // create & insert initial preview
+      /** @type {Element | null} */
+      let previewNode = null;
+
       switch (input.type) {
         case "className":
           if (contents.length) {
-            previewContainer.classList.add(contents);
+            setClassTokens(previewContainer.classList, contents);
           }
           break;
         case "text":
           previewContainer.insertAdjacentHTML(
             "beforeend",
-            input.mask?.(contents) ?? contents
+            maskInputValue(input, contents, proxy)
           );
+          previewNode = previewContainer.lastElementChild;
           break;
         case "img":
-          const proxifiedContents = contents.length
-            ? proxy + contents
-            : contents;
-
           previewContainer.insertAdjacentHTML(
             "beforeend",
-            input.mask?.(proxifiedContents) ?? proxifiedContents
+            contents.length
+              ? maskInputValue(input, contents, proxy)
+              : (input.mask?.("") ?? "")
           );
+          previewNode = previewContainer.lastElementChild;
       }
 
-      const previewNode = Array.from(previewContainer.childNodes)[i];
       const inputContainer = fieldContainer.querySelector(
         `div:has(> #${inputId})`
       );
       const inputNode = fieldContainer.querySelector(`#${inputId}`);
 
-      // handle options
+      if (!inputContainer || !inputNode) {
+        return;
+      }
+
       const optionNodesArr = Array.from(
         inputContainer.querySelectorAll(`input[type="radio"]`)
       );
+
       const selectExistingOption = (value) => {
         if (!resolvedOptions.length) {
           return;
         }
 
-        const selectedOption = inputContainer.querySelector(
-          `input[type="radio"][value="${value}"]`
+        const selectedOption = optionNodesArr.find(
+          (optionInputNode) => optionInputNode.value === value
         );
 
         if (selectedOption) {
@@ -384,68 +351,47 @@ const generateCustomFields = async ({
         }
       };
 
-      // set input value & event listener?
+      const syncFromValue = (value) => {
+        updatePreview({
+          input,
+          value,
+          previewNode,
+          previewContainer,
+          proxy
+        });
+        refreshCustomizationFld();
+        selectExistingOption(value);
+      };
+
       inputNode.value = contents;
       selectExistingOption(contents);
 
-      // refresh preview
-      const updatePreviewOnInputChange = (value) => {
-        switch (input.type) {
-          case "img":
-            const previewImg =
-              previewNode.nodeName === "IMG"
-                ? previewNode
-                : previewNode.querySelector("img");
-
-            if (!previewImg) {
-              break;
-            }
-
-            if (value.length) {
-              previewImg.setAttribute("src", proxy + value);
-              previewImg.removeAttribute("hidden");
-            } else {
-              previewImg.removeAttribute("src");
-              previewImg.setAttribute("hidden", "");
-            }
-            break;
-          case "text":
-            previewNode.innerHTML = value;
-            break;
-          case "className":
-            if (previewContainer.classList.length) {
-              previewContainer.removeAttribute("class");
-            }
-
-            if (value.length) {
-              previewContainer.classList.add(value);
-            }
-        }
-      };
-
       if (input.type === "img") {
-        updatePreviewOnInputChange(contents);
+        updatePreview({
+          input,
+          value: contents,
+          previewNode,
+          previewContainer,
+          proxy
+        });
       }
 
-      const handleTextInputChange = (e) => {
-        updatePreviewOnInputChange(e.target.value);
-        refreshCustomizationFld();
-
-        selectExistingOption(e.target.value);
-      };
-      inputNode.addEventListener("change", handleTextInputChange, true);
+      inputNode.addEventListener(
+        "change",
+        (e) => {
+          syncFromValue(e.target.value);
+        },
+        true
+      );
 
       if (resolvedOptions.length) {
-        const handleRadioInputChange = (e) => {
-          inputNode.value = e.target.value;
-
-          updatePreviewOnInputChange(e.target.value);
-          refreshCustomizationFld();
-        };
         optionNodesArr.forEach((optionInputNode) => {
           optionInputNode.addEventListener(
             "change",
-            handleRadioInputChange,
+            (e) => {
+              inputNode.value = e.target.value;
+              syncFromValue(e.target.value);
+            },
             true
           );
         });
