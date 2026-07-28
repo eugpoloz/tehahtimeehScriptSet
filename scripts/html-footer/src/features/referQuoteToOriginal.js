@@ -7,9 +7,15 @@ const referQuoteToOriginal = () => {
 
     posts.forEach((post) => {
       const quoteLink = post.querySelector(".pl-quote a");
+      if (!quoteLink) {
+        return;
+      }
 
       const pid = post.getAttribute("id");
-      const href = post.querySelector(".pl-quote a").getAttribute("href");
+      const href = quoteLink.getAttribute("href");
+      if (!pid || !href) {
+        return;
+      }
 
       const updatedHref = href.replace("('", `('#${pid},`);
 
@@ -23,8 +29,11 @@ const referQuoteToOriginal = () => {
   if (quoteCites.length > 0) {
     quoteCites.forEach((cite) => {
       const [pidWithHash, username] = cite.textContent.split(",");
-      const pid = pidWithHash.slice(1);
+      if (!pidWithHash || !username) {
+        return;
+      }
 
+      const pid = pidWithHash.slice(1);
       const postInTopic = document.querySelector(`#${pid}.post`);
 
       cite.innerHTML = `<a class="qc-post-link" href="${postInTopic ? `#${pid}` : getViewtopicHref(pid)}">${username}</a>`;
