@@ -385,7 +385,17 @@ const generateCustomFields = async ({
                 ? previewNode
                 : previewNode.querySelector("img");
 
-            previewImg.setAttribute("src", value.length ? proxy + value : "");
+            if (!previewImg) {
+              break;
+            }
+
+            if (value.length) {
+              previewImg.setAttribute("src", proxy + value);
+              previewImg.removeAttribute("hidden");
+            } else {
+              previewImg.removeAttribute("src");
+              previewImg.setAttribute("hidden", "");
+            }
             break;
           case "text":
             previewNode.innerHTML = value;
@@ -400,6 +410,10 @@ const generateCustomFields = async ({
             }
         }
       };
+
+      if (input.type === "img") {
+        updatePreviewOnInputChange(contents);
+      }
 
       const handleTextInputChange = (e) => {
         updatePreviewOnInputChange(e.target.value);
