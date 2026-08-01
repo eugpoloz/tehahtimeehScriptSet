@@ -1,5 +1,5 @@
-import { handleError } from "@teh/utils";
-import { CUSTOMFLDS_MODULE_NAME } from "../const";
+import { handleError, handleLogs } from "@teh/utils";
+import { CUSTOMFLDS_MODULE_NAME } from "../const.js";
 
 /**
  * @typedef {import("../types.js").CustomFieldOption} CustomFieldOption
@@ -10,17 +10,18 @@ import { CUSTOMFLDS_MODULE_NAME } from "../const";
  * @returns {string}
  */
 export const getCollectionPageHref = (raw = "") => {
-  const trimmed = raw.trim();
-  if (!trimmed) {
+  if (!raw) {
     return "";
   }
 
-  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith("/")) {
-    return trimmed;
+  const match = raw.match(/(?:href|data-href)="([^"]+)"/i);
+  const value = match?.[1]?.trim() ?? "";
+
+  if (!value) {
+    return "";
   }
 
-  const parsed = new DOMParser().parseFromString(trimmed, "text/html");
-  return parsed.querySelector("a[href]")?.getAttribute("href")?.trim() ?? "";
+  return value.startsWith("/pages/") ? value : `/pages/${value}`;
 };
 
 /**
