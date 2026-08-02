@@ -109,6 +109,7 @@ const replaceFldContentWithHTML = (parent, selector) => {
  * @typedef {object} TransformProfilesConfig
  * @property {OnlineIndicatorOptions} [userStatus] Labels for online / offline indicators.
  * @property {string[]} [fieldsWithTitle] Selectors of post fields that should get a hover title.
+ * @property {number[]} [htmlFields] Selectors of post-author custom fields (fld1, fld2, etc.) that should have their content sanitized and rendered as HTML.
  */
 
 /**
@@ -124,12 +125,15 @@ const transformProfiles = (config = {}) => {
     ".pa-fld4",
     ".pa-respect"
   ];
+  const htmlFields = config?.htmlFields ?? [1, 2, 3];
 
   if (hasTopic) {
     const posts = document.querySelectorAll(".post");
 
     posts.forEach((post) => {
-      replaceFldContentWithHTML(post, 'li[class^="pa-fld"]');
+      htmlFields.forEach((fldNum) => {
+        replaceFldContentWithHTML(post, `li.pa-fld${fldNum}`);
+      });
       handleOnlineIndicators(post, userStatus);
 
       if (Array.isArray(fieldsWithTitle)) {
@@ -141,10 +145,12 @@ const transformProfiles = (config = {}) => {
   }
 
   if (!!document.getElementById("viewprofile-next")) {
-    replaceFldContentWithHTML(
-      document.getElementById("profile-right"),
-      'li[id^="pa-fld"] strong'
-    );
+      htmlFields.forEach((fldNum) => {
+        replaceFldContentWithHTML(
+          document.getElementById("profile-right"),
+          `li#pa-fld${fldNum} strong`
+        );
+      });
   }
 };
 

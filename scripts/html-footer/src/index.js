@@ -45,5 +45,6 @@ export {
 //    online: 'Онлайн',
 //    offline: 'Трогает траву'
 //  },
-//  fieldsWithTitle: ['.pa-posts', '.pa-fld4', '.pa-respect']
+//  fieldsWithTitle: ['.pa-posts', '.pa-fld4', '.pa-respect'],
+//  htmlFields: [1, 2, 3]
 //});
