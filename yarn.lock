@@ -213,6 +213,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teh/add-episode-templates@workspace:scripts/add-episode-templates":
+  version: 0.0.0-use.local
+  resolution: "@teh/add-episode-templates@workspace:scripts/add-episode-templates"
+  dependencies:
+    "@teh/utils": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@teh/core@workspace:scripts/core":
   version: 0.0.0-use.local
   resolution: "@teh/core@workspace:scripts/core"
