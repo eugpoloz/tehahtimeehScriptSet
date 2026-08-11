@@ -1,0 +1,17 @@
+{
+  "name": "@teh/add-episode-templates",
+  "version": "0.7.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "../../dist/teh.add-episode-templates.iife.js",
+  "exports": {
+    ".": "../../dist/teh.add-episode-templates.iife.js"
+  },
+  "scripts": {
+    "build": "yarn run -T vite build",
+    "dev": "yarn run -T vite build --watch"
+  },
+  "dependencies": {
+    "@teh/utils": "workspace:*"
+  }
+}
