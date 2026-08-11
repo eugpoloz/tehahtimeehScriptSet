@@ -255,6 +255,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/hehedges-specials@workspace:scripts/hehedges-specials":
+  version: 0.0.0-use.local
+  resolution: "@teh/hehedges-specials@workspace:scripts/hehedges-specials"
+  dependencies:
+    "@teh/utils": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@teh/html-footer@workspace:scripts/html-footer":
   version: 0.0.0-use.local
   resolution: "@teh/html-footer@workspace:scripts/html-footer"
@@ -285,14 +293,6 @@ __metadata:
 "@teh/utils@workspace:*, @teh/utils@workspace:lib/utils":
   version: 0.0.0-use.local
   resolution: "@teh/utils@workspace:lib/utils"
-  languageName: unknown
-  linkType: soft
-
-"@teh/web-components@workspace:scripts/web-components":
-  version: 0.0.0-use.local
-  resolution: "@teh/web-components@workspace:scripts/web-components"
-  dependencies:
-    "@teh/utils": "workspace:*"
   languageName: unknown
   linkType: soft
 

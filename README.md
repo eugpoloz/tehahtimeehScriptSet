@@ -9,14 +9,15 @@ lib/
   utils/                     # @teh/utils — shared helpers (source only)
 scripts/
   core/                      # @teh/core → teh.core.iife.js
-  html-footer/               # @teh/html-footer → teh.html-footer.iife.js
-  main-reply/                # @teh/main-reply → teh.main-reply.iife.js
-  web-components/            # @teh/web-components → teh.web-components.iife.js
+  html-footer/               # → teh.html-footer.iife.js
+  main-reply/                # → teh.main-reply.iife.js
+  hehedges-specials/         # → teh.hehedges-specials.iife.js
   generate-custom-fields/    # → teh.generate-custom-fields.iife.js
   generate-random-portraits/ # → teh.generate-random-portraits.iife.js
   multiacc-quick-login/      # → teh.multiacc-quick-login.iife.js
   count-posts-in-topic/      # → teh.count-posts-in-topic.iife.js
   enhance-reactions/         # → teh.enhance-reactions.iife.js
+  add-episode-templates/     # → teh.add-episode-templates.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
   new-script.mjs             # used by `make new-script`
@@ -42,4 +43,4 @@ Outputs land in the root `dist/` folder.
 
 Sources stay `.js`. Types come from JSDoc + `globals.d.ts`; `make typecheck` runs `tsc --noEmit` (`allowJs` / `checkJs` / `noEmit`).
 
-Currently `tsconfig.json` includes **`lib/**`only** so the check stays green. To opt scripts in later, add`"scripts/\*_/_.js"`to`include`and fix reported issues gradually (or add`// @ts-check` per file).
+Currently `tsconfig.json` includes `lib/**/*.js` plus opted-in script packages. To opt more scripts in later, add their `src/**/*.js` paths to `include` and fix reported issues gradually (or add `// @ts-check` per file).
