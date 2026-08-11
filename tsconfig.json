@@ -17,7 +17,7 @@
   "include": [
     "lib/**/*.js",
     "scripts/core/src/**/*.js",
-    "scripts/web-components/src/**/*.js",
+    "scripts/hehedges-specials/src/**/*.js",
     "globals.d.ts"
   ],
   "exclude": ["**/dist/**", "node_modules"]

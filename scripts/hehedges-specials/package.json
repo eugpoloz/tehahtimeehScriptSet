@@ -1,11 +1,11 @@
 {
-  "name": "@teh/web-components",
+  "name": "@teh/hehedges-specials",
   "version": "0.7.0",
   "license": "MIT",
   "type": "module",
-  "main": "../../dist/teh.web-components.iife.js",
+  "main": "../../dist/teh.hehedges-specials.iife.js",
   "exports": {
-    ".": "../../dist/teh.web-components.iife.js"
+    ".": "../../dist/teh.hehedges-specials.iife.js"
   },
   "scripts": {
     "build": "yarn run -T vite build",
