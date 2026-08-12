@@ -1,18 +1,18 @@
 "use strict";
 
-/**
- * `@teh/hehedges-specials` entry: registers `theme-subject` and exports
- * `defineAgeFromBirthday` for forum config.
- */
-
 import ThemeSubject from "./features/webComponents/theme-subject";
 import defineAgeFromBirthday from "./features/webComponents/age-from-birthday";
+import loadFriendsBanners from "./features/loadFriendsBanners";
 
-// module definitions
 customElements.define("theme-subject", ThemeSubject);
 
-export { defineAgeFromBirthday };
+export { defineAgeFromBirthday, loadFriendsBanners };
 
 // config example
 //
 // teh.defineAgeFromBirthday("age-from-dob", "GAME_LATEST_DATE");
+// teh.loadFriendsBanners({
+//   url: "/pages/friends",
+//   source: "#pun-main .container",
+//   target: "#html-footer .friends .wrapper"
+// });
