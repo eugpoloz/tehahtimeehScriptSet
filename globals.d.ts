@@ -10,7 +10,7 @@ interface ForumEditor {
 }
 
 interface Forum {
-  topic?: ForumTopic | object | null;
+  topic?: ForumTopic | null;
   editor?: ForumEditor | object | null;
   get?: (path: string) => unknown;
   [key: string]: unknown;
@@ -44,3 +44,8 @@ interface TehNamespace {
 }
 
 declare const teh: TehNamespace;
+
+/** Notification API supplied by the forum's jGrowl integration. */
+declare const $: {
+  jGrowl(message: string, options?: { sticky?: boolean }): void;
+};
