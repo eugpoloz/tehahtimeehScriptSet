@@ -24,6 +24,7 @@ async function autoReactToPosts() {
     if (!superlikeBtn) {
       return;
     }
+    const button = superlikeBtn;
 
     async function handleAutoReact() {
       const postsToLike = document.querySelectorAll(
@@ -32,6 +33,7 @@ async function autoReactToPosts() {
       const superlikesLength = postsToLike.length;
 
       if (superlikesLength) {
+        /** @param {number} idx */
         const superlikeNotificationContent = (idx) =>
           `Суперлайк в процессе: ${idx}/${superlikesLength}`;
 
@@ -74,16 +76,18 @@ async function autoReactToPosts() {
         $.jGrowl(ALL_LIKED_TEXT);
       }
 
-      superlikeBtn.removeAttribute("disabled");
-      superlikeBtn.classList.remove("cursor-wait");
+      button.removeAttribute("disabled");
+      button.classList.remove("cursor-wait");
     }
 
-    superlikeBtn.addEventListener("click", (e) => {
-      superlikeBtn.setAttribute("disabled", "");
-      superlikeBtn.classList.add("cursor-wait");
+    button.addEventListener("click", (e) => {
+      button.setAttribute("disabled", "");
+      button.classList.add("cursor-wait");
 
       handleAutoReact();
-      e.target.blur();
+      if (e.currentTarget instanceof HTMLElement) {
+        e.currentTarget.blur();
+      }
     });
   } catch (error) {
     handleError("enhance-reactions/autoReactToPosts", error);
