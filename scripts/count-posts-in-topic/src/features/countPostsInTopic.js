@@ -2,6 +2,19 @@ import { handleError, handleLogs } from "@teh/utils";
 
 const COUNTER_MODULE_NAME = "countPostsInTopic";
 
+/**
+ * @typedef {object} CountPostsInTopicOptions
+ * @property {number[]} [forumsToTrack]
+ * @property {string} [fldId]
+ * @property {string} [nextFldSelector]
+ * @property {boolean} [countTopicStarter]
+ * @property {boolean} [debug]
+ */
+
+/**
+ * @param {CountPostsInTopicOptions} [options]
+ * @returns {Promise<void>}
+ */
 const countPostsInTopic = async ({
   forumsToTrack = [],
   fldId = "5",
@@ -19,14 +32,14 @@ const countPostsInTopic = async ({
     const newPost = document.getElementById("pun-post");
 
     // for topic thread
-    if (typeof FORUM.topic === "object") {
-      const topic = FORUM.topic;
+    if (FORUM.topic && typeof FORUM.topic === "object") {
       forumId = +FORUM.topic.forum_id; // string needs to be converted to number
     } else if (newPost) {
-      forumId = +newPost.dataset.forumId;
+      const newPostForumId = newPost.dataset.forumId;
+      forumId = newPostForumId ? +newPostForumId : undefined;
     }
 
-    if (!forumsToTrack.includes(forumId)) {
+    if (forumId === undefined || !forumsToTrack.includes(forumId)) {
       return;
     }
 
@@ -44,7 +57,7 @@ const countPostsInTopic = async ({
       postForm.addEventListener("submit", function (event) {
         localStorage.setItem(
           COUNTER_NEW_POST_KEY,
-          Math.floor(Date.now() / 1000)
+          String(Math.floor(Date.now() / 1000))
         ); // in seconds
         handleLogs(
           {
@@ -76,16 +89,24 @@ const countPostsInTopic = async ({
     );
 
     if (latestPost) {
-      const initialCounter = window[`UserFld${fldId}`]
-        ? +window[`UserFld${fldId}`]
-        : 0;
+      const forumGlobals = /** @type {Record<string, unknown>} */ (
+        /** @type {unknown} */ (window)
+      );
+      const userFieldKey = `UserFld${fldId}`;
+      const userFieldValue = forumGlobals[userFieldKey];
+      const initialCounter = userFieldValue ? +String(userFieldValue) : 0;
       const updatedCounter = initialCounter + 1;
 
       const url = `/profile.php?section=fields&id=${window.UserID}`;
 
       const iframeHTML = `<iframe name="profileiframe" src="${window.location.origin + url}" width="0" height="0" tabindex="-1" class="hidden" hidden></iframe>`;
       document.body.insertAdjacentHTML("beforeend", iframeHTML);
-      const iframe = document.querySelector("iframe[name=profileiframe]");
+      const iframe = /** @type {HTMLIFrameElement | null} */ (
+        document.querySelector("iframe[name=profileiframe]")
+      );
+      if (!iframe) {
+        return;
+      }
 
       const updateCounterOnProfileRefresh = () => {
         const error =
@@ -95,23 +116,25 @@ const countPostsInTopic = async ({
           throw new Error("Failed to update profile");
         }
 
-        window[`UserFld${fldId}`] = updatedCounter;
+        forumGlobals[userFieldKey] = updatedCounter;
 
         const authorsPostsInTopic = document.querySelectorAll(
           `.post[data-user-id="${UserID}"] .post-author`
         );
 
         authorsPostsInTopic.forEach((author) => {
-          const counter = author.querySelector(`.pa-fld${fldId}`);
+          const counter = /** @type {HTMLElement | null} */ (
+            author.querySelector(`.pa-fld${fldId}`)
+          );
 
           if (counter) {
-            counter.innerText = updatedCounter;
+            counter.innerText = String(updatedCounter);
           } else {
             const html = `<li class="pa-fld${fldId}" title="Постов:"> ${updatedCounter}</li>`;
 
             author
               .querySelector(nextFldSelector)
-              .insertAdjacentHTML("beforebegin", html);
+              ?.insertAdjacentHTML("beforebegin", html);
           }
         });
 
@@ -120,13 +143,20 @@ const countPostsInTopic = async ({
       };
 
       const updateProfileOnLoad = () => {
-        const profileForm =
-          iframe?.contentWindow.document.getElementById("profile8");
-
-        const changingFld = profileForm.querySelector(
-          `[name="form[fld${fldId}]"]`
+        const profileForm = /** @type {HTMLFormElement | null} */ (
+          iframe.contentWindow?.document.getElementById("profile8") ?? null
         );
-        changingFld.value = updatedCounter;
+        if (!profileForm) {
+          throw new Error("Failed to load profile form");
+        }
+
+        const changingFld = /** @type {HTMLInputElement | null} */ (
+          profileForm.querySelector(`[name="form[fld${fldId}]"]`)
+        );
+        if (!changingFld) {
+          throw new Error(`Failed to find profile field ${fldId}`);
+        }
+        changingFld.value = String(updatedCounter);
 
         iframe.addEventListener("load", updateCounterOnProfileRefresh, {
           once: true

@@ -1,5 +1,9 @@
 import { viewprofile } from "@teh/utils";
 
+/**
+ * @param {number[]} [forums]
+ * @returns {void}
+ */
 function addProfileLinkToPosts(forums = [14, 15, 16, 17, 5]) {
   const profileName = document.getElementById("profile-name");
 
@@ -10,7 +14,7 @@ function addProfileLinkToPosts(forums = [14, 15, 16, 17, 5]) {
 
     const topicsLink = document.getElementById("user-topics");
 
-    topicsLink.insertAdjacentHTML("beforebegin", html);
+    topicsLink?.insertAdjacentHTML("beforebegin", html);
   }
 }
 
