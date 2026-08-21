@@ -1,7 +1,11 @@
+/** @param {Node} el */
 function selectElementText(el) {
-  let range = document.createRange();
+  const range = document.createRange();
   range.selectNodeContents(el);
-  let selection = window.getSelection();
+  const selection = window.getSelection();
+  if (!selection) {
+    return false;
+  }
   selection.removeAllRanges();
   selection.addRange(range);
   return true;
@@ -19,6 +23,10 @@ function copySelectionText() {
 
 // OUR CODE
 // helper func
+/**
+ * @param {Element | null} el
+ * @param {string} innerHTML
+ */
 function changeText(el, innerHTML) {
   if (el) {
     el.innerHTML = innerHTML;
@@ -26,6 +34,10 @@ function changeText(el, innerHTML) {
   }
 }
 
+/**
+ * @param {{ text?: string, copiedText?: string }} [props]
+ * @returns {void}
+ */
 export default function selectableCodeBox(props) {
   let text = "Выделить и скопировать:";
   let copiedText = "Скопировано в буфер обмена!";
@@ -42,6 +54,7 @@ export default function selectableCodeBox(props) {
 
   const textHTML = `<a href="#">${text}</a>`;
 
+  /** @param {Event} e */
   function codeSelector(e) {
     e.preventDefault();
     const { target } = e;
@@ -66,6 +79,7 @@ export default function selectableCodeBox(props) {
             // let's show user that our stuff is copied to clipboard
             if (elLegend) {
               changeText(elLegend, copiedText);
+              /** @type {number | undefined} */
               let timer;
 
               function revertTextBack() {

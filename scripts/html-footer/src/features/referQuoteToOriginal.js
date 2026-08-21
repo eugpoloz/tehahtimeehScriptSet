@@ -1,4 +1,5 @@
 const referQuoteToOriginal = () => {
+  /** @param {string} pid */
   const getViewtopicHref = (pid) => `/viewtopic.php?pid=${pid.slice(1)}#${pid}`;
 
   if (typeof FORUM.topic === "object") {
@@ -24,11 +25,11 @@ const referQuoteToOriginal = () => {
   }
 
   const quoteCites = [...document.querySelectorAll(".answer-box cite")].filter(
-    (cite) => cite?.textContent.startsWith("#")
+    (cite) => cite.textContent?.startsWith("#")
   );
   if (quoteCites.length > 0) {
     quoteCites.forEach((cite) => {
-      const [pidWithHash, username] = cite.textContent.split(",");
+      const [pidWithHash, username] = (cite.textContent ?? "").split(",");
       if (!pidWithHash || !username) {
         return;
       }

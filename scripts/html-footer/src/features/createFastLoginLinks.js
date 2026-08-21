@@ -1,5 +1,17 @@
 import { getLang, handleLogin } from "@teh/utils";
 
+/**
+ * @typedef {object} FastLogin
+ * @property {string} [id]
+ * @property {string | Record<string, string>} link
+ * @property {string} login
+ * @property {string} password
+ */
+
+/**
+ * @param {{ after?: string, logins?: FastLogin[] }} options
+ * @returns {void}
+ */
 export default function createFastLoginLinks({
   after = "navlogin",
   logins = []
@@ -7,7 +19,9 @@ export default function createFastLoginLinks({
   // if the current user group is a guest one
   if (GroupID === 3) {
     // helper function
-    function handleFastLoginClick({ target }) {
+    /** @param {Event} event */
+    function handleFastLoginClick(event) {
+      const { target } = event;
       if (target instanceof HTMLElement) {
         const { login, password } = target.dataset;
 
@@ -19,12 +33,13 @@ export default function createFastLoginLinks({
       const loginMap = logins.map(({ id, link, login, password }, i) => {
         const liID = id || `navAdd${i}`;
 
-        if (typeof link !== "string") {
+        let linkLabel = link;
+        if (typeof linkLabel !== "string") {
           const lang = getLang();
-          link = link[lang];
+          linkLabel = linkLabel[lang] ?? "";
         }
 
-        return `<li id="${liID}"><a class="js_login" data-login="${login}" data-password="${password}">${link}</a></li>`;
+        return `<li id="${liID}"><a class="js_login" data-login="${login}" data-password="${password}">${linkLabel}</a></li>`;
       });
 
       const afterEl = document.getElementById(after);

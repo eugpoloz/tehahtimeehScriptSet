@@ -19,8 +19,12 @@ function transformNodes() {
   }
 }
 
+/**
+ * @param {number} [forum_id]
+ * @returns {void | false}
+ */
 export default function clickableGuestNames(forum_id) {
-  if (typeof FORUM.topic === "object") {
+  if (FORUM.topic && typeof FORUM.topic === "object") {
     const current_forum = Number(FORUM.topic.forum_id);
 
     if (forum_id && forum_id === current_forum) {
