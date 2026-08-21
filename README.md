@@ -41,6 +41,4 @@ Outputs land in the root `dist/` folder.
 
 ## Type safety (without TypeScript sources)
 
-Sources stay `.js`. Types come from JSDoc + `globals.d.ts`; `make typecheck` runs `tsc --noEmit` (`allowJs` / `checkJs` / `noEmit`).
-
-Currently `tsconfig.json` includes `lib/**/*.js` plus opted-in script packages. To opt more scripts in later, add their `src/**/*.js` paths to `include` and fix reported issues gradually (or add `// @ts-check` per file).
+Sources stay `.js`. Types come from JSDoc plus the root declaration files; `make typecheck` runs `tsc --noEmit` (`allowJs` / `checkJs` / `noEmit`) across shared utilities and every script package.
