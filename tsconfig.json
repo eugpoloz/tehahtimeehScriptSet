@@ -19,7 +19,8 @@
     "scripts/core/src/**/*.js",
     "scripts/hehedges-specials/src/**/*.js",
     "scripts/add-episode-templates/src/**/*.js",
-    "globals.d.ts"
+    "globals.d.ts",
+    "vendor.d.ts"
   ],
   "exclude": ["**/dist/**", "node_modules"]
 }
