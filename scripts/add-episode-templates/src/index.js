@@ -1,6 +1,6 @@
 "use strict";
 
-import addEpisodeTemplates from "./features/addEpisodeTemplates";
+import addEpisodeTemplates from "./features/add-episode-templates";
 
 export default addEpisodeTemplates;
 

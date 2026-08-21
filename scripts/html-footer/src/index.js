@@ -1,12 +1,12 @@
 "use strict";
 
-import transformProfiles from "./features/transformProfiles";
-import selectCodeBox from "./features/selectAndCopy";
-import addGuestNameClicks from "./features/makeGuestNamesClickable";
-import createFastLoginLinks from "./features/createFastLoginLinks";
-import disableProfiles from "./features/disableProfiles";
-import changeFontSize from "./features/changeFontSize";
-import referQuoteToOriginal from "./features/referQuoteToOriginal";
+import transformProfiles from "./features/transform-profiles";
+import selectCodeBox from "./features/select-and-copy";
+import addGuestNameClicks from "./features/make-guest-names-clickable";
+import createFastLoginLinks from "./features/create-fast-login-links";
+import disableProfiles from "./features/disable-profiles";
+import changeFontSize from "./features/change-font-size";
+import referQuoteToOriginal from "./features/refer-quote-to-original";
 
 // module exports
 export {

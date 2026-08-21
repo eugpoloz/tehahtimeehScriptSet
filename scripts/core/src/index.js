@@ -10,8 +10,8 @@
 import { version } from "../package.json";
 import init from "./features/init";
 import gnu from "./features/gnu-terry-pratchett";
-import loadWhen from "./features/loadWhen";
-import { popoverHintPolyfill } from "./polyfills/popoverHint";
+import loadWhen from "./features/load-when";
+import { popoverHintPolyfill } from "./polyfills/popover-hint";
 
 import "interestfor";
 

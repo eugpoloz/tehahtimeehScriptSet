@@ -1,7 +1,7 @@
 "use strict";
 
 import defaultOptions from "./config/defaults";
-import generateCustomFieldsFeature from "./features/generateCustomFields";
+import generateCustomFieldsFeature from "./features/generate-custom-fields";
 
 /**
  * @typedef {import("./types.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions

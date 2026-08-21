@@ -1,9 +1,9 @@
 "use strict";
 
-import countTextareaCharacters from "./features/textarea/charCounter";
-import submitOnHotkey from "./features/textarea/fastSubmit";
-import * as refactorEditorButtons from "./features/textarea/refactorEditorButtons";
-import addEditorButtons from "./features/textarea/addEditorButtons";
+import countTextareaCharacters from "./features/textarea/char-counter";
+import submitOnHotkey from "./features/textarea/fast-submit";
+import * as refactorEditorButtons from "./features/textarea/refactor-editor-buttons";
+import addEditorButtons from "./features/textarea/add-editor-buttons";
 
 // default scripts
 refactorEditorButtons.addCtrlClicks();
