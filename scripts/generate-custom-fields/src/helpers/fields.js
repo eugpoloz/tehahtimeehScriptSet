@@ -43,9 +43,9 @@ export const getClassNameContents = (options, container) => {
     return "";
   }
 
-  const optionValues = (options ?? [])
-    .map((option) => option.value)
-    .filter(Boolean);
+  const optionValues = (options ?? []).flatMap((option) =>
+    option.value ? [option.value] : []
+  );
 
   return (
     optionValues.find((value) => container.classList.contains(value)) ?? ""
