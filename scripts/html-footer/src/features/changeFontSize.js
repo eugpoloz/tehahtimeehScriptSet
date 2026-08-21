@@ -8,15 +8,16 @@ const changeFontSize = () => {
     const pun = document.getElementById("pun");
     const postContent = document.querySelector(".post-content");
 
-    if (!postContent) {
+    if (!pun || !postContent) {
       return;
     }
     const getComputedFontSizeFromPost = () =>
       Number(window.getComputedStyle(postContent).fontSize.slice(0, -2));
 
+    /** @param {number} size */
     const setDynamicFontSize = (size) => {
       pun.style.setProperty(CSS_VARIABLE_SIZE_KEY, `${size}px`);
-      localStorage.setItem(LOCALSTORAGE_SIZE_KEY, size);
+      localStorage.setItem(LOCALSTORAGE_SIZE_KEY, String(size));
     };
 
     const userFontSize = Number(
@@ -56,7 +57,7 @@ const changeFontSize = () => {
     };
 
     const btnIncrease = document.getElementById("text-increase");
-    btnIncrease.addEventListener("click", increaseFontSize);
+    btnIncrease?.addEventListener("click", increaseFontSize);
 
     const btnDecrease = document.getElementById("text-decrease");
     btnDecrease?.addEventListener("click", decreaseFontSize);

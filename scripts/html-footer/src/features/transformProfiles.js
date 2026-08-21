@@ -18,6 +18,9 @@ const handleOnlineIndicators = (post, options = {}) => {
   const offline = options?.offline ?? "Трогает траву";
 
   const postAuthor = post.querySelector(".post-author");
+  if (!postAuthor) {
+    return;
+  }
 
   const isOnline = postAuthor.classList.contains("online");
 
@@ -63,8 +66,13 @@ const addTitleToIconFields = (post, field) => {
     const fieldName = fieldNode.querySelector(".fld-name")?.textContent;
 
     if (field === ".pa-respect") {
-      const contentSpan = fieldNode.querySelector("span:not(.fld-name)");
-      contentSpan.title = fieldName;
+      const contentSpan = /** @type {HTMLElement | null} */ (
+        fieldNode.querySelector("span:not(.fld-name)")
+      );
+      if (!contentSpan) {
+        return;
+      }
+      contentSpan.title = fieldName ?? "";
       contentSpan.classList.add(CONTENT_CLASS_NAME);
       return;
     }
@@ -72,7 +80,7 @@ const addTitleToIconFields = (post, field) => {
     const childNodes = fieldNode.childNodes;
     for (const node of childNodes) {
       if (node.nodeType === Node.TEXT_NODE) {
-        const html = `<span class="${CONTENT_CLASS_NAME}" title="${fieldName}">${node.textContent.trim()}</span>`;
+        const html = `<span class="${CONTENT_CLASS_NAME}" title="${fieldName ?? ""}">${node.textContent?.trim() ?? ""}</span>`;
 
         const range = document.createRange();
         const fragment = range.createContextualFragment(html);
@@ -101,7 +109,9 @@ const replaceFldContentWithHTML = (parent, selector) => {
 
       fld.innerHTML = cleanContent;
     }
-    fld.dataset.ready = "";
+    if (fld instanceof HTMLElement) {
+      fld.dataset.ready = "";
+    }
   });
 };
 
@@ -144,13 +154,11 @@ const transformProfiles = (config = {}) => {
     });
   }
 
-  if (!!document.getElementById("viewprofile-next")) {
-      htmlFields.forEach((fldNum) => {
-        replaceFldContentWithHTML(
-          document.getElementById("profile-right"),
-          `li#pa-fld${fldNum} strong`
-        );
-      });
+  const profileRight = document.getElementById("profile-right");
+  if (document.getElementById("viewprofile-next") && profileRight) {
+    htmlFields.forEach((fldNum) => {
+      replaceFldContentWithHTML(profileRight, `li#pa-fld${fldNum} strong`);
+    });
   }
 };
 
