@@ -1,7 +1,27 @@
 import shuffle from "lodash-es/shuffle";
 import { handleError } from "@teh/utils";
 
-/** This creates HTML markup for the portraits.
+/**
+ * @typedef {object} PortraitUser
+ * @property {string | number} user_id
+ * @property {string} username
+ * @property {string} [avatar]
+ */
+
+/**
+ * @typedef {object} GenerateRandomPortraitsOptions
+ * @property {string[]} [filteredUsers]
+ * @property {(string | number)[]} [group_id]
+ * @property {number} [howMany]
+ * @property {string} [placeholder]
+ * @property {string} [selector]
+ */
+
+/**
+ * This creates HTML markup for the portraits.
+ *
+ * @param {{ users: PortraitUser[], placeholder: string, selector?: string }} options
+ * @returns {void}
  */
 function createPortraits({
   users,
@@ -25,7 +45,11 @@ function createPortraits({
   });
 }
 
-async function generateRandomPortraits(pickPortraits) {
+/**
+ * @param {GenerateRandomPortraitsOptions} [pickPortraits]
+ * @returns {Promise<PortraitUser[] | undefined>}
+ */
+async function generateRandomPortraits(pickPortraits = {}) {
   try {
     const {
       filteredUsers = [], // usernames
@@ -40,7 +64,9 @@ async function generateRandomPortraits(pickPortraits) {
     const data = await fetch(
       `${window.location.origin}/api.php?method=users.get&fields=user_id,username,avatar&limit=200&group_id=${groupIds}`
     );
-    const response = await data.json();
+    const response = /** @type {{ response: { users: PortraitUser[] } }} */ (
+      await data.json()
+    );
 
     let { users } = response.response;
 
