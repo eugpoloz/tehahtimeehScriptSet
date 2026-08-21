@@ -1,4 +1,4 @@
-import { getSubject } from "../../helpers/getSubject";
+import { getSubject } from "../../helpers/get-subject";
 
 /**
  * Displays the episode/theme subject: light-DOM children if present,

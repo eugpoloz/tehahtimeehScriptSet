@@ -1,5 +1,5 @@
 import { handleError, handleLogs } from "@teh/utils";
-import { CUSTOMFLDS_MODULE_NAME } from "../const.js";
+import { CUSTOMFLDS_MODULE_NAME } from "../constants.js";
 
 /**
  * @typedef {import("../types.js").CustomFieldOption} CustomFieldOption

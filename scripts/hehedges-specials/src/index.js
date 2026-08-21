@@ -1,8 +1,8 @@
 "use strict";
 
-import ThemeSubject from "./features/webComponents/theme-subject";
-import defineAgeFromBirthday from "./features/webComponents/age-from-birthday";
-import loadFriendsBanners from "./features/loadFriendsBanners";
+import ThemeSubject from "./features/web-components/theme-subject";
+import defineAgeFromBirthday from "./features/web-components/age-from-birthday";
+import loadFriendsBanners from "./features/load-friends-banners";
 
 customElements.define("theme-subject", ThemeSubject);
 

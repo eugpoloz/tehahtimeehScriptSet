@@ -1,7 +1,7 @@
 "use strict";
 
-import addProfileLinkToPosts from "./features/addProfileLinkToPosts";
-import countPostsInTopic from "./features/countPostsInTopic";
+import addProfileLinkToPosts from "./features/add-profile-link-to-posts";
+import countPostsInTopic from "./features/count-posts-in-topic";
 
 // run by default
 addProfileLinkToPosts();

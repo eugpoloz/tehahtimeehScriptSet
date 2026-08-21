@@ -1,7 +1,7 @@
 "use strict";
 
-import addFastReactions from "./features/addFastReactions";
-import autoReactToPosts from "./features/autoReactToPosts";
+import addFastReactions from "./features/add-fast-reactions";
+import autoReactToPosts from "./features/auto-react-to-posts";
 
 function enhanceReactions() {
   addFastReactions();

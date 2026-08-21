@@ -1,6 +1,6 @@
 import { handleLogs } from "@teh/utils";
 import { hasProfile, isProperWindow, isAMS } from "@teh/utils";
-import { CUSTOMFLDS_MODULE_NAME } from "../const";
+import { CUSTOMFLDS_MODULE_NAME } from "../constants";
 import {
   getMaxLength,
   getCollectionPageHref,
