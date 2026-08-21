@@ -16,9 +16,7 @@
   },
   "include": [
     "lib/**/*.js",
-    "scripts/core/src/**/*.js",
-    "scripts/hehedges-specials/src/**/*.js",
-    "scripts/add-episode-templates/src/**/*.js",
+    "scripts/*/src/**/*.js",
     "globals.d.ts",
     "vendor.d.ts"
   ],
