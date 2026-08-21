@@ -4,6 +4,12 @@ import { decryptAndLoad, encryptAndSave } from "./helpers/crypto";
 const INDEXED_DB_KEY = "MultiaccQuickLoginEncryptionKey";
 const LOCAL_STORAGE_KEY = "MultiaccQuickLogin";
 
+/**
+ * @typedef {object} StoredLogin
+ * @property {string} login
+ * @property {string} password
+ */
+
 const getQuickLoginFormHTML = () => {
   const FULL_LOGIN_LINK =
     GroupID === 3 ? `<a href="/login.php">На страницу логина</a>` : "";
@@ -51,6 +57,7 @@ const MULTIACC_LIST_VIP_HTML = `
 </div>
 `;
 
+/** @param {string} login */
 const getMultiaccItemHTML = (login) => {
   let loginHTML = "";
 
@@ -63,14 +70,15 @@ const getMultiaccItemHTML = (login) => {
   </li>`;
 };
 
+/** @returns {Promise<StoredLogin[] | null>} */
 const getMultiaccEncryptedData = async () => {
   const decryptedDataString = await decryptAndLoad({
     encryptionKey: INDEXED_DB_KEY,
     localStorageKey: LOCAL_STORAGE_KEY
   });
 
-  const decryptedData = !!decryptedDataString
-    ? JSON.parse(decryptedDataString)
+  const decryptedData = decryptedDataString
+    ? /** @type {StoredLogin[]} */ (JSON.parse(decryptedDataString))
     : null;
 
   return decryptedData;
@@ -83,26 +91,32 @@ const setFormBusy = () => {
   }
 };
 
+/** @param {SubmitEvent} e */
 const handleQuickLogin = async (e) => {
   e.preventDefault();
   setFormBusy();
 
+  if (!(e.target instanceof HTMLFormElement)) {
+    return;
+  }
+
   const formData = new FormData(e.target);
-  const login = formData.get("req_username");
-  const password = formData.get("req_password");
+  const loginValue = formData.get("req_username");
+  const passwordValue = formData.get("req_password");
+  if (typeof loginValue !== "string" || typeof passwordValue !== "string") {
+    return;
+  }
+  const login = loginValue;
+  const password = passwordValue;
 
   const rememberAcc = formData.get("remember-acc");
 
   if (rememberAcc) {
     const decryptedData = await getMultiaccEncryptedData();
 
-    let decryptedDataWithoutCurrentLogin = [];
-
-    if (decryptedData?.length > 0) {
-      decryptedDataWithoutCurrentLogin = decryptedData.filter(
-        (item) => item.login !== login
-      );
-    }
+    const decryptedDataWithoutCurrentLogin = (decryptedData ?? []).filter(
+      (item) => item.login !== login
+    );
 
     const dataToEncrypt = [
       { login, password },
@@ -145,8 +159,13 @@ const getVIPMultiAccList = async () => {
 
 const renderMultiaccList = async () => {
   const multiaccList = document.getElementById("multiacc-list");
+  const pun = document.getElementById("pun");
+  const multiListLocal = document.getElementById("multiacc-list-local");
+  if (!multiaccList || !pun || !multiListLocal) {
+    return;
+  }
 
-  const isVIP = document.getElementById("pun").classList.contains("isvip");
+  const isVIP = pun.classList.contains("isvip");
 
   if (isVIP) {
     if (!document.getElementById("multiacc-list-vip")) {
@@ -154,11 +173,14 @@ const renderMultiaccList = async () => {
     }
 
     const multiListVip = document.getElementById("multiacc-list-vip");
+    if (!multiListVip) {
+      return;
+    }
 
     if (multiListVip.innerHTML === "") {
       const multiList = await getVIPMultiAccList();
 
-      if (multiList && multiListVip) {
+      if (multiList) {
         multiList.forEach((item) => {
           multiListVip.insertAdjacentElement("beforeend", item);
 
@@ -180,7 +202,6 @@ const renderMultiaccList = async () => {
     }
   }
 
-  const multiListLocal = document.getElementById("multiacc-list-local");
   if (multiListLocal.innerHTML === "") {
     let decryptedData = await getMultiaccEncryptedData();
 
@@ -194,15 +215,21 @@ const renderMultiaccList = async () => {
       );
 
       multiaccLocalItems.forEach((itemElement) => {
+        if (!(itemElement instanceof HTMLElement)) {
+          return;
+        }
         const removeItem = itemElement.querySelector(".multiacc-item-remove");
         const loginItem = itemElement.querySelector(".multiacc-item-login");
 
         const login = itemElement.dataset.login;
+        if (!removeItem || !login) {
+          return;
+        }
 
         removeItem.addEventListener("click", async (e) => {
           e.preventDefault();
 
-          const updatedData = [...decryptedData].filter(
+          const updatedData = [...(decryptedData ?? [])].filter(
             (storedItem) => storedItem.login !== login
           );
 
@@ -221,7 +248,7 @@ const renderMultiaccList = async () => {
             e.preventDefault();
             setFormBusy();
 
-            const password = decryptedData.find(
+            const password = decryptedData?.find(
               (storedItem) => storedItem.login === login
             )?.password;
 
@@ -237,7 +264,7 @@ const renderMultiaccList = async () => {
 
 const multiaccQuickLogin = () => {
   const lang = getLang();
-  const link = { en: "Re-login", ru: "Перезайти" }[lang];
+  const link = { en: "Re-login", ru: "Перезайти" }[lang] ?? "Перезайти";
 
   const html = `<div id="teh-multiacc-quick-login" class="teh-multiacc-quick-login">
     <div class="container">
@@ -255,6 +282,9 @@ const multiaccQuickLogin = () => {
   const logoutNavlink = document.getElementById("navlogout");
 
   const navlinks = document.getElementById("pun-navlinks");
+  if (!navlinks) {
+    return;
+  }
 
   navlinks.insertAdjacentHTML("beforeend", html);
 
@@ -267,17 +297,25 @@ const multiaccQuickLogin = () => {
     logoutNavlink.insertAdjacentHTML("beforebegin", quickLoginNavlink);
   }
 
-  document.querySelector(".js_relogin").addEventListener("click", async (e) => {
+  const reloginLink = document.querySelector(".js_relogin");
+  if (!reloginLink) {
+    return;
+  }
+
+  reloginLink.addEventListener("click", async (e) => {
     e.preventDefault();
 
     const quickForm = document.getElementById("teh-multiacc-quick-login");
     if (quickForm) {
       quickForm.classList.toggle("visible");
 
+      /** @param {MouseEvent} eClickOutside */
       const handleClickOutside = (eClickOutside) => {
+        const clickTarget = eClickOutside.target;
         if (
-          !eClickOutside.target.closest("#teh-multiacc-quick-login .wrapper") &&
-          eClickOutside.target !== e.target
+          clickTarget instanceof Element &&
+          !clickTarget.closest("#teh-multiacc-quick-login .wrapper") &&
+          clickTarget !== e.target
         ) {
           quickForm.classList.remove("visible");
           document.removeEventListener("click", handleClickOutside, false);
