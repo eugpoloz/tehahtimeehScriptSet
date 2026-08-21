@@ -4,10 +4,16 @@ export default function submitPostOnHotkey() {
     const submitInput = document.querySelector(`input[name="submit"]`);
 
     if (textarea instanceof HTMLTextAreaElement) {
-      function checkClicked({ key, ctrlKey, metaKey }) {
+      const editor = textarea;
+
+      /** @param {KeyboardEvent} event */
+      function checkClicked(event) {
+        const { key, ctrlKey, metaKey } = event;
         if (key === "Enter" && (ctrlKey || metaKey)) {
-          submitInput?.click();
-          textarea.value = "";
+          if (submitInput instanceof HTMLElement) {
+            submitInput.click();
+          }
+          editor.value = "";
         }
       }
 

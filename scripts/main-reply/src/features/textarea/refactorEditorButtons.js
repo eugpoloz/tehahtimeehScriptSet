@@ -1,4 +1,6 @@
-function handleClick({ target, ctrlKey, metaKey, altKey }) {
+/** @param {MouseEvent} event */
+function handleClick(event) {
+  const { target, ctrlKey, metaKey, altKey } = event;
   if (target instanceof HTMLElement) {
     const { parentNode } = target;
     if (parentNode instanceof HTMLElement) {
@@ -18,7 +20,7 @@ function handleClick({ target, ctrlKey, metaKey, altKey }) {
             break;
         }
       } else {
-        FORUM.get("editor." + nodeID + ".onclick()");
+        FORUM.get?.("editor." + nodeID + ".onclick()");
       }
     }
   }

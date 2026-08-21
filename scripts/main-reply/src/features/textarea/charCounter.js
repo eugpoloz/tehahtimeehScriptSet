@@ -8,19 +8,23 @@ export default function countCharacters(counterText = "Знаков в сооб�
   if (typeof FORUM.editor === "object") {
     const textarea = document.getElementById("main-reply");
 
+    /** @param {string} value */
     function updateCharCounter(value) {
       const { length } = value;
 
       const counter = document.querySelector(`#${counterId} .count`);
       if (counter) {
-        counter.innerText = length.toString();
+        counter.textContent = length.toString();
       }
     }
 
-    const debouncedUpdate = debounce(
-      ({ target }) => updateCharCounter(target.value),
-      15
-    );
+    /** @param {Event} event */
+    const updateFromEvent = (event) => {
+      if (event.target instanceof HTMLTextAreaElement) {
+        updateCharCounter(event.target.value);
+      }
+    };
+    const debouncedUpdate = debounce(updateFromEvent, 15);
 
     if (textarea instanceof HTMLTextAreaElement) {
       const tehTarget = document.querySelector("#teh-target");
