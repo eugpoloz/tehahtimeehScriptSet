@@ -54,7 +54,9 @@ const generateCustomFields = async ({
   }
 
   const fldSelector = `[name="form[fld${fldId}]"]`;
-  const formFld = profileForm.querySelector(fldSelector);
+  const formFld = /** @type {HTMLInputElement | HTMLTextAreaElement | null} */ (
+    profileForm.querySelector(fldSelector)
+  );
   const fieldset = profileForm.querySelector(`fieldset:has(${fldSelector})`);
   const fsBox = fieldset?.querySelector(".fs-box");
 
@@ -67,6 +69,7 @@ const generateCustomFields = async ({
     fieldset.querySelector(".areafield")?.setAttribute("hidden", "");
   }
 
+  /** @param {CustomFieldSection} section */
   const canEditSection = (section) =>
     section.userAccess || access.hasFullAccess;
 
@@ -83,8 +86,8 @@ const generateCustomFields = async ({
   );
 
   if (collectionInputs.length) {
-    const collectionFld = profileForm.querySelector(
-      `[name="form[fld${collectionFldId}]"]`
+    const collectionFld = /** @type {HTMLInputElement | null} */ (
+      profileForm.querySelector(`[name="form[fld${collectionFldId}]"]`)
     );
     const pageHref = getCollectionPageHref(collectionFld?.value ?? "");
 
@@ -142,8 +145,11 @@ const generateCustomFields = async ({
     return;
   }
 
+  /** @param {string} sectionName */
   const getSectionId = (sectionName) => `custom-fld-${fldId}-${sectionName}`;
+  /** @param {string} inputName */
   const getInputId = (inputName) => `input_${fldId}_${inputName}`;
+  /** @param {string} inputName */
   const getRadioName = (inputName) => `fld${fldId}_${inputName}`;
 
   const refreshCustomizationFld = () => {
@@ -164,8 +170,8 @@ const generateCustomFields = async ({
         return;
       }
 
-      const sectionInputsArr = Array.from(
-        sectionEl.querySelectorAll(`input[type="text"]`)
+      const sectionInputsArr = /** @type {HTMLInputElement[]} */ (
+        Array.from(sectionEl.querySelectorAll(`input[type="text"]`))
       );
 
       section.inputs.forEach((input, i) => {
@@ -323,16 +329,19 @@ const generateCustomFields = async ({
       const inputContainer = fieldContainer.querySelector(
         `div:has(> #${inputId})`
       );
-      const inputNode = fieldContainer.querySelector(`#${inputId}`);
+      const inputNode = /** @type {HTMLInputElement | null} */ (
+        fieldContainer.querySelector(`#${inputId}`)
+      );
 
       if (!inputContainer || !inputNode) {
         return;
       }
 
-      const optionNodesArr = Array.from(
-        inputContainer.querySelectorAll(`input[type="radio"]`)
+      const optionNodesArr = /** @type {HTMLInputElement[]} */ (
+        Array.from(inputContainer.querySelectorAll(`input[type="radio"]`))
       );
 
+      /** @param {string} value */
       const selectExistingOption = (value) => {
         if (!resolvedOptions.length) {
           return;
@@ -351,6 +360,7 @@ const generateCustomFields = async ({
         }
       };
 
+      /** @param {string} value */
       const syncFromValue = (value) => {
         updatePreview({
           input,
@@ -379,7 +389,9 @@ const generateCustomFields = async ({
       inputNode.addEventListener(
         "change",
         (e) => {
-          syncFromValue(e.target.value);
+          if (e.currentTarget instanceof HTMLInputElement) {
+            syncFromValue(e.currentTarget.value);
+          }
         },
         true
       );
@@ -389,8 +401,10 @@ const generateCustomFields = async ({
           optionInputNode.addEventListener(
             "change",
             (e) => {
-              inputNode.value = e.target.value;
-              syncFromValue(e.target.value);
+              if (e.currentTarget instanceof HTMLInputElement) {
+                inputNode.value = e.currentTarget.value;
+                syncFromValue(e.currentTarget.value);
+              }
             },
             true
           );
