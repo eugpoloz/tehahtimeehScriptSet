@@ -23,6 +23,25 @@ tooling/
   new-script.mjs             # used by `make new-script`
 ```
 
+## Script package conventions
+
+Every buildable script is a workspace under `scripts/<kebab-case-name>/` with a `package.json`, a `vite.config.js`, and a `src/index.js` entry point. Keep the entry point focused on the public API, default initialization, and exports.
+
+Add package directories only when the code needs them:
+
+```text
+src/
+  index.js       # public API and initialization
+  features/      # feature-specific behavior
+  helpers/       # reusable helpers local to this package
+  config/        # substantial static or default configuration
+  types.js       # shared JSDoc types for this package
+```
+
+Source modules and feature directories use lowercase kebab-case. A feature may be a single file or a directory with its own `index.js` when it spans several modules. Keep broadly reusable browser helpers in `lib/utils`; do not move package-specific helpers there.
+
+Put substantial configuration and usage documentation in the package's `README.md`. Short invocation examples may remain beside the public entry point. Do not create empty convention directories.
+
 ## Commands
 
 ```bash
@@ -35,7 +54,7 @@ make format    # prettier --write
 make new-script NAME=my-feature  # scaffold a new scripts/* package
 ```
 
-`NAME` must be kebab-case. That creates `scripts/<name>/`, updates the README layout, and runs `yarn install`. Global export is camelCase (`my-feature` → `teh.myFeature`); the dist file is kebab (`teh.my-feature.iife.js`). Makefile targets are discovered from `scripts/*/`.
+`NAME` must be kebab-case. That creates `scripts/<name>/` with a thin entry point and `src/features/<name>.js`, updates the README layout, and runs `yarn install`. Global export is camelCase (`my-feature` → `teh.myFeature`); the dist file is kebab (`teh.my-feature.iife.js`). The `tsconfig.json` and Makefile discover new packages automatically.
 
 Outputs land in the root `dist/` folder.
 
