@@ -62,16 +62,19 @@ export default createIifeConfig({
 `,
   "src/index.js": `"use strict";
 
-/**
- * @param {unknown} [config]
- */
-function ${camel}(config) {}
+import ${camel} from "./features/${kebab}";
 
 export default ${camel};
 
-// config example
-//
-// teh.${camel}();
+// Usage: teh.${camel}();
+`,
+  [`src/features/${kebab}.js`]: `/**
+ * @param {unknown} [config]
+ * @returns {void}
+ */
+const ${camel} = (config) => {};
+
+export default ${camel};
 `
 };
 
@@ -95,6 +98,7 @@ if (!readme.includes(`  ${kebab}/`)) {
 console.log(`Created scripts/${kebab}`);
 console.log(`  package: @teh/${kebab}`);
 console.log(`  export:  teh.${camel} / teh.${kebab}.iife.js`);
+console.log(`  feature: src/features/${kebab}.js`);
 console.log(`  make:    make ${kebab}`);
 
 const install = spawnSync("yarn", ["install"], {
