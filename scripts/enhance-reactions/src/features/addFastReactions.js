@@ -1,5 +1,9 @@
 import { handleError } from "@teh/utils";
 
+/**
+ * @param {string} href
+ * @returns {Promise<void>}
+ */
 const handleFastVote = async (href) => {
   try {
     const url = new URL(window.location.origin + href + `&format=json`);
@@ -8,7 +12,10 @@ const handleFastVote = async (href) => {
       method: "GET",
       credentials: "include"
     });
-    const voteResponse = await voteRequest.json();
+    const voteResponse =
+      /** @type {{ error?: { message?: string }, delta?: number }} */ (
+        await voteRequest.json()
+      );
 
     if (voteResponse?.error?.message) {
       throw new Error(voteResponse?.error?.message);
@@ -41,7 +48,7 @@ const handleFastVote = async (href) => {
     }
   } catch (e) {
     handleError("enhance-reactions/addFastReactions", e);
-    $.jGrowl(e?.message);
+    $.jGrowl(e instanceof Error ? e.message : String(e));
   }
 };
 
@@ -68,12 +75,15 @@ const addFastReactions = () => {
       vote.setAttribute("title", "Лайк с комментом");
       vote.innerHTML = `<span class="vote-name">+</span>`;
 
+      /** @param {Event} e */
       const fetchVote = (e) => {
         e.stopImmediatePropagation();
         e.preventDefault();
         handleFastVote(href);
 
-        e.target?.blur();
+        if (e.currentTarget instanceof HTMLElement) {
+          e.currentTarget.blur();
+        }
       };
 
       rating.addEventListener("click", fetchVote, { passive: false });
