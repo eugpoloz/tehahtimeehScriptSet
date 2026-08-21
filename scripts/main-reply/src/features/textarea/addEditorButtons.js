@@ -1,3 +1,15 @@
+/**
+ * @typedef {object} EditorButtonConfig
+ * @property {string} target
+ * @property {string} id
+ * @property {string} title
+ * @property {string} onclick
+ */
+
+/**
+ * @param {EditorButtonConfig[]} [btnConfig]
+ * @returns {void}
+ */
 const addEditorButtons = (btnConfig = []) => {
   btnConfig.forEach((btn) => {
     const btnTarget = document.getElementById(btn.target);
