@@ -16,7 +16,9 @@ const loadFriendsBanners = async ({
   source = "#pun-main .container",
   target = "#html-footer .friends .wrapper"
 } = {}) => {
-  const wrapper = document.querySelector(target);
+  const wrapper = /** @type {HTMLElement | null} */ (
+    document.querySelector(target)
+  );
   if (!wrapper) {
     return;
   }
