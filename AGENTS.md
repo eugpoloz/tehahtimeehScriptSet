@@ -18,6 +18,9 @@
 - Use ESM imports and exports.
 - Follow the repository Prettier configuration: 2 spaces and no trailing
   commas.
+- Prefer HTML template strings over creating DOM elements imperatively. Do not
+  use `document.createElement` or equivalent element-by-element construction
+  when generating markup.
 - Prefer small feature modules under `src/features` and reusable helpers under
   `src/helpers`.
 - Use early returns for unsupported pages, missing DOM elements, and failed
