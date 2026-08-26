@@ -1,56 +1,5 @@
 import { handleError } from "@teh/utils";
-
-/**
- * @param {string} href
- * @returns {Promise<void>}
- */
-const handleFastVote = async (href) => {
-  try {
-    const url = new URL(window.location.origin + href + `&format=json`);
-
-    const voteRequest = await fetch(url, {
-      method: "GET",
-      credentials: "include"
-    });
-    const voteResponse =
-      /** @type {{ error?: { message?: string }, delta?: number }} */ (
-        await voteRequest.json()
-      );
-
-    if (voteResponse?.error?.message) {
-      throw new Error(voteResponse?.error?.message);
-    }
-
-    if (voteResponse?.delta) {
-      const pid = url.searchParams.get("id");
-      const post = document.getElementById(`p${pid}`);
-      const rating = post?.querySelector(".post-rating a");
-
-      if (!post || !rating) {
-        return;
-      }
-
-      const userId = post.dataset.userId;
-
-      post.classList.add("mylike");
-
-      const postRating = rating.textContent.split("+").join("");
-      rating.textContent = `+${Number(postRating) + 1}`;
-
-      const userPostReputation = document.querySelectorAll(
-        `.post[data-user-id="${userId}"] .pa-respect span:not(.fld-name)`
-      );
-
-      userPostReputation.forEach((respect) => {
-        const userRespect = respect.textContent.split("+").join("");
-        respect.textContent = `+${Number(userRespect) + 1}`;
-      });
-    }
-  } catch (e) {
-    handleError("enhance-reactions/addFastReactions", e);
-    $.jGrowl(e instanceof Error ? e.message : String(e));
-  }
-};
+import { handleFastVote } from "../helpers/fast-vote";
 
 const addFastReactions = () => {
   try {
@@ -62,7 +11,11 @@ const addFastReactions = () => {
       const rating = post.querySelector(".post-rating a");
       const vote = post.querySelector(".post-vote a");
 
-      if (!rating || !vote) {
+      if (
+        !rating ||
+        !vote ||
+        rating.hasAttribute("data-ready")
+      ) {
         return;
       }
 
@@ -76,17 +29,20 @@ const addFastReactions = () => {
       vote.innerHTML = `<span class="vote-name">+</span>`;
 
       /** @param {Event} e */
-      const fetchVote = (e) => {
+      const fetchVote = async (e) => {
         e.stopImmediatePropagation();
         e.preventDefault();
-        handleFastVote(href);
 
-        if (e.currentTarget instanceof HTMLElement) {
-          e.currentTarget.blur();
+        try {
+          await handleFastVote(href);
+        } catch (error) {
+          handleError("enhance-reactions/addFastReactions", error);
+          $.jGrowl(error instanceof Error ? error.message : String(error));
         }
       };
 
       rating.addEventListener("click", fetchVote, { passive: false });
+      rating.setAttribute("data-ready", "");
     });
   } catch (error) {
     handleError("enhance-reactions/addFastReactions", error);
