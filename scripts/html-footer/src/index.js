@@ -7,6 +7,7 @@ import createFastLoginLinks from "./features/create-fast-login-links";
 import disableProfiles from "./features/disable-profiles";
 import changeFontSize from "./features/change-font-size";
 import referQuoteToOriginal from "./features/refer-quote-to-original";
+import addTitlePopovers from "./features/add-title-popovers";
 
 // module exports
 export {
@@ -16,7 +17,8 @@ export {
   addGuestNameClicks,
   changeFontSize,
   referQuoteToOriginal,
-  transformProfiles
+  transformProfiles,
+  addTitlePopovers
 };
 
 // possible config for reference:
@@ -48,3 +50,14 @@ export {
 //  fieldsWithTitle: ['.pa-posts', '.pa-fld4', '.pa-respect'],
 //  htmlFields: [1, 2, 3]
 //});
+//teh.addTitlePopovers([
+//  {
+//    selector: ".post-content abbr[title]",
+//    insertPosition: "beforeend"
+//  },
+//  {
+//    selector: ".post-content img[title]",
+//    insertPosition: "afterend"
+//  }
+//]);
+//teh.addTitlePopovers(["abbr[title]", "button[title]"]);
