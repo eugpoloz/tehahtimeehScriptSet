@@ -23,6 +23,8 @@
   when generating markup.
 - Prefer small feature modules under `src/features` and reusable helpers under
   `src/helpers`.
+- Optimize for human readability. Prefer explicit conditionals over multiline
+  or nested ternary expressions.
 - Use early returns for unsupported pages, missing DOM elements, and failed
   access checks.
 - Add JSDoc to public functions and non-obvious data structures.
