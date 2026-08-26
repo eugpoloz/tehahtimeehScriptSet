@@ -1,93 +1,148 @@
 import { hasTopic, handleError } from "@teh/utils";
 import { randomDelay, sleep } from "../helpers/delay";
+import { handleFastVote } from "../helpers/fast-vote";
 
 const ALL_LIKED_TEXT = "На этой странице всё пролайкано!";
+const SUPERLIKE_TOOLTIP_ID = "superlike-tooltip";
+const SUPERLIKE_TOOLTIP_TEXT = "Лайкнуть все сообщения на странице";
 
 async function autoReactToPosts() {
+  if (!hasTopic) {
+    return;
+  }
+
+  const controlsContainer =
+    document.querySelector("#topic-modmenu .container") ??
+    document.querySelector("#topic-feed .container");
+
+  if (!controlsContainer) {
+    return;
+  }
+
   try {
-    if (!hasTopic) {
+    if (document.getElementById(SUPERLIKE_TOOLTIP_ID)) {
       return;
     }
 
-    const modmenu =
-      document.querySelector("#topic-modmenu .container") ??
-      document.querySelector("#topic-feed .container");
+    const html = `<div class="superlike__container">
+      <button type="button" class="superlike" interestfor="${SUPERLIKE_TOOLTIP_ID}" popovertarget="${SUPERLIKE_TOOLTIP_ID}">Лайкнуть всех</button>
+      <div class="tooltip" popover="hint" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto">${SUPERLIKE_TOOLTIP_TEXT}</div>
+    </div>`;
+    controlsContainer.insertAdjacentHTML("beforeend", html);
 
-    if (!modmenu) {
+    const superlikeBtn = controlsContainer.querySelector(".superlike");
+    const superlikeTooltip = document.getElementById(SUPERLIKE_TOOLTIP_ID);
+
+    if (!(superlikeBtn instanceof HTMLElement) || !superlikeTooltip) {
       return;
     }
+    /** @type {number | undefined} */
+    let hideTooltipTimeout;
 
-    const html = `<button type="button" class="superlike">Лайкнуть всех</button>`;
-    modmenu.insertAdjacentHTML("beforeend", html);
+    /** @param {string} content */
+    const showSuperlikeTooltip = (content) => {
+      superlikeTooltip.textContent = content;
+      if (!superlikeTooltip.matches(":popover-open")) {
+        superlikeTooltip.showPopover({ source: superlikeBtn });
+      }
+    };
 
-    const superlikeBtn = modmenu.querySelector(".superlike");
-    if (!superlikeBtn) {
-      return;
-    }
-    const button = superlikeBtn;
+    const hideSuperlikeTooltip = () => {
+      if (superlikeTooltip.matches(":popover-open")) {
+        superlikeTooltip.hidePopover();
+      }
+    };
+
+    const lockSuperlikeTooltip = () => {
+      superlikeBtn.removeAttribute("interestfor");
+      superlikeTooltip.setAttribute("popover", "manual");
+    };
+
+    const resetSuperlikeTooltip = () => {
+      superlikeBtn.setAttribute("interestfor", SUPERLIKE_TOOLTIP_ID);
+      hideSuperlikeTooltip();
+      superlikeTooltip.setAttribute("popover", "hint");
+      superlikeTooltip.textContent = SUPERLIKE_TOOLTIP_TEXT;
+    };
 
     async function handleAutoReact() {
-      const postsToLike = document.querySelectorAll(
-        `.post:not(.mylike):not([data-user-id="${UserID}"]) .post-rating a`
-      );
-      const superlikesLength = postsToLike.length;
+      try {
+        if (hideTooltipTimeout !== undefined) {
+          clearTimeout(hideTooltipTimeout);
+          hideTooltipTimeout = undefined;
+        }
 
-      if (superlikesLength) {
-        /** @param {number} idx */
-        const superlikeNotificationContent = (idx) =>
-          `Суперлайк в процессе: ${idx}/${superlikesLength}`;
+        lockSuperlikeTooltip();
 
-        $.jGrowl(superlikeNotificationContent(0), {
-          sticky: true
-        });
+        const reactionsToAdd = document.querySelectorAll(
+          `.post:not(.mylike):not([data-user-id="${UserID}"]) .post-rating a`
+        );
+        const superlikesLength = reactionsToAdd.length;
+        let successfulLikes = 0;
+        let failedLikes = 0;
 
-        for (let i = 0; i < superlikesLength; i++) {
-          const message = document.querySelector(".jGrowl-message");
-          if (message) {
-            message.textContent = superlikeNotificationContent(i);
-          }
+        showSuperlikeTooltip(
+          superlikesLength
+            ? `Суперлайк в процессе: 0/${superlikesLength}`
+            : ALL_LIKED_TEXT
+        );
+
+        for (const [index, reaction] of reactionsToAdd.entries()) {
+          const href = reaction
+            .closest(".post")
+            ?.querySelector(".post-vote a")
+            ?.getAttribute("href");
 
           try {
-            postsToLike[i].dispatchEvent(
-              new MouseEvent("click", {
-                bubbles: true,
-                cancelable: true,
-                view: window
-              })
-            );
-          } catch (e) {
-            handleError("enhance-reactions/autoReactToPosts", e);
+            if (!href) {
+              throw new Error("Не найдена ссылка для лайка");
+            }
+
+            await handleFastVote(href);
+            successfulLikes++;
+          } catch (error) {
+            failedLikes++;
+            handleError("enhance-reactions/autoReactToPosts", error);
           }
 
-          await sleep(randomDelay());
+          showSuperlikeTooltip(
+            `Суперлайк в процессе: ${index + 1}/${superlikesLength}`
+          );
+
+          if (index < superlikesLength - 1) {
+            await sleep(randomDelay());
+          }
         }
 
-        const message = document.querySelector(".jGrowl-message");
-        if (message) {
-          message.textContent = ALL_LIKED_TEXT;
-
-          setTimeout(() => {
-            $.jGrowl("close");
-          }, 3000);
+        if (failedLikes) {
+          showSuperlikeTooltip(
+            `Лайки поставлены: ${successfulLikes}/${superlikesLength}. Ошибок: ${failedLikes}`
+          );
+        } else {
+          showSuperlikeTooltip(ALL_LIKED_TEXT);
         }
-      }
+      } catch (error) {
+        handleError("enhance-reactions/autoReactToPosts", error);
+        showSuperlikeTooltip("Не удалось завершить суперлайк");
+      } finally {
+        hideTooltipTimeout = window.setTimeout(() => {
+          resetSuperlikeTooltip();
+          hideTooltipTimeout = undefined;
+        }, 3000);
 
-      if (!document.querySelector(".jGrowl-message")) {
-        $.jGrowl(ALL_LIKED_TEXT);
+        superlikeBtn?.removeAttribute("disabled");
+        superlikeBtn?.classList.remove("cursor-wait");
       }
-
-      button.removeAttribute("disabled");
-      button.classList.remove("cursor-wait");
     }
 
-    button.addEventListener("click", (e) => {
-      button.setAttribute("disabled", "");
-      button.classList.add("cursor-wait");
+    superlikeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      superlikeBtn.setAttribute("disabled", "");
+      superlikeBtn.classList.add("cursor-wait");
 
-      handleAutoReact();
-      if (e.currentTarget instanceof HTMLElement) {
-        e.currentTarget.blur();
-      }
+      void handleAutoReact().catch((error) => {
+        handleError("enhance-reactions/autoReactToPosts", error);
+      });
     });
   } catch (error) {
     handleError("enhance-reactions/autoReactToPosts", error);
