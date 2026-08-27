@@ -26,6 +26,10 @@ execute when the parsed fragment is inserted. Only grant access to fully
 trusted users or groups because this permits arbitrary JavaScript on the forum
 origin.
 
+The same allowlists apply to AJAX previews. When the current `UserID` or
+`GroupID` is allowed, marked code blocks under `#post-preview` are rendered
+again after every `pun_preview` event.
+
 ## Title popovers
 
 `teh.addTitlePopovers()` replaces native `title` tooltips with accessible
