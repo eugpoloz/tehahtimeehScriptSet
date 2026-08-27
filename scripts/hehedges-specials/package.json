@@ -12,6 +12,7 @@
     "dev": "yarn run -T vite build --watch"
   },
   "dependencies": {
-    "@teh/utils": "workspace:*"
+    "@teh/utils": "workspace:*",
+    "dialog-closedby-polyfill": "1.3.0"
   }
 }
