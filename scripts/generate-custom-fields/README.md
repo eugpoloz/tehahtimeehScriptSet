@@ -25,7 +25,7 @@ teh.generateCustomFields({
 ## Configuration
 
 - `fldId`: profile field that stores the generated HTML.
-- `collectionFldId`: profile field containing a personal-page URL or an `<a href="…">` value.
+- `collectionFldId`: profile field containing a character collection page URL or an `<a href="…">` value.
 - `config`: sections and inputs rendered by the editor.
 - `proxy`: prefix applied to image URLs in previews and saved HTML.
 - `userAccessGroups`: additional group IDs allowed to use the editor.
