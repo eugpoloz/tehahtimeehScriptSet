@@ -1,0 +1,17 @@
+{
+  "name": "@teh/html-header",
+  "version": "0.7.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "../../dist/teh.html-header.iife.js",
+  "exports": {
+    ".": "../../dist/teh.html-header.iife.js"
+  },
+  "scripts": {
+    "build": "yarn run -T vite build",
+    "dev": "yarn run -T vite build --watch"
+  },
+  "dependencies": {
+    "@teh/utils": "workspace:*"
+  }
+}
