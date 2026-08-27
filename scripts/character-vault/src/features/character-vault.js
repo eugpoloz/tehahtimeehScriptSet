@@ -1,14 +1,12 @@
+import describeCharacter from "./describe-character.js";
+import loadCharacters from "./load-characters.js";
 import {
-  describeCharacter,
-  getProfile,
-  loadCharacters,
-  sortCharacterKeys
-} from "../helpers/character-data.js";
-import {
+  enableAvatarFallbacks,
   parseCollection,
-  parseDataFromElement
-} from "../helpers/collections.js";
-import { enableAvatarFallbacks } from "../helpers/dom.js";
+  parseDataFromElement,
+  sortCharacterKeys
+} from "../helpers/character-vault.js";
+import getProfile from "../helpers/get-profile.js";
 import {
   adminActionMarkup,
   characterMarkup,
@@ -21,9 +19,15 @@ import {
 } from "../helpers/markup.js";
 import { ALL_FILTER, CHAR_PARAM } from "../constants.js";
 
-/** @param {HTMLElement} root @param {string} name */
-const getTarget = (root, name) =>
-  /** @type {HTMLElement} */ (root.querySelector(`[data-vault="${name}"]`));
+/**
+ * @param {HTMLElement} root
+ * @param {string} name
+ * @returns {HTMLElement | null}
+ */
+const getTarget = (root, name) => {
+  const target = root.querySelector(`[data-vault="${name}"]`);
+  return target instanceof HTMLElement ? target : null;
+};
 
 /**
  * Initializes a character collection page or its content inside the vault modal.
@@ -54,20 +58,28 @@ const characterVault = async (root = null) => {
   const selectedCharTarget = getTarget(root, "selected-char");
   const characterTarget = getTarget(root, "character");
   const giftTarget = getTarget(root, "gift");
+  const actionsTarget = getTarget(root, "actions");
+  if (
+    !filters ||
+    !selectedCharTarget ||
+    !characterTarget ||
+    !giftTarget ||
+    !actionsTarget
+  ) {
+    return;
+  }
 
   const filterPopover =
     /** @type {(HTMLElement & { hidePopover: () => void }) | null} */ (
       root.querySelector("#character-filter-popover")
     );
-  const handle = isDirectPage
-    ? window.location.pathname.split("/pages/").filter(Boolean)[0]
-    : pageHref.split("?")[0];
+  let handle = pageHref.split("?")[0];
+  if (isDirectPage) {
+    handle = window.location.pathname.split("/pages/").filter(Boolean)[0];
+  }
 
   if (handle) {
-    getTarget(root, "actions").insertAdjacentHTML(
-      "beforeend",
-      adminActionMarkup(handle)
-    );
+    actionsTarget.insertAdjacentHTML("beforeend", adminActionMarkup(handle));
   }
 
   const collectionMarkup = {
@@ -75,16 +87,23 @@ const characterVault = async (root = null) => {
     plashka: plashkaMarkup,
     coupon: couponMarkup
   };
-  Object.entries(collectionMarkup).forEach(([key, markup]) => {
+  for (const [key, markup] of Object.entries(collectionMarkup)) {
+    const target = getTarget(root, key);
+    if (!target) {
+      return;
+    }
+
     parseCollection(root, key).forEach((item) => {
-      getTarget(root, key).insertAdjacentHTML("beforeend", markup(item));
+      target.insertAdjacentHTML("beforeend", markup(item));
     });
-  });
+  }
 
   const readCharParam = () => {
-    const search = isDirectPage
-      ? window.location.search
-      : `?${pageHref.split("?")[1] ?? ""}`;
+    let search = `?${pageHref.split("?")[1] ?? ""}`;
+    if (isDirectPage) {
+      search = window.location.search;
+    }
+
     return new URLSearchParams(search).get(CHAR_PARAM)?.trim() ?? "";
   };
 
@@ -99,6 +118,7 @@ const characterVault = async (root = null) => {
     } else {
       params.delete(CHAR_PARAM);
     }
+
     const query = params.toString();
     window.history.replaceState(
       null,
@@ -170,14 +190,16 @@ const characterVault = async (root = null) => {
     };
 
     filters.addEventListener("change", (event) => {
-      const input = /** @type {HTMLInputElement | null} */ (
-        event.target instanceof Element
-          ? event.target.closest('input[name="character"]')
-          : null
-      );
+      /** @type {HTMLInputElement | null} */
+      let input = null;
+      if (event.target instanceof Element) {
+        input = event.target.closest('input[name="character"]');
+      }
+
       if (!input) {
         return;
       }
+
       applySelection(input.value === ALL_FILTER ? "" : input.value);
 
       if (filterPopover?.matches(":popover-open")) {
@@ -215,6 +237,10 @@ const characterVault = async (root = null) => {
       Number(coins.textContent ?? 0)
     );
     const motherlode = getTarget(root, "motherlode");
+    if (!motherlode) {
+      return;
+    }
+
     motherlode.dataset.ready = "";
     motherlode.textContent = String(balance);
   } catch (error) {

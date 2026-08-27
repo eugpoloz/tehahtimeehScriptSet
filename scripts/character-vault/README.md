@@ -1,6 +1,12 @@
 # Character vault
 
-Build with `make character-vault`. The IIFE exposes `teh.characterVault(root)`.
+Build with `make character-vault`. The IIFE extends `teh` with:
+
+- `teh.characterVault(root)` initializes the character vault.
+- `teh.loadCharacters()` loads and returns the external `window.characters`
+  data.
+- `teh.describeCharacter(character)` returns the Russian
+  species/status description, including the gendered cursed marker.
 
 Pass the `.main.pages` element for a direct personal page or for a personal
 page inserted into the vault modal. If omitted, it uses the first
