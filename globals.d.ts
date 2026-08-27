@@ -6,13 +6,17 @@ interface ForumTopic {
 }
 
 interface ForumEditor {
+  font: {
+    fonts: string[];
+  };
   [key: string]: unknown;
 }
 
 interface Forum {
   topic?: ForumTopic | null;
-  editor?: ForumEditor | object | null;
+  editor?: ForumEditor | null;
   get?: (path: string) => unknown;
+  set?: (path: string, value: unknown) => unknown;
   [key: string]: unknown;
 }
 
