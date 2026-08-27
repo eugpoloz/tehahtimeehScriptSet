@@ -2,23 +2,58 @@
 /** @typedef {import("../types.js").Profile} Profile */
 
 import { ALL_FILTER } from "../constants.js";
-
-export const IMAGE_PROXY = "https://external-content.duckduckgo.com/iu/?u=";
+import { IMAGE_PROXY } from "@teh/utils";
 
 /** @param {boolean} isDirectPage */
 export const vaultMarkup = (isDirectPage) => `
   <article class="vault-toolbar sticky">
-    <div class="motherlode"><i class="material-symbols-sharp" aria-hidden="true">savings</i><strong class="subtitle" data-vault="motherlode"></strong><span class="sr-only">тугриков</span></div>
-    <fieldset class="char-select"><legend class="sr-only">Выберите персонажа:</legend><button class="char-select__btn" type="button" popovertarget="character-filter-popover"><span class="char-select__value" data-vault="selected-char"></span><i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i></button><div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto"><div data-vault="all-chars"></div></div></fieldset>
-    <div class="actions"><div class="ams-only" data-vault="actions"></div>${isDirectPage ? "" : '<button commandfor="vault-modal" command="close" class="vault-modal__close"><span class="sr-only">Закрыть</span><i class="material-symbols-sharp" aria-hidden="true">close</i></button>'}</div>
+    <div class="motherlode">
+      <i class="material-symbols-sharp" aria-hidden="true">savings</i>
+      <strong class="subtitle" data-vault="motherlode"></strong>
+      <span class="sr-only">тугриков</span>
+    </div>
+    <fieldset class="char-select">
+      <legend class="sr-only">Выберите персонажа:</legend>
+      <button class="char-select__btn" type="button" popovertarget="character-filter-popover">
+        <span class="char-select__value" data-vault="selected-char"></span>
+        <i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i>
+      </button>
+      <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
+        <div data-vault="all-chars"></div>
+      </div>
+    </fieldset>
+    <div class="actions">
+      <div class="ams-only" data-vault="actions"></div>
+      ${isDirectPage ? "" : '<button commandfor="vault-modal" command="close" class="vault-modal__close"><span class="sr-only">Закрыть</span><i class="material-symbols-sharp" aria-hidden="true">close</i></button>'}
+    </div>
   </article>
-  <article class="vault-header"><div class="vault-cover" aria-hidden="true"></div><div class="vault-overview"><section class="character" data-vault="character"></section></div></article>
+  <article class="vault-header">
+    <div class="vault-cover" aria-hidden="true"></div>
+    <div class="vault-overview">
+      <section class="character" data-vault="character"></section>
+    </div>
+  </article>
   <article class="content">
-    <section class="wallet relative"><div class="sticky"><small><strong>купоны</strong></small></div><ul class="collection scrollable coupons" data-vault="coupon"></ul></section>
-    <section class="plashkas relative"><div class="sticky"><small><strong>плашки</strong></small></div><div class="collection scrollable plashkas" data-vault="plashka"></div></section>
-    <section class="icons relative"><div class="sticky"><small><strong>иконки</strong></small></div><div class="collection scrollable icons" data-vault="icon"></div></section>
-    <section class="gifts relative"><div class="sticky"><small><strong>подарки</strong></small></div><ul class="collection scrollable gifts" data-vault="gift"></ul></section>
-    <section class="achievements relative"><div class="sticky"><small><strong>ачивки?</strong></small></div><ul class="collection scrollable achievements" data-vault="achievement"></ul></section>
+    <section class="wallet relative">
+      <div class="sticky"><small><strong>купоны</strong></small></div>
+      <ul class="collection scrollable coupons" data-vault="coupon"></ul>
+    </section>
+    <section class="plashkas relative">
+      <div class="sticky"><small><strong>плашки</strong></small></div>
+      <div class="collection scrollable plashkas" data-vault="plashka"></div>
+    </section>
+    <section class="icons relative">
+      <div class="sticky"><small><strong>иконки</strong></small></div>
+      <div class="collection scrollable icons" data-vault="icon"></div>
+    </section>
+    <section class="gifts relative">
+      <div class="sticky"><small><strong>подарки</strong></small></div>
+      <ul class="collection scrollable gifts" data-vault="gift"></ul>
+    </section>
+    <section class="achievements relative">
+      <div class="sticky"><small><strong>ачивки?</strong></small></div>
+      <ul class="collection scrollable achievements" data-vault="achievement"></ul>
+    </section>
   </article>
 `;
 

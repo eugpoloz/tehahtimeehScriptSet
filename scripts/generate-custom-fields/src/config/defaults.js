@@ -3,6 +3,8 @@
  * @typedef {import("../types.js").GenerateCustomFieldsOptions} GenerateCustomFieldsOptions
  */
 
+import { IMAGE_PROXY } from "@teh/utils";
+
 /** @type {CustomFieldSection[]} */
 const fieldConfig = [
   {
@@ -102,7 +104,7 @@ const defaultOptions = {
   fldId: "1",
   collectionFldId: "5",
   config: fieldConfig,
-  proxy: "https://external-content.duckduckgo.com/iu/?u=",
+  proxy: IMAGE_PROXY,
   // Персонажи, Персонажи в архиве
   userAccessGroups: [5, 7],
   debug: true
