@@ -16,3 +16,19 @@ data from `[data-collection]` elements inside `root`.
 
 The function does not initialize automatically. This keeps the script usable
 only where the direct page or vault-modal loader explicitly invokes it.
+
+On hehedges, `hehedges-specials` owns asset loading and initialization. Direct
+vault pages opt in with a `[data-character-vault-page]` marker; fetched modal
+pages are initialized by the modal loader. Those pages should contain only
+their collection data and should not include the vault stylesheet, script, or
+an inline `teh.characterVault()` call.
+
+Pass the complete asset URLs, including any desired cache-busting query, from
+the forum configuration:
+
+```js
+teh.loadCharacterVault({
+  scriptUrl: "//forumstatic.ru/files/001c/ab/7e/61137.js?v=2",
+  stylesUrl: "//forumstatic.ru/files/001c/ab/7e/37167.css?v=2"
+});
+```
