@@ -2,6 +2,30 @@
 
 Load `@teh/core` before this package.
 
+## Post HTML
+
+`teh.renderPostHtml({ userIds, groupIds })` replaces marked code boxes in posts
+by allowed authors with their interpreted HTML. Both allowlists are empty by
+default, which disables the feature. IDs may be strings or numbers and are
+matched against the post's `data-user-id` and `data-group-id` attributes.
+
+```js
+teh.renderPostHtml({ userIds: [3], groupIds: [1] });
+```
+
+The code block must begin with the exact marker:
+
+```text
+[code]<!-- HTML -->
+<section>Rendered as HTML</section>
+[/code]
+```
+
+Marked code blocks inside quotes are ignored. Scripts in authorized blocks
+execute when the parsed fragment is inserted. Only grant access to fully
+trusted users or groups because this permits arbitrary JavaScript on the forum
+origin.
+
 ## Title popovers
 
 `teh.addTitlePopovers()` replaces native `title` tooltips with accessible

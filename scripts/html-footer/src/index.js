@@ -8,6 +8,7 @@ import disableProfiles from "./features/disable-profiles";
 import changeFontSize from "./features/change-font-size";
 import referQuoteToOriginal from "./features/refer-quote-to-original";
 import addTitlePopovers from "./features/add-title-popovers";
+import renderPostHtml from "./features/render-post-html";
 
 // module exports
 export {
@@ -18,7 +19,8 @@ export {
   changeFontSize,
   referQuoteToOriginal,
   transformProfiles,
-  addTitlePopovers
+  addTitlePopovers,
+  renderPostHtml
 };
 
 // possible config for reference:
@@ -61,3 +63,4 @@ export {
 //  }
 //]);
 //teh.addTitlePopovers(["abbr[title]", "button[title]"]);
+//teh.renderPostHtml({ userIds: [3], groupIds: [1] });
