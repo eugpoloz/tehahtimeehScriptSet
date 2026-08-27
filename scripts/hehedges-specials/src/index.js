@@ -2,13 +2,21 @@
 
 import ThemeSubject from "./features/web-components/theme-subject";
 import defineAgeFromBirthday from "./features/web-components/age-from-birthday";
+import loadCharacterVault, {
+  loadCharacterVaultPage,
+  loadVaultModal
+} from "./features/load-character-vault";
 import loadFriendsBanners from "./features/load-friends-banners";
-import loadVaultModal from "./features/load-vault-modal";
 
 customElements.define("theme-subject", ThemeSubject);
-loadVaultModal();
 
-export { defineAgeFromBirthday, loadFriendsBanners, loadVaultModal };
+export {
+  defineAgeFromBirthday,
+  loadCharacterVault,
+  loadCharacterVaultPage,
+  loadFriendsBanners,
+  loadVaultModal
+};
 
 // config example
 //
@@ -17,4 +25,8 @@ export { defineAgeFromBirthday, loadFriendsBanners, loadVaultModal };
 //   url: "/pages/friends",
 //   source: "#pun-main .container",
 //   target: "#html-footer .friends .wrapper"
+// });
+// teh.loadCharacterVault({
+//   scriptUrl: "//forumstatic.ru/files/001c/ab/7e/61137.js?v=2",
+//   stylesUrl: "//forumstatic.ru/files/001c/ab/7e/37167.css?v=2"
 // });
