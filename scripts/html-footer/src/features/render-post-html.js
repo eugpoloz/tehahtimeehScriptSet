@@ -7,29 +7,48 @@ const HTML_MARKER = "<!-- HTML -->";
  */
 
 /**
- * Replaces one marked code box with its HTML contents.
+ * Renders marked code blocks within one post or preview container.
  *
- * @param {HTMLPreElement} code
+ * @param {ParentNode} container
  * @returns {void}
  */
-const renderCodeBox = (code) => {
-  const source = code.textContent.trimStart();
-  if (!source.startsWith(HTML_MARKER)) {
-    return;
+const renderCodeBoxes = (container) => {
+  const codeBlocks = /** @type {NodeListOf<HTMLPreElement>} */ (
+    container.querySelectorAll(".post-content .code-box pre")
+  );
+  for (const code of codeBlocks) {
+    if (code.closest(".quote-box, blockquote")) {
+      continue;
+    }
+
+    const source = code.textContent.trimStart();
+    if (!source.startsWith(HTML_MARKER)) {
+      continue;
+    }
+
+    const codeBox = code.closest(".code-box");
+    if (!codeBox) {
+      continue;
+    }
+
+    const html = source.slice(HTML_MARKER.length).trimStart();
+    const range = document.createRange();
+    range.selectNode(codeBox);
+
+    const fragment = range.createContextualFragment(html);
+    codeBox.replaceWith(fragment);
   }
-
-  const codeBox = code.closest(".code-box");
-  if (!codeBox) {
-    return;
-  }
-
-  const html = source.slice(HTML_MARKER.length).trimStart();
-  const range = document.createRange();
-  range.selectNode(codeBox);
-
-  const fragment = range.createContextualFragment(html);
-  codeBox.replaceWith(fragment);
 };
+
+/**
+ * @param {string} userId
+ * @param {string} groupId
+ * @param {Set<string>} allowedUsers
+ * @param {Set<string>} allowedGroups
+ * @returns {boolean}
+ */
+const isAllowed = (userId, groupId, allowedUsers, allowedGroups) =>
+  allowedUsers.has(userId) || allowedGroups.has(groupId);
 
 /**
  * Renders marked code blocks as HTML in posts by explicitly allowed authors.
@@ -52,21 +71,36 @@ const renderPostHtml = ({ userIds = [], groupIds = [] } = {}) => {
   for (const post of posts) {
     const userId = post.dataset.userId ?? "";
     const groupId = post.dataset.groupId ?? "";
-    if (!allowedUsers.has(userId) && !allowedGroups.has(groupId)) {
+    if (!isAllowed(userId, groupId, allowedUsers, allowedGroups)) {
       continue;
     }
 
-    const codeBlocks = /** @type {NodeListOf<HTMLPreElement>} */ (
-      post.querySelectorAll(".post-content .code-box pre")
-    );
-    for (const code of codeBlocks) {
-      if (code.closest(".quote-box, blockquote")) {
-        continue;
+    renderCodeBoxes(post);
+  }
+
+  if (typeof $ !== "function") {
+    return;
+  }
+
+  const previewEvents = $(document);
+  previewEvents.off(".tehRenderPostHtml");
+
+  const userId = String(window.UserID ?? "");
+  const groupId = String(window.GroupID ?? "");
+  if (!isAllowed(userId, groupId, allowedUsers, allowedGroups)) {
+    return;
+  }
+
+  previewEvents.on("pun_preview.tehRenderPostHtml", () => {
+    window.setTimeout(() => {
+      const preview = document.getElementById("post-preview");
+      if (!preview) {
+        return;
       }
 
-      renderCodeBox(code);
-    }
-  }
+      renderCodeBoxes(preview);
+    }, 0);
+  });
 };
 
 export default renderPostHtml;

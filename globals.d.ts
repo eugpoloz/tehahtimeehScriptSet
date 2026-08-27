@@ -45,7 +45,15 @@ interface TehNamespace {
 
 declare const teh: TehNamespace;
 
-/** Notification API supplied by the forum's jGrowl integration. */
-declare const $: {
+interface JQueryDocumentEvents {
+  on(events: string, handler: (event: Event) => void): JQueryDocumentEvents;
+  off(events: string): JQueryDocumentEvents;
+}
+
+/** jQuery APIs supplied by the forum. */
+interface JQueryStatic {
+  (target: Document): JQueryDocumentEvents;
   jGrowl(message: string, options?: { sticky?: boolean }): void;
-};
+}
+
+declare const $: JQueryStatic;
