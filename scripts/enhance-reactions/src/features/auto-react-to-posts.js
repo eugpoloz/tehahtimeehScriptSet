@@ -4,7 +4,6 @@ import { handleFastVote } from "../helpers/fast-vote";
 
 const ALL_LIKED_TEXT = "На этой странице всё пролайкано!";
 const SUPERLIKE_TOOLTIP_ID = "superlike-tooltip";
-const SUPERLIKE_TOOLTIP_TEXT = "Лайкнуть все сообщения на странице";
 
 async function autoReactToPosts() {
   if (!hasTopic) {
@@ -25,8 +24,8 @@ async function autoReactToPosts() {
     }
 
     const html = `<div class="superlike__container">
-      <button type="button" class="superlike" interestfor="${SUPERLIKE_TOOLTIP_ID}" popovertarget="${SUPERLIKE_TOOLTIP_ID}">Лайкнуть всех</button>
-      <div class="tooltip" popover="hint" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto">${SUPERLIKE_TOOLTIP_TEXT}</div>
+      <button type="button" class="superlike">Лайкнуть всех</button>
+      <div class="tooltip" popover="manual" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto"></div>
     </div>`;
     controlsContainer.insertAdjacentHTML("beforeend", html);
 
@@ -53,26 +52,12 @@ async function autoReactToPosts() {
       }
     };
 
-    const lockSuperlikeTooltip = () => {
-      superlikeBtn.removeAttribute("interestfor");
-      superlikeTooltip.setAttribute("popover", "manual");
-    };
-
-    const resetSuperlikeTooltip = () => {
-      superlikeBtn.setAttribute("interestfor", SUPERLIKE_TOOLTIP_ID);
-      hideSuperlikeTooltip();
-      superlikeTooltip.setAttribute("popover", "hint");
-      superlikeTooltip.textContent = SUPERLIKE_TOOLTIP_TEXT;
-    };
-
     async function handleAutoReact() {
       try {
         if (hideTooltipTimeout !== undefined) {
           clearTimeout(hideTooltipTimeout);
           hideTooltipTimeout = undefined;
         }
-
-        lockSuperlikeTooltip();
 
         const reactionsToAdd = document.querySelectorAll(
           `.post:not(.mylike):not([data-user-id="${UserID}"]) .post-rating a`
@@ -126,7 +111,7 @@ async function autoReactToPosts() {
         showSuperlikeTooltip("Не удалось завершить суперлайк");
       } finally {
         hideTooltipTimeout = window.setTimeout(() => {
-          resetSuperlikeTooltip();
+          hideSuperlikeTooltip();
           hideTooltipTimeout = undefined;
         }, 3000);
 
