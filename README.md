@@ -18,6 +18,7 @@ scripts/
   count-posts-in-topic/      # → teh.count-posts-in-topic.iife.js
   enhance-reactions/         # → teh.enhance-reactions.iife.js
   add-episode-templates/     # → teh.add-episode-templates.iife.js
+  character-vault/            # → teh.character-vault.iife.js
 tooling/
   vite-iife.config.js        # shared Vite IIFE factory
   new-script.mjs             # used by `make new-script`

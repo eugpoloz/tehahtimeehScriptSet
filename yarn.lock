@@ -177,6 +177,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/character-vault@workspace:scripts/character-vault":
+  version: 0.0.0-use.local
+  resolution: "@teh/character-vault@workspace:scripts/character-vault"
+  dependencies:
+    "@teh/utils": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@teh/core@workspace:scripts/core":
   version: 0.0.0-use.local
   resolution: "@teh/core@workspace:scripts/core"
