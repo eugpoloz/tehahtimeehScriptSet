@@ -27,6 +27,24 @@ declare const UserID: string | number | undefined;
 
 declare const GroupID: string | number | undefined;
 
+interface RusffCoreSettings {
+  show_reportBtn: number;
+  rusff_smilepack: number;
+  use_awards: number;
+  files: {
+    button: boolean;
+  };
+  share: boolean;
+  tags: boolean;
+  graffiti: boolean;
+}
+
+interface RusffCore {
+  sets: RusffCoreSettings;
+}
+
+declare const RusffCore: RusffCore;
+
 /** Editor helpers injected by the forum UI. */
 declare function bbcode(open: string, close?: string): void;
 declare function insert(text: string): void;

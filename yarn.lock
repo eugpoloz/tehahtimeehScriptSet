@@ -245,6 +245,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/html-header@workspace:scripts/html-header":
+  version: 0.0.0-use.local
+  resolution: "@teh/html-header@workspace:scripts/html-header"
+  dependencies:
+    "@teh/utils": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@teh/main-reply@workspace:scripts/main-reply":
   version: 0.0.0-use.local
   resolution: "@teh/main-reply@workspace:scripts/main-reply"
