@@ -155,7 +155,10 @@ const characterVault = async (root = null) => {
       }
 
       characterTarget.innerHTML = characterMarkup(
-        character,
+        {
+          en: key,
+          ...character
+        },
         profiles[key],
         describeCharacter(character)
       );

@@ -4,6 +4,7 @@ import { handleError } from "@teh/utils";
 import {
   fetchVault,
   initializeCharacterVault,
+  preloadCharacterVault,
   VAULT_MODAL_HTML
 } from "../helpers/vault";
 
@@ -67,6 +68,10 @@ export const loadVaultModal = (config) => {
     return;
   }
 
+  preloadCharacterVault(config).catch((error) => {
+    handleError("hehedges-specials/preloadCharacterVault", error);
+  });
+
   document.querySelectorAll(".vault").forEach((button) => {
     if (initializedButtons.has(button)) {
       return;
@@ -80,11 +85,13 @@ export const loadVaultModal = (config) => {
         return;
       }
 
-      modal.replaceChildren();
-      delete modal.dataset.ready;
-      pageModal.showModal();
-
       try {
+        await preloadCharacterVault(config);
+
+        modal.replaceChildren();
+        delete modal.dataset.ready;
+        pageModal.showModal();
+
         const content = await fetchVault(`/pages/${dataHref}`);
         modal.replaceChildren(content);
 
@@ -100,7 +107,9 @@ export const loadVaultModal = (config) => {
       } catch (error) {
         handleError("hehedges-specials/loadVaultModal", error);
       } finally {
-        modal.dataset.ready = "";
+        if (pageModal.open) {
+          modal.dataset.ready = "";
+        }
       }
     });
   });

@@ -146,6 +146,16 @@ const getCharacterVault = (config) => {
 };
 
 /**
+ * Loads the character-vault assets without initializing a page.
+ *
+ * @param {CharacterVaultConfig} config
+ * @returns {Promise<void>}
+ */
+export const preloadCharacterVault = async (config) => {
+  await getCharacterVault(config);
+};
+
+/**
  * Loads and initializes the character vault for a page root.
  *
  * @param {HTMLElement} root

@@ -1,7 +1,7 @@
 /**
  * @typedef {object} Character
  * @property {number | string} id
- * @property {string} en
+ * @property {string} [en]
  * @property {string} ru
  * @property {string} dob
  * @property {string} [desc]
