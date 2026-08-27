@@ -27,6 +27,9 @@
   or nested ternary expressions.
 - Use early returns for unsupported pages, missing DOM elements, and failed
   access checks.
+- Always use braces for every control-flow block; never omit them for a
+  single-statement branch. Write `return` on its own line and leave a blank
+  line after the block before the following statement.
 - Add JSDoc to public functions and non-obvious data structures.
 - Preserve Russian user-facing text unless the task explicitly changes copy.
 - Preserve existing public `window.teh` APIs unless a breaking change is
