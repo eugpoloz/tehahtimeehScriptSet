@@ -39,10 +39,11 @@ teh.configureEditor({
 Call the initializer where the font-size controls should be inserted:
 
 ```js
-teh.addStyleControls();
+teh.changeFontSize();
 ```
 
 The controls are inserted next to the calling script, or at the end of the
-document body when called later. Their existing IDs remain compatible with
-`teh.changeFontSize()`, while their labels use accessible hint popovers instead
-of native `title` tooltips.
+document body when called later. The initializer restores the saved size
+immediately and connects the controls; post content is looked up only when a
+control is used, so initialization is safe from the HTML header. The control
+labels use accessible hint popovers instead of native `title` tooltips.

@@ -5,7 +5,6 @@ import selectCodeBox from "./features/select-and-copy";
 import addGuestNameClicks from "./features/make-guest-names-clickable";
 import createFastLoginLinks from "./features/create-fast-login-links";
 import disableProfiles from "./features/disable-profiles";
-import changeFontSize from "./features/change-font-size";
 import referQuoteToOriginal from "./features/refer-quote-to-original";
 import addTitlePopovers from "./features/add-title-popovers";
 import renderPostHtml from "./features/render-post-html";
@@ -16,7 +15,6 @@ export {
   selectCodeBox,
   disableProfiles,
   addGuestNameClicks,
-  changeFontSize,
   referQuoteToOriginal,
   transformProfiles,
   addTitlePopovers,
