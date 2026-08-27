@@ -30,7 +30,7 @@ const handleOnlineIndicators = (post, options = {}) => {
   if (paOnline || paLastVisit) {
     const timeOnline = paOnline?.textContent.split("Активен")[1]?.trim() ?? "∞";
     const lastVisit =
-      paLastVisit?.textContent.split("визит:").join("визит: ") ?? offline;
+      paLastVisit?.textContent.split("визит:").join("визит:<br/>") ?? offline;
 
     const status = isOnline ? "on" : "off";
 
