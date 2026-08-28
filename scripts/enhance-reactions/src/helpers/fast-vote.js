@@ -47,12 +47,23 @@ export const handleFastVote = async (href) => {
   const postRating = rating.textContent.split("+").join("");
   rating.textContent = `+${Number(postRating) + delta}`;
 
-  const userPostReputation = document.querySelectorAll(
-    `.post[data-user-id="${userId}"] .pa-respect span:not(.fld-name)`
+  const userPostReputationFields = document.querySelectorAll(
+    `.post[data-user-id="${userId}"] .pa-respect`
   );
 
-  userPostReputation.forEach((respect) => {
-    const userRespect = respect.textContent.split("+").join("");
-    respect.textContent = `+${Number(userRespect) + delta}`;
+  userPostReputationFields.forEach((field) => {
+    const respect =
+      field.querySelector(".fld-content") ??
+      field.querySelector("span:not(.fld-name)");
+    if (!respect) {
+      return;
+    }
+
+    const userRespect = Number(respect.textContent.trim());
+    if (!Number.isFinite(userRespect)) {
+      return;
+    }
+
+    respect.textContent = `+${userRespect + delta}`;
   });
 };
