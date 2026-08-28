@@ -6,6 +6,47 @@ const CSS_VARIABLE_MIN_SIZE_KEY = "--dynamic-font-size-min";
 const CSS_VARIABLE_MAX_SIZE_KEY = "--dynamic-font-size-max";
 
 /** @typedef {{ pun: HTMLElement, minFontSize: number, maxFontSize: number }} FontSizeContext */
+/** @typedef {{ id: string, icon: string, label: string }} FontSizeControl */
+
+/** @type {FontSizeControl[]} */
+const FONT_SIZE_CONTROLS = [
+  {
+    id: "text-increase",
+    icon: "text_increase",
+    label: "Увеличить шрифт"
+  },
+  {
+    id: "text-decrease",
+    icon: "text_decrease",
+    label: "Уменьшить шрифт"
+  },
+  {
+    id: "text-clear",
+    icon: "format_clear",
+    label: "Скинуть размер шрифта"
+  }
+];
+
+/** @param {FontSizeControl} control */
+const fontSizeControlMarkup = ({ id, icon, label }) => {
+  const tooltipId = `${id}-tooltip`;
+
+  return `
+    <div class="theme__control">
+      <button type="button" id="${id}" interestfor="${tooltipId}" popovertarget="${tooltipId}" aria-labelledby="${tooltipId}">
+        <i class="material-symbols-sharp">${icon}</i>
+      </button>
+      <span class="tooltip" id="${tooltipId}" popover="hint" role="tooltip">${label}</span>
+    </div>`;
+};
+
+/** @returns {string} */
+export const fontSizeControlsMarkup = () => `
+  <section class="theme">
+    <h3>Размер шрифта</h3>
+    <div class="theme__controls">${FONT_SIZE_CONTROLS.map(fontSizeControlMarkup).join("")}
+    </div>
+  </section>`;
 
 /**
  * Converts a CSS length in pixels or rems to pixels.
@@ -155,8 +196,8 @@ const resetFontSize = () => {
   }
 };
 
-/** Restores the saved font size and connects its controls. */
-export const initializeFontSizeControls = () => {
+/** Restores the saved font size. */
+export const restoreFontSize = () => {
   try {
     const context = getFontSizeContext();
     if (!context) {
@@ -173,6 +214,18 @@ export const initializeFontSizeControls = () => {
       userFontSize <= maxFontSize
     ) {
       setDynamicFontSize(pun, userFontSize);
+    }
+  } catch (e) {
+    handleError("html-header/changeVisuals/fontSize", e);
+  }
+};
+
+/** Connects the font-size controls. */
+export const initializeFontSizeControls = () => {
+  try {
+    const context = getFontSizeContext();
+    if (!context) {
+      return;
     }
 
     document

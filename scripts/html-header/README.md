@@ -22,8 +22,10 @@ replace either default for a call.
 teh.changeVisuals();
 ```
 
-This inserts the current visual controls beside the calling script (or at the
-end of `body`) and restores saved settings. Theme controls can be added to this
-module once their structure and behavior are defined.
+This inserts a settings button into `#pun-navlinks ul` and restores saved
+settings. The button toggles a light-dismiss popover with font-size controls
+and a group reserved for light, dark, and system theme controls. When the
+document is still loading, the saved font-size CSS variable is restored
+immediately while control insertion and event setup wait for `DOMContentLoaded`.
 
 Font sizing requires `#pun`.
