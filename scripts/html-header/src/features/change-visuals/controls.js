@@ -3,15 +3,13 @@ import { themeControlsMarkup } from "./theme";
 
 const VISUAL_CONTROLS_HTML = `
   <li class="theme__container">
-    <div class="theme__control">
-      <button class="theme__toggle" type="button" popovertarget="theme-settings-popover" aria-haspopup="dialog">
-        <span class="sr-only" id="theme-settings-title">Настройки отображения</span>
-        <i class="material-symbols-sharp" aria-hidden="true">wand_stars</i>
-      </button>
-      <div class="theme__menu popover-custom" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
-        ${fontSizeControlsMarkup()}
-        ${themeControlsMarkup()}
-      </div>
+    <button class="theme__toggle" type="button" popovertarget="theme-settings-popover" aria-haspopup="dialog">
+      <span class="sr-only" id="theme-settings-title">Настройки отображения</span>
+      <i class="material-symbols-sharp" aria-hidden="true">wand_stars</i>
+    </button>
+    <div class="theme__menu popover-custom" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
+      ${fontSizeControlsMarkup()}
+      ${themeControlsMarkup()}
     </div>
   </li>`;
 
