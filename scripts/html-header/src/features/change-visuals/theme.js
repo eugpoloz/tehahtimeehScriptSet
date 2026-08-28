@@ -1,28 +1,13 @@
 import { handleError } from "@teh/utils";
+import { spinToggleMarkup } from "./spin-toggle";
 
 const LOCAL_STORAGE_THEME_KEY = "userTheme";
 const SYSTEM_THEME_QUERY = "(prefers-color-scheme: dark)";
-const THEME_CONTROL_SELECTOR = 'input[type="radio"][name="theme-preference"]';
+const THEME_TOGGLE_ID = "theme-light-dark-toggle";
+const SYSTEM_THEME_CONTROL_ID = "theme-system";
 
 /** @typedef {"light" | "dark" | "system"} ThemePreference */
 /** @typedef {"light" | "dark"} ResolvedTheme */
-/** @typedef {{ preference: ThemePreference, label: string }} ThemeControl */
-
-/** @type {ThemeControl[]} */
-const THEME_CONTROLS = [
-  {
-    preference: "light",
-    label: "Светлая"
-  },
-  {
-    preference: "dark",
-    label: "Темная"
-  },
-  {
-    preference: "system",
-    label: "Системная"
-  }
-];
 
 /** @type {MediaQueryList | null} */
 let systemThemeMediaQuery = null;
@@ -32,22 +17,23 @@ let systemThemeListenerConnected = false;
 const isThemePreference = (value) =>
   value === "light" || value === "dark" || value === "system";
 
-/** @param {ThemeControl} control */
-const themeControlMarkup = ({ preference, label }) => {
-  const controlId = `theme-${preference}`;
-
-  return `
-    <div class="theme__control">
-      <input class="theme__radio sr-only" type="radio" id="${controlId}" name="theme-preference" value="${preference}">
-      <label class="theme__button" for="${controlId}">${label}</label>
-    </div>`;
-};
+/** @param {unknown} value @returns {value is ResolvedTheme} */
+const isResolvedTheme = (value) => value === "light" || value === "dark";
 
 /** @returns {string} */
 export const themeControlsMarkup = () => `
   <section class="theme" aria-labelledby="theme-controls-title">
     <h3 id="theme-controls-title">Тема</h3>
-    <div class="theme__controls theme__group" id="theme-preference-controls" role="radiogroup" aria-labelledby="theme-controls-title" aria-orientation="horizontal">${THEME_CONTROLS.map(themeControlMarkup).join("")}
+    <div class="theme__controls theme__group" id="theme-preference-controls" role="group" aria-labelledby="theme-controls-title">
+      <div class="theme__control">
+        ${spinToggleMarkup(THEME_TOGGLE_ID)}
+      </div>
+      <div class="theme__control">
+        <label class="theme__system-control" for="${SYSTEM_THEME_CONTROL_ID}">
+          <input type="checkbox" id="${SYSTEM_THEME_CONTROL_ID}">
+          <span>Cистемная</span>
+        </label>
+      </div>
     </div>
   </section>`;
 
@@ -95,15 +81,34 @@ const storeThemePreference = (preference) => {
 
 /** @param {ThemePreference} preference */
 const synchronizeThemeControls = (preference) => {
-  const controls = document.querySelectorAll(THEME_CONTROL_SELECTOR);
+  const themeToggle = document.getElementById(THEME_TOGGLE_ID);
+  const systemThemeControl = document.getElementById(SYSTEM_THEME_CONTROL_ID);
+  const currentTheme = document.documentElement.dataset.theme;
+  let resolvedTheme = resolveTheme(preference);
+  if (isResolvedTheme(currentTheme)) {
+    resolvedTheme = currentTheme;
+  }
 
-  controls.forEach((control) => {
-    if (!(control instanceof HTMLInputElement)) {
-      return;
+  if (themeToggle instanceof HTMLButtonElement) {
+    const usesSystemTheme = preference === "system";
+    const usesDarkTheme = resolvedTheme === "dark";
+    const themeName = usesDarkTheme ? "тёмная" : "светлая";
+    let label = "Включить тёмную тему";
+    if (usesSystemTheme) {
+      label = `Системная тема: ${themeName}`;
+    } else if (usesDarkTheme) {
+      label = "Включить светлую тему";
     }
 
-    control.checked = control.value === preference;
-  });
+    themeToggle.disabled = usesSystemTheme;
+    themeToggle.setAttribute("aria-label", label);
+    themeToggle.setAttribute("aria-pressed", String(usesDarkTheme));
+    themeToggle.title = label;
+  }
+
+  if (systemThemeControl instanceof HTMLInputElement) {
+    systemThemeControl.checked = preference === "system";
+  }
 };
 
 /**
@@ -122,21 +127,29 @@ const applyThemePreference = (preference, persist) => {
   }
 };
 
-/** @param {Event} event */
-const selectTheme = (event) => {
-  const target = event.target;
-  if (!(target instanceof Element)) {
+const toggleTheme = () => {
+  const currentTheme = document.documentElement.dataset.theme;
+  const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+  applyThemePreference(nextTheme, true);
+};
+
+const selectSystemTheme = () => {
+  const systemThemeControl = document.getElementById(SYSTEM_THEME_CONTROL_ID);
+  if (!(systemThemeControl instanceof HTMLInputElement)) {
     return;
   }
 
-  const control = target.closest(THEME_CONTROL_SELECTOR);
-  if (!(control instanceof HTMLInputElement) || !control.checked) {
+  if (systemThemeControl.checked) {
+    applyThemePreference("system", true);
+
     return;
   }
 
-  const preference = control.value;
-  if (!isThemePreference(preference)) {
-    return;
+  const currentTheme = document.documentElement.dataset.theme;
+  let preference = getSystemTheme();
+  if (isResolvedTheme(currentTheme)) {
+    preference = currentTheme;
   }
 
   applyThemePreference(preference, true);
@@ -149,7 +162,7 @@ const followSystemTheme = () => {
       return;
     }
 
-    document.documentElement.dataset.theme = getSystemTheme();
+    applyThemePreference("system", false);
   } catch (e) {
     handleError("html-header/changeVisuals/theme", e);
   }
@@ -172,12 +185,17 @@ export const restoreTheme = () => {
 /** Connects and synchronizes the theme controls. */
 export const initializeThemeControls = () => {
   try {
-    const group = document.getElementById("theme-preference-controls");
-    if (!group) {
+    const themeToggle = document.getElementById(THEME_TOGGLE_ID);
+    const systemThemeControl = document.getElementById(SYSTEM_THEME_CONTROL_ID);
+    if (
+      !(themeToggle instanceof HTMLButtonElement) ||
+      !(systemThemeControl instanceof HTMLInputElement)
+    ) {
       return;
     }
 
-    group.addEventListener("change", selectTheme);
+    themeToggle.addEventListener("click", toggleTheme);
+    systemThemeControl.addEventListener("change", selectSystemTheme);
 
     const preference = document.documentElement.dataset.themePreference;
     synchronizeThemeControls(

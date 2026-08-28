@@ -4,47 +4,25 @@ const LOCAL_STORAGE_SIZE_KEY = "userFontSize";
 const CSS_VARIABLE_SIZE_KEY = "--dynamic-font-size";
 const CSS_VARIABLE_MIN_SIZE_KEY = "--dynamic-font-size-min";
 const CSS_VARIABLE_MAX_SIZE_KEY = "--dynamic-font-size-max";
+const FONT_SIZE_VALUE_ID = "font-size-value";
 
 /** @typedef {{ pun: HTMLElement, minFontSize: number, maxFontSize: number }} FontSizeContext */
-/** @typedef {{ id: string, icon: string, label: string }} FontSizeControl */
-
-/** @type {FontSizeControl[]} */
-const FONT_SIZE_CONTROLS = [
-  {
-    id: "text-increase",
-    icon: "text_increase",
-    label: "Увеличить шрифт"
-  },
-  {
-    id: "text-decrease",
-    icon: "text_decrease",
-    label: "Уменьшить шрифт"
-  },
-  {
-    id: "text-clear",
-    icon: "format_clear",
-    label: "Скинуть размер шрифта"
-  }
-];
-
-/** @param {FontSizeControl} control */
-const fontSizeControlMarkup = ({ id, icon, label }) => {
-  const tooltipId = `${id}-tooltip`;
-
-  return `
-    <div class="theme__control">
-      <button type="button" id="${id}" interestfor="${tooltipId}" popovertarget="${tooltipId}" aria-labelledby="${tooltipId}">
-        <i class="material-symbols-sharp">${icon}</i>
-      </button>
-      <span class="tooltip" id="${tooltipId}" popover="hint" role="tooltip">${label}</span>
-    </div>`;
-};
 
 /** @returns {string} */
 export const fontSizeControlsMarkup = () => `
-  <section class="theme">
-    <h3>Размер шрифта</h3>
-    <div class="theme__controls">${FONT_SIZE_CONTROLS.map(fontSizeControlMarkup).join("")}
+  <section class="theme" aria-labelledby="font-size-controls-title">
+    <h3 id="font-size-controls-title">Размер шрифта</h3>
+    <div class="theme__font-size-controls">
+      <div class="theme__font-size-stepper" role="group" aria-labelledby="font-size-controls-title">
+        <button type="button" id="text-decrease" aria-label="Уменьшить шрифт">
+          <i class="material-symbols-sharp" aria-hidden="true">remove</i>
+        </button>
+        <output id="${FONT_SIZE_VALUE_ID}" aria-live="polite">—</output>
+        <button type="button" id="text-increase" aria-label="Увеличить шрифт">
+          <i class="material-symbols-sharp" aria-hidden="true">add</i>
+        </button>
+      </div>
+      <button class="theme__font-size-reset" type="button" id="text-clear">Сбросить</button>
     </div>
   </section>`;
 
@@ -114,6 +92,54 @@ const getComputedFontSizeFromPost = () => {
   return Number.parseFloat(window.getComputedStyle(postContent).fontSize);
 };
 
+/**
+ * @param {HTMLElement} pun
+ * @returns {number | null}
+ */
+const getCurrentFontSize = (pun) => {
+  const postFontSize = getComputedFontSizeFromPost();
+  if (postFontSize !== null && Number.isFinite(postFontSize)) {
+    return postFontSize;
+  }
+
+  const dynamicFontSize = cssLengthToPixels(
+    window.getComputedStyle(pun).getPropertyValue(CSS_VARIABLE_SIZE_KEY)
+  );
+
+  return Number.isFinite(dynamicFontSize) ? dynamicFontSize : null;
+};
+
+/** @param {FontSizeContext} context */
+const synchronizeFontSizeControls = (context) => {
+  const { pun, minFontSize, maxFontSize } = context;
+
+  const resetButton = document.getElementById("text-clear");
+  if (resetButton instanceof HTMLButtonElement) {
+    resetButton.disabled =
+      pun.style.getPropertyValue(CSS_VARIABLE_SIZE_KEY).trim() === "";
+  }
+
+  const fontSize = getCurrentFontSize(pun);
+  if (fontSize === null) {
+    return;
+  }
+
+  const value = document.getElementById(FONT_SIZE_VALUE_ID);
+  if (value) {
+    value.textContent = String(Number(fontSize.toFixed(2)));
+  }
+
+  const decreaseButton = document.getElementById("text-decrease");
+  if (decreaseButton instanceof HTMLButtonElement) {
+    decreaseButton.disabled = fontSize <= minFontSize;
+  }
+
+  const increaseButton = document.getElementById("text-increase");
+  if (increaseButton instanceof HTMLButtonElement) {
+    increaseButton.disabled = fontSize >= maxFontSize;
+  }
+};
+
 /** @returns {number | null} */
 const getStoredFontSize = () => {
   try {
@@ -145,12 +171,14 @@ const removeStoredFontSize = () => {
 };
 
 /**
- * @param {HTMLElement} pun
+ * @param {FontSizeContext} context
  * @param {number} size
  */
-const setDynamicFontSize = (pun, size) => {
+const setDynamicFontSize = (context, size) => {
+  const { pun } = context;
   pun.style.setProperty(CSS_VARIABLE_SIZE_KEY, `${size}px`);
   storeFontSize(size);
+  synchronizeFontSizeControls(context);
 };
 
 /** @param {number} delta */
@@ -162,8 +190,8 @@ const adjustFontSize = (delta) => {
     }
 
     const { pun, minFontSize, maxFontSize } = context;
-    const currentFontSize = getComputedFontSizeFromPost();
-    if (currentFontSize === null || !Number.isFinite(currentFontSize)) {
+    const currentFontSize = getCurrentFontSize(pun);
+    if (currentFontSize === null) {
       return;
     }
 
@@ -173,7 +201,7 @@ const adjustFontSize = (delta) => {
       return;
     }
 
-    setDynamicFontSize(pun, updatedFontSize);
+    setDynamicFontSize(context, updatedFontSize);
   } catch (e) {
     handleError("html-header/changeVisuals/fontSize", e);
   }
@@ -184,13 +212,15 @@ const decreaseFontSize = () => adjustFontSize(-1);
 
 const resetFontSize = () => {
   try {
-    const pun = document.getElementById("pun");
-    if (!pun) {
+    const context = getFontSizeContext();
+    if (!context) {
       return;
     }
 
+    const { pun } = context;
     pun.style.removeProperty(CSS_VARIABLE_SIZE_KEY);
     removeStoredFontSize();
+    synchronizeFontSizeControls(context);
   } catch (e) {
     handleError("html-header/changeVisuals/fontSize", e);
   }
@@ -204,7 +234,7 @@ export const restoreFontSize = () => {
       return;
     }
 
-    const { pun, minFontSize, maxFontSize } = context;
+    const { minFontSize, maxFontSize } = context;
     const userFontSize = getStoredFontSize();
 
     if (
@@ -213,7 +243,7 @@ export const restoreFontSize = () => {
       userFontSize >= minFontSize &&
       userFontSize <= maxFontSize
     ) {
-      setDynamicFontSize(pun, userFontSize);
+      setDynamicFontSize(context, userFontSize);
     }
   } catch (e) {
     handleError("html-header/changeVisuals/fontSize", e);
@@ -227,6 +257,8 @@ export const initializeFontSizeControls = () => {
     if (!context) {
       return;
     }
+
+    synchronizeFontSizeControls(context);
 
     document
       .getElementById("text-increase")
