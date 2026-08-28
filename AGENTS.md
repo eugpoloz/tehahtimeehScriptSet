@@ -1,57 +1,74 @@
-# Repository guidelines
+# Repository instructions
 
-## Architecture
+These instructions apply to the entire repository.
 
-- This repository is a Yarn 4 workspace monorepo for browser scripts targeting
-  mybb/rusff forums.
-- Keep application source in JavaScript. Do not convert source files to
-  TypeScript unless the task explicitly requires it.
-- Use JSDoc and strict `checkJs` for type safety.
-- Put shared browser utilities in `lib/utils`.
-- Put buildable scripts in `scripts/<kebab-case-name>`.
-- Each script builds an IIFE into the root `dist/` directory and attaches its
-  public API to `window.teh`.
-- Load `@teh/core` before packages that attach to the shared namespace.
+## Scope and change discipline
 
-## Code style
+- Implement only the behavior requested for the current task. Treat future
+  features and examples as context, not authorization to implement them.
+- Requests to “outline,” “scaffold,” or “prepare for” a feature authorize only
+  that preparatory work, not the feature itself.
+- When implementing a larger feature or refactor, prefer small, reviewable
+  steps. After each step, summarize the changes and validation, then wait for
+  review before starting the next step.
+- Preserve existing runtime behavior and public `window.teh` APIs unless the
+  task explicitly requests a behavior change or breaking change.
+- Keep changes focused. Do not include unrelated cleanup.
+- If the requested boundary or file structure is unclear, present the proposed
+  structure and wait for approval before editing.
+- Before adding any dependency, explain why it is necessary and wait for
+  explicit approval.
 
-- Use ESM imports and exports.
-- Follow the repository Prettier configuration: 2 spaces and no trailing
-  commas.
-- Prefer HTML template strings over creating DOM elements imperatively. Do not
-  use `document.createElement` or equivalent element-by-element construction
-  when generating markup.
-- Prefer small feature modules under `src/features` and reusable helpers under
-  `src/helpers`.
-- Optimize for human readability. Prefer explicit conditionals over multiline
-  or nested ternary expressions.
-- Use early returns for unsupported pages, missing DOM elements, and failed
-  access checks.
-- Always use braces for every control-flow block; never omit them for a
-  single-statement branch. Write `return` on its own line and leave a blank
-  line after the block before the following statement.
-- Add JSDoc to public functions and non-obvious data structures.
-- Preserve Russian user-facing text unless the task explicitly changes copy.
-- Preserve existing public `window.teh` APIs unless a breaking change is
-  requested.
+## Repository architecture
 
-## Workflow
+- This is a Yarn 4 workspace monorepo of browser scripts for mybb/rusff forums.
+- Keep buildable scripts in `scripts/<kebab-case-name>`.
+- Keep shared browser utilities in `lib/utils`.
+- Organize script code into small feature modules under `src/features` and
+  reusable helpers under `src/helpers`.
+- Each script must build as an IIFE into the root `dist/` directory and expose
+  its public API through `window.teh`.
+- Load `@teh/core` before any package that extends the shared `window.teh`
+  namespace.
 
-- Use `make new-script NAME=<kebab-name>` to scaffold a script package.
-- Run `make typecheck` after changing checked JavaScript or JSDoc types.
-- Build the affected package with `make <script-name>`. Use `make build` for
-  cross-package or build-system changes.
-- Run `make format` only when formatting changes are intended; it rewrites
-  matching files across the repository.
-- Do not hand-edit files in `dist/`; regenerate them through the build.
-- Do not add production dependencies without explaining why they are needed.
+## JavaScript and markup standards
 
-## Change policy
+- Keep application source in JavaScript unless the task explicitly requires
+  TypeScript. Use ESM imports and exports.
+- Use JSDoc with strict `checkJs` for type safety. Document public functions and
+  non-obvious data structures.
+- Follow the repository Prettier configuration: 2-space indentation and no
+  trailing commas.
+- Optimize for human readability:
+  - Prefer explicit conditionals to multiline or nested ternary expressions.
+  - Use early returns for unsupported pages, missing DOM elements, and failed
+    access checks.
+  - Always use braces for control-flow blocks, including single-statement
+    branches.
+  - Put `return` on its own line. After a block that returns, leave a blank line
+    before the next statement.
+- Generate markup with HTML template strings. Do not construct generated markup
+  element by element with `document.createElement` or equivalent APIs.
+- Preserve Russian user-facing text unless the task explicitly changes the
+  copy.
 
-- Prefer focused changes over unrelated cleanup.
+## Editing, building, and validation
+
+- Scaffold a new script package with `make new-script NAME=<kebab-name>`.
+- Edit source files, never generated files in `dist/`. Regenerate `dist/`
+  artifacts through the build.
+- After changing checked JavaScript or JSDoc types, run `make typecheck`.
+- Build a changed script with `make <script-name>`.
+- Run `make build` instead when a change affects multiple packages or the build
+  system.
+- Run `make format` only when repository-wide formatting changes are intended;
+  it rewrites all matching files.
+- Before handing off, report every validation command run and any check that
+  could not be run.
+
+## Documentation and commits
+
 - Update `README.md` when commands, packages, architecture, or public APIs
   change.
-- Follow the repository's Conventional Commit-style history, for example
-  `feat(scope): description` or `fix(scope): description`.
-- Before handing off a change, report which validation commands ran and any
-  checks that could not run.
+- When creating a commit, follow the repository's Conventional Commit style,
+  for example `feat(scope): description` or `fix(scope): description`.
