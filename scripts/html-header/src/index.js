@@ -2,8 +2,10 @@
 
 import configureCoreSettings from "./features/configure-core-settings";
 import configureEditor from "./features/configure-editor";
-import changeFontSize from "./features/change-font-size";
+import changeVisuals from "./features/change-visuals";
 
 configureCoreSettings();
 
-export { changeFontSize, configureEditor };
+const changeFontSize = changeVisuals;
+
+export { changeFontSize, changeVisuals, configureEditor };
