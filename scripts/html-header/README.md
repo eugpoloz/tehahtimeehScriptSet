@@ -24,8 +24,10 @@ teh.changeVisuals();
 
 This inserts a settings button into `#pun-navlinks ul` and restores saved
 settings. The button toggles a light-dismiss popover with font-size controls
-and a radio-button group for light, dark, and system theme preferences. The
-preference is stored in `userTheme`. The document root receives
+and an animated light/dark toggle with a separate system-theme checkbox. The
+preference is stored in `userTheme`. While the system preference is selected,
+the light/dark toggle displays the resolved theme and is disabled. The
+document root receives
 `data-theme-preference` with that preference and `data-theme` with the resolved
 `light` or `dark` theme. Changes to the system theme are followed while the
 system preference is selected.
