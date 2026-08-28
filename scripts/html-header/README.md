@@ -24,8 +24,14 @@ teh.changeVisuals();
 
 This inserts a settings button into `#pun-navlinks ul` and restores saved
 settings. The button toggles a light-dismiss popover with font-size controls
-and a group reserved for light, dark, and system theme controls. When the
-document is still loading, the saved font-size CSS variable is restored
-immediately while control insertion and event setup wait for `DOMContentLoaded`.
+and a radio-button group for light, dark, and system theme preferences. The
+preference is stored in `userTheme`. The document root receives
+`data-theme-preference` with that preference and `data-theme` with the resolved
+`light` or `dark` theme. Changes to the system theme are followed while the
+system preference is selected.
+
+When the document is still loading, the saved theme and font-size CSS variable
+are restored immediately while control insertion and event setup wait for
+`DOMContentLoaded`.
 
 Font sizing requires `#pun`.

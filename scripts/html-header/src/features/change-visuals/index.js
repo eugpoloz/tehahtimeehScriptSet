@@ -2,6 +2,7 @@ import { handleError } from "@teh/utils";
 
 import { insertVisualControls } from "./controls";
 import { initializeFontSizeControls, restoreFontSize } from "./font-size";
+import { initializeThemeControls, restoreTheme } from "./theme";
 
 /** Inserts and connects controls after the page DOM is available. */
 const initializeVisualControls = () => {
@@ -12,6 +13,7 @@ const initializeVisualControls = () => {
     }
 
     initializeFontSizeControls();
+    initializeThemeControls();
   } catch (e) {
     handleError("html-header/changeVisuals", e);
   }
@@ -26,6 +28,7 @@ const initializeVisualControls = () => {
 const changeVisuals = () => {
   try {
     restoreFontSize();
+    restoreTheme();
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initializeVisualControls, {

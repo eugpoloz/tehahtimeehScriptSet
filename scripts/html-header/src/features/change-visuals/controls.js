@@ -1,4 +1,5 @@
 import { fontSizeControlsMarkup } from "./font-size";
+import { themeControlsMarkup } from "./theme";
 
 const VISUAL_CONTROLS_HTML = `
   <li class="theme__container">
@@ -9,12 +10,7 @@ const VISUAL_CONTROLS_HTML = `
       </button>
       <div class="theme__menu popover-custom" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
         ${fontSizeControlsMarkup()}
-        <section class="theme" aria-labelledby="theme-controls-title">
-          <h3 id="theme-controls-title">Тема</h3>
-          <div class="theme__controls">
-
-          </div>
-        </section>
+        ${themeControlsMarkup()}
       </div>
     </div>
   </li>`;
