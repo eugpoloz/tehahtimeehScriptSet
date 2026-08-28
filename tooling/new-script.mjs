@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, readFile, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, access } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -82,17 +82,6 @@ for (const [relativePath, body] of Object.entries(files)) {
   const dest = join(pkgDir, relativePath);
   await mkdir(dirname(dest), { recursive: true });
   await writeFile(dest, body);
-}
-
-const readmePath = join(root, "README.md");
-let readme = await readFile(readmePath, "utf8");
-
-if (!readme.includes(`  ${kebab}/`)) {
-  readme = readme.replace(
-    /\ntooling\/\n/,
-    `\n  ${kebab}/                    # → teh.${kebab}.iife.js\ntooling/\n`
-  );
-  await writeFile(readmePath, readme);
 }
 
 console.log(`Created scripts/${kebab}`);
