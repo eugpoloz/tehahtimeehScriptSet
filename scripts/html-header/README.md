@@ -34,16 +34,21 @@ teh.configureEditor({
 });
 ```
 
-## Style controls
+## Visual controls
 
-Call the initializer where the font-size controls should be inserted:
+Call the initializer where the theme and font-size controls should be inserted:
 
 ```js
-teh.changeFontSize();
+teh.changeVisuals();
 ```
 
 The controls are inserted next to the calling script, or at the end of the
-document body when called later. The initializer restores the saved size
-immediately and connects the controls; post content is looked up only when a
-control is used, so initialization is safe from the HTML header. The control
-labels use accessible hint popovers instead of native `title` tooltips.
+document body when called later. The initializer restores the saved theme and
+font size and connects the controls. Theme preference is stored as `light`,
+`dark`, or `system`; the document root receives `data-theme-preference` with
+that value and `data-theme` with the resolved `light` or `dark` value for CSS.
+System theme changes are followed while the `system` preference is active.
+
+Font-size controls remain inactive when the current page does not provide
+`#pun` and its dynamic size limits. The existing `teh.changeFontSize()` name is
+retained as a compatibility alias for `teh.changeVisuals()`.
