@@ -6,13 +6,16 @@ These instructions apply to the entire repository.
 
 - Implement only the behavior requested for the current task. Treat future
   features and examples as context, not authorization to implement them.
+- Read only files relevant to the current task and avoid broad repository
+  scans.
 - Requests to “outline,” “scaffold,” or “prepare for” a feature authorize only
   that preparatory work, not the feature itself.
 - When implementing a larger feature or refactor, prefer small, reviewable
   steps. After each step, summarize the changes and validation, then wait for
   review before starting the next step.
-- Preserve existing runtime behavior and public `window.teh` APIs unless the
-  task explicitly requests a behavior change or breaking change.
+- Backwards compatibility is not required: this repository is in beta and is
+  used only by the repository owner. Make breaking changes when they directly
+  satisfy the current task.
 - Keep changes focused. Do not include unrelated cleanup.
 - If the requested boundary or file structure is unclear, present the proposed
   structure and wait for approval before editing.
@@ -54,17 +57,32 @@ These instructions apply to the entire repository.
 
 ## Editing, building, and validation
 
+- Treat small tasks as one implementation step.
+- For every implementation step that changes code, run `make typecheck` and
+  the appropriate build. Documentation-only changes do not require these
+  checks. Do not run any other checks unless the user explicitly requests
+  them.
+- Do not rerun a check unless files affecting it changed since the last
+  successful run.
+- Do not run `git diff --check`; it is not needed for this repository.
 - Scaffold a new script package with `make new-script NAME=<kebab-name>`.
 - Edit source files, never generated files in `dist/`. Regenerate `dist/`
   artifacts through the build.
-- After changing checked JavaScript or JSDoc types, run `make typecheck`.
 - Build a changed script with `make <script-name>`.
 - Run `make build` instead when a change affects multiple packages or the build
   system.
-- Run `make format` only when repository-wide formatting changes are intended;
-  it rewrites all matching files.
-- Before handing off, report every validation command run and any check that
-  could not be run.
+- Run `make format` as the final step immediately before handing files off for
+  review. Documentation-only changes require only this final format step. If
+  files change afterward, run `make format` again before handoff.
+- Before handing off, report the applicable validation commands run, and any
+  required checks that could not be run.
+
+## Communication efficiency
+
+- Keep progress updates and final responses concise.
+- Summarize successful command output; include detailed output only when a
+  command fails or the details are necessary.
+- Do not restate repository instructions or explain obvious edits.
 
 ## Documentation and commits
 
