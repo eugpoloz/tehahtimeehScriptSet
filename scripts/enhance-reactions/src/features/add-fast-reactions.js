@@ -11,11 +11,7 @@ const addFastReactions = () => {
       const rating = post.querySelector(".post-rating a");
       const vote = post.querySelector(".post-vote a");
 
-      if (
-        !rating ||
-        !vote ||
-        rating.hasAttribute("data-ready")
-      ) {
+      if (!rating || !vote || rating.hasAttribute("data-ready")) {
         return;
       }
 
