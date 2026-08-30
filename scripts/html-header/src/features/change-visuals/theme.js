@@ -1,5 +1,5 @@
 import { handleError } from "@teh/utils";
-import { spinToggleMarkup } from "./spin-toggle";
+import { spinToggleMarkup } from "../../helpers/spin-toggle";
 
 const LOCAL_STORAGE_THEME_KEY = "userTheme";
 const SYSTEM_THEME_QUERY = "(prefers-color-scheme: dark)";
@@ -57,6 +57,12 @@ const resolveTheme = (preference) => {
 const getStoredThemePreference = () => {
   try {
     const preference = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
+
+    if (preference === null) {
+      storeThemePreference("light");
+
+      return "light";
+    }
 
     return isThemePreference(preference) ? preference : "system";
   } catch (e) {
