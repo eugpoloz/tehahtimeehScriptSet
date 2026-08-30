@@ -17,7 +17,16 @@ export const fontSizeControlsMarkup = () => `
         <button type="button" id="text-decrease" aria-label="Уменьшить шрифт">
           <i class="material-symbols-sharp" aria-hidden="true">remove</i>
         </button>
-        <output id="${FONT_SIZE_VALUE_ID}" aria-live="polite">—</output>
+        <label>
+          <span class="sr-only">Текущий размер шрифта</span>
+          <input
+            id="${FONT_SIZE_VALUE_ID}"
+            type="number"
+            inputmode="decimal"
+            step="1"
+            aria-live="polite"
+          />
+        </label>
         <button type="button" id="text-increase" aria-label="Увеличить шрифт">
           <i class="material-symbols-sharp" aria-hidden="true">add</i>
         </button>
@@ -125,8 +134,10 @@ const synchronizeFontSizeControls = (context) => {
   }
 
   const value = document.getElementById(FONT_SIZE_VALUE_ID);
-  if (value) {
-    value.textContent = String(Number(fontSize.toFixed(2)));
+  if (value instanceof HTMLInputElement) {
+    value.min = String(minFontSize);
+    value.max = String(maxFontSize);
+    value.value = String(Number(fontSize.toFixed(2)));
   }
 
   const decreaseButton = document.getElementById("text-decrease");
@@ -210,6 +221,37 @@ const adjustFontSize = (delta) => {
 const increaseFontSize = () => adjustFontSize(1);
 const decreaseFontSize = () => adjustFontSize(-1);
 
+/** Applies a manually entered font size. */
+const setFontSizeFromInput = () => {
+  try {
+    const context = getFontSizeContext();
+    if (!context) {
+      return;
+    }
+
+    const value = document.getElementById(FONT_SIZE_VALUE_ID);
+    if (!(value instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const size = Number(value.value);
+    if (
+      value.value.trim() === "" ||
+      !Number.isFinite(size) ||
+      size < context.minFontSize ||
+      size > context.maxFontSize
+    ) {
+      synchronizeFontSizeControls(context);
+
+      return;
+    }
+
+    setDynamicFontSize(context, size);
+  } catch (e) {
+    handleError("html-header/changeVisuals/fontSize", e);
+  }
+};
+
 const resetFontSize = () => {
   try {
     const context = getFontSizeContext();
@@ -266,6 +308,9 @@ export const initializeFontSizeControls = () => {
     document
       .getElementById("text-decrease")
       ?.addEventListener("click", decreaseFontSize);
+    document
+      .getElementById(FONT_SIZE_VALUE_ID)
+      ?.addEventListener("change", setFontSizeFromInput);
     document
       .getElementById("text-clear")
       ?.addEventListener("click", resetFontSize);
