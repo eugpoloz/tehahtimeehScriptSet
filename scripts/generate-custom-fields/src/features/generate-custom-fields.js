@@ -33,6 +33,8 @@ const generateCustomFields = async ({
   config,
   proxy,
   userAccessGroups,
+  outputMode = "multi",
+  valueAttribute = "data-href",
   debug = false
 }) => {
   const profileForm = document.getElementById("profile8");
@@ -195,6 +197,11 @@ const generateCustomFields = async ({
         ? ` class="${fldClassNames.trim()}"`
         : "";
 
+      if (outputMode === "single") {
+        updatedContents += fldContents;
+        return;
+      }
+
       updatedContents += !!fldContents
         ? `<div data-custom-fld="${section.name}"${fldClassNamesStr}>${fldContents}</div>\n`
         : "";
@@ -208,9 +215,10 @@ const generateCustomFields = async ({
       return;
     }
 
-    const initialFldContainer = initialContainer.querySelector(
-      `[data-custom-fld="${section.name}"]`
-    );
+    const initialFldContainer =
+      outputMode === "single"
+        ? initialContainer
+        : initialContainer.querySelector(`[data-custom-fld="${section.name}"]`);
 
     const sectionId = getSectionId(section.name);
     const sectionFldsId = sectionId + "_flds";
@@ -238,7 +246,12 @@ const generateCustomFields = async ({
     }
 
     section.inputs.forEach((input) => {
-      const contents = readInputContents(input, initialFldContainer, proxy);
+      const contents = readInputContents(
+        input,
+        initialFldContainer,
+        proxy,
+        outputMode === "single" ? valueAttribute : ""
+      );
 
       handleLogs(
         {
@@ -362,7 +375,7 @@ const generateCustomFields = async ({
 
       /** @param {string} value */
       const syncFromValue = (value) => {
-        updatePreview({
+        previewNode = updatePreview({
           input,
           value,
           previewNode,
