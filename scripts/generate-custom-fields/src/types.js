@@ -32,6 +32,8 @@
  * @property {string} fldId Profile field that stores the generated custom-field HTML.
  * @property {string} collectionFldId Profile field with the personal page URL or `<a href="…">`.
  * @property {CustomFieldSection[]} config Field sections to render.
+ * @property {"multi" | "single"} [outputMode] Store multiple sections with wrappers or one masked field directly.
+ * @property {string} [valueAttribute] Attribute read from the root masked element in single mode. Defaults to `data-href`.
  * @property {string} proxy Image proxy prefix applied to img URLs in preview/saved HTML.
  * @property {number[]} userAccessGroups Extra group IDs (beyond AMS) allowed to use the editor.
  * @property {boolean} [debug] Enable debug logging.
