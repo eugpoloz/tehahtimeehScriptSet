@@ -56,9 +56,19 @@ export const getClassNameContents = (options, container) => {
  * @param {CustomFieldInput} input
  * @param {Element | null | undefined} container
  * @param {string} proxy
+ * @param {string} [valueAttribute]
  * @returns {string}
  */
-export const readInputContents = (input, container, proxy) => {
+export const readInputContents = (
+  input,
+  container,
+  proxy,
+  valueAttribute = ""
+) => {
+  if (input.type === "text" && valueAttribute) {
+    return container?.firstElementChild?.getAttribute(valueAttribute) ?? "";
+  }
+
   switch (input.type) {
     case "img":
       return getImgSrc(container, proxy);
@@ -112,7 +122,7 @@ export const getOptionLabel = (input, optionValue, optionLabel, proxy) => {
  * @param {Element | null} params.previewNode
  * @param {Element} params.previewContainer
  * @param {string} params.proxy
- * @returns {void}
+ * @returns {Element | null}
  */
 export const updatePreview = ({
   input,
@@ -124,7 +134,7 @@ export const updatePreview = ({
   switch (input.type) {
     case "img": {
       if (!previewNode) {
-        return;
+        return null;
       }
 
       const previewImg =
@@ -133,7 +143,7 @@ export const updatePreview = ({
           : previewNode.querySelector("img");
 
       if (!previewImg) {
-        return;
+        return previewNode;
       }
 
       if (value.length) {
@@ -143,13 +153,30 @@ export const updatePreview = ({
         previewImg.removeAttribute("src");
         previewImg.setAttribute("hidden", "");
       }
-      return;
+      return previewNode;
     }
-    case "text":
-      if (previewNode) {
-        previewNode.innerHTML = value;
+    case "text": {
+      const maskedValue = input.mask?.(value);
+
+      if (!previewNode) {
+        if (!maskedValue) {
+          return null;
+        }
+
+        previewContainer.insertAdjacentHTML("beforeend", maskedValue);
+        return previewContainer.lastElementChild;
       }
-      return;
+
+      if (maskedValue === undefined) {
+        previewNode.innerHTML = value;
+        return previewNode;
+      }
+
+      previewNode.insertAdjacentHTML("afterend", maskedValue);
+      const updatedPreviewNode = previewNode.nextElementSibling;
+      previewNode.remove();
+      return updatedPreviewNode;
+    }
     case "className":
       if (previewContainer.classList.length) {
         previewContainer.removeAttribute("class");
@@ -158,5 +185,8 @@ export const updatePreview = ({
       if (value.length) {
         setClassTokens(previewContainer.classList, value);
       }
+      return null;
   }
+
+  return null;
 };

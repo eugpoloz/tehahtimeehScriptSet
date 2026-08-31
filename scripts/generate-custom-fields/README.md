@@ -11,6 +11,8 @@ teh.generateCustomFields();
 - `fldId`: field that stores generated HTML
 - `collectionFldId`: field containing a collection page URL or link
 - `config`: editor sections and inputs
+- `outputMode`: use `"multi"` for regular sections or `"single"` for one masked input without a section wrapper
+- `valueAttribute`: attribute read from the masked element in `"single"` mode; defaults to `data-href`
 - `proxy`: image URL prefix
 - `userAccessGroups`: additional allowed group IDs
 - `debug`: diagnostic logging
@@ -39,4 +41,28 @@ teh.generateCustomFields({
     }
   ]
 });
+```
+
+For a single masked field, add this section to the config:
+
+```js
+{
+  name: "vault",
+  userAccess: true,
+  inputs: [{
+    label: "Коллекция",
+    name: "vault",
+    type: "text",
+    mask: (value) =>
+      `<button type="button" class="vault" data-href="${value}">Коллекция</button>`
+  }]
+}
+```
+
+Use it with `outputMode: "single"` and `fldId: "5"`. The default
+`valueAttribute: "data-href"` restores the typed value automatically. The
+stored value for `laurent_ambrose` is:
+
+```html
+<button type="button" class="vault" data-href="laurent_ambrose">Коллекция</button>
 ```
