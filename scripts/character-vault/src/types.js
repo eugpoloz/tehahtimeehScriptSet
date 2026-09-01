@@ -19,13 +19,11 @@
  * @property {string} [posts]
  */
 
-/** @typedef {"normal" | "reusable"} CouponState */
-
 /**
  * @typedef {object} Coupon
  * @property {string} content
  * @property {number} quantity
- * @property {CouponState} state
+ * @property {boolean} reusable
  */
 
 export {};
