@@ -150,7 +150,7 @@ export const characterMarkup = (character, profile, details) => {
   <span class="char-avatar">${avatar}</span>
   <div class="char-info">
     <h3 class="title">${character.ru}, <age-from-dob>${character.dob}</age-from-dob></h3>
-    <strong><small><a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a></small></strong>
+    <strong><small><a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a> · <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a></small></strong>
     <p class="desc">${description}${separator}${details}</p>
   </div>
 </div>`;
