@@ -2,6 +2,7 @@
 /** @typedef {import("../types.js").Profile} Profile */
 
 import { ALL_FILTER } from "../constants.js";
+import { parseCoupon } from "./character-vault.js";
 import { IMAGE_PROXY } from "@teh/utils";
 
 /** @param {boolean} isDirectPage */
@@ -76,7 +77,21 @@ export const plashkaMarkup = (plashka) => `<div data-custom-fld="plashka">
 </div>`;
 
 /** @param {string} coupon */
-export const couponMarkup = (coupon) => `<li>${coupon}</li>`;
+export const couponMarkup = (coupon) => {
+  const { content, quantity, state } = parseCoupon(coupon);
+  const isReusable = state === "reusable";
+  const classes = `coupon${isReusable ? " coupon--reusable" : ""}`;
+  const stateAttribute = isReusable ? ' data-coupon-state="reusable"' : "";
+  const quantityMarkup =
+    quantity > 1
+      ? `<span class="coupon__quantity" aria-label="Количество: ${quantity}">×${quantity}</span>`
+      : "";
+  const reusableMarkup = isReusable
+    ? '<span class="sr-only">Многоразовый купон</span>'
+    : "";
+
+  return `<li class="${classes}"${stateAttribute}>${quantityMarkup}<span class="coupon__content">${content}</span>${reusableMarkup}</li>`;
+};
 
 /**
  * @param {string} label

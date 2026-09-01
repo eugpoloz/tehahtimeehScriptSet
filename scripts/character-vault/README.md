@@ -26,3 +26,20 @@ teh.loadCharacterVault({
 
 Mark direct vault pages with `[data-character-vault-page]`. Page markup should
 not load the vault assets or call the initializer itself.
+
+Coupons are defined as one nonempty line in a `[data-collection="coupon"]`
+element. Existing single-field coupon lines remain valid. Optional trailing
+metadata supports quantity and reusable status:
+
+```html
+<div data-collection="coupon">
+  Купон на скидку
+  Купон на скидку | 3
+  Купон без расходования | reusable
+  Купон без расходования | 3 | reusable
+</div>
+```
+
+Quantity defaults to `1` and must be a positive integer. The `reusable` state
+marks a coupon as reusable; unrecognized trailing content remains part of the
+coupon text.

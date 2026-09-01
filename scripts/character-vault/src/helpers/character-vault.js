@@ -1,4 +1,5 @@
 /** @typedef {import("../types.js").Character} Character */
+/** @typedef {import("../types.js").Coupon} Coupon */
 
 /**
  * @param {HTMLElement} root
@@ -10,6 +11,47 @@ export const parseDataFromElement = (root) =>
     .split("\n")
     .map((value) => value.trim())
     .filter(Boolean);
+
+/**
+ * Parses optional trailing metadata from a coupon line.
+ *
+ * @param {string} value
+ * @returns {Coupon}
+ */
+export const parseCoupon = (value) => {
+  const source = value.trim();
+  let content = source;
+  let quantity = 1;
+  let state = /** @type {Coupon["state"]} */ ("normal");
+
+  const reusableMatch = source.match(/^(.*)\|\s*reusable\s*$/i);
+  if (reusableMatch) {
+    state = "reusable";
+    content = reusableMatch[1].trim();
+
+    const quantityMatch = content.match(/^(.*)\|\s*([1-9]\d*)\s*$/);
+    if (quantityMatch) {
+      const parsedQuantity = Number(quantityMatch[2]);
+      if (Number.isSafeInteger(parsedQuantity)) {
+        quantity = parsedQuantity;
+        content = quantityMatch[1].trim();
+      }
+    }
+
+    return { content, quantity, state };
+  }
+
+  const quantityMatch = source.match(/^(.*)\|\s*([1-9]\d*)\s*$/);
+  if (quantityMatch) {
+    const parsedQuantity = Number(quantityMatch[2]);
+    if (Number.isSafeInteger(parsedQuantity)) {
+      quantity = parsedQuantity;
+      content = quantityMatch[1].trim();
+    }
+  }
+
+  return { content, quantity, state };
+};
 
 /**
  * @param {HTMLElement} root
