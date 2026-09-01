@@ -3,6 +3,7 @@ import { randomDelay, sleep } from "../helpers/delay";
 import { handleFastVote } from "../helpers/fast-vote";
 
 const ALL_LIKED_TEXT = "На этой странице всё пролайкано!";
+const SUPERLIKE_BUTTON_ID = "superlike";
 const SUPERLIKE_TOOLTIP_ID = "superlike-tooltip";
 
 async function autoReactToPosts() {
@@ -23,13 +24,13 @@ async function autoReactToPosts() {
       return;
     }
 
-    const html = `<div class="superlike__container">
-      <button type="button" class="superlike">Лайкнуть всех</button>
-      <div class="tooltip" popover="manual" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto"></div>
-    </div>`;
+    const html = `<button type="button" id="${SUPERLIKE_BUTTON_ID}" class="button button--wide ms-auto">Лайкнуть всех</button>
+      <div class="tooltip" popover="manual" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto"></div>`;
     controlsContainer.insertAdjacentHTML("beforeend", html);
 
-    const superlikeBtn = controlsContainer.querySelector(".superlike");
+    const superlikeBtn = controlsContainer.querySelector(
+      `#${SUPERLIKE_BUTTON_ID}`
+    );
     const superlikeTooltip = document.getElementById(SUPERLIKE_TOOLTIP_ID);
 
     if (!(superlikeBtn instanceof HTMLElement) || !superlikeTooltip) {
