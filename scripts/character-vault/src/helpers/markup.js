@@ -78,19 +78,18 @@ export const plashkaMarkup = (plashka) => `<div data-custom-fld="plashka">
 
 /** @param {string} coupon */
 export const couponMarkup = (coupon) => {
-  const { content, quantity, state } = parseCoupon(coupon);
-  const isReusable = state === "reusable";
-  const classes = `coupon${isReusable ? " coupon--reusable" : ""}`;
-  const stateAttribute = isReusable ? ' data-coupon-state="reusable"' : "";
+  const { content, quantity, reusable } = parseCoupon(coupon);
+
   const quantityMarkup =
     quantity > 1
-      ? `<span class="coupon__quantity" aria-label="Количество: ${quantity}">×${quantity}</span>`
+      ? `<span class="coupon__quantity">${quantity}<em class="sr-only"> шт.</em></span>`
       : "";
-  const reusableMarkup = isReusable
-    ? '<span class="sr-only">Многоразовый купон</span>'
-    : "";
 
-  return `<li class="${classes}"${stateAttribute}>${quantityMarkup}<span class="coupon__content">${content}</span>${reusableMarkup}</li>`;
+  return `<li class="coupon${reusable ? " coupon--reusable" : ""}">
+    ${quantityMarkup}
+    <span class="coupon__content">${content}</span>
+    ${reusable ? '<span class="sr-only">Несгораемый купон</span>' : ""}
+  </li>`;
 };
 
 /**
@@ -150,8 +149,7 @@ export const characterMarkup = (character, profile, details) => {
   <div class="char-avatar">${avatar}</div>
   <div class="char-info">
     <h3 class="title">
-      <span class="char-name">${character.ru}</span>
-      <span class="char-age"><age-from-dob>${character.dob}</age-from-dob></span>
+      <span class="char-name">${character.ru}</span>, <age-from-dob class="char-age">${character.dob}</age-from-dob>
     </h3>
     <div class="char-meta">
       <a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a>

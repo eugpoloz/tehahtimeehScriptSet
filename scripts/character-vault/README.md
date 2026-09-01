@@ -40,6 +40,6 @@ metadata supports quantity and reusable status:
 </div>
 ```
 
-Quantity defaults to `1` and must be a positive integer. The `reusable` state
-marks a coupon as reusable; unrecognized trailing content remains part of the
+Quantity defaults to `1` and must be a positive integer. The `reusable` flag
+marks a coupon as permament; unrecognized trailing content remains part of the
 coupon text.
