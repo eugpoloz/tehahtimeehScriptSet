@@ -143,17 +143,24 @@ export const filtersMarkup = (keys, selectedChar, profiles) => {
  */
 export const characterMarkup = (character, profile, details) => {
   const description = character.desc ?? "";
-  const separator = description && details ? " • " : "";
+  const content = [description, details].filter(Boolean).join(" • ");
   const avatar = profile?.avatar ? `<img src="${profile.avatar}" alt="">` : "";
 
-  return `<div class="char-card">
-  <span class="char-avatar">${avatar}</span>
+  return `<article class="char-card">
+  <div class="char-avatar">${avatar}</div>
   <div class="char-info">
-    <h3 class="title">${character.ru}, <age-from-dob>${character.dob}</age-from-dob></h3>
-    <strong><small><a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a> · <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a></small></strong>
-    <p class="desc">${description}${separator}${details}</p>
+    <h3 class="title">
+      <span class="char-name">${character.ru}</span>
+      <span class="char-age"><age-from-dob>${character.dob}</age-from-dob></span>
+    </h3>
+    <div class="char-meta">
+      <a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a>
+      <span aria-hidden="true">·</span>
+      <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a>
+    </div>
+    ${content ? `<p class="desc">${content}</p>` : ""}
   </div>
-</div>`;
+</article>`;
 };
 
 /** @param {string} gift @param {number} index @param {string} profile */
