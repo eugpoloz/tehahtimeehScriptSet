@@ -34,23 +34,23 @@ export const vaultMarkup = (isDirectPage) => `
     </div>
   </article>
   <article class="content">
-    <section class="wallet relative">
+    <section class="wallet relative" hidden>
       <div class="sticky"><small><strong>купоны</strong></small></div>
       <ul class="collection scrollable coupons" data-vault="coupon"></ul>
     </section>
-    <section class="plashkas relative">
+    <section class="plashkas relative" hidden>
       <div class="sticky"><small><strong>плашки</strong></small></div>
       <div class="collection scrollable plashkas" data-vault="plashka"></div>
     </section>
-    <section class="icons relative">
+    <section class="icons relative" hidden>
       <div class="sticky"><small><strong>иконки</strong></small></div>
       <div class="collection scrollable icons" data-vault="icon"></div>
     </section>
-    <section class="gifts relative">
+    <section class="gifts relative" hidden>
       <div class="sticky"><small><strong>подарки</strong></small></div>
       <ul class="collection scrollable gifts" data-vault="gift"></ul>
     </section>
-    <section class="achievements relative">
+    <section class="achievements relative" hidden>
       <div class="sticky"><small><strong>ачивки?</strong></small></div>
       <ul class="collection scrollable achievements" data-vault="achievement"></ul>
     </section>
