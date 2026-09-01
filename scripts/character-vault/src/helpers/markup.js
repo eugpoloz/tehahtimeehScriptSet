@@ -149,9 +149,9 @@ export const characterMarkup = (character, profile, details) => {
   <div class="char-avatar">${avatar}</div>
   <div class="char-info">
     <h3 class="title">
-      <span class="char-name">${character.ru}</span>, <age-from-dob class="char-age">${character.dob}</age-from-dob>
+      <span class="char-name">${character.ru}</span>, <age-from-dob>${character.dob}</age-from-dob>
     </h3>
-    <div class="char-meta">
+    <div class="meta">
       <a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a>
       <span aria-hidden="true">·</span>
       <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a>
