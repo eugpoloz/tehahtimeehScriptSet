@@ -72,7 +72,7 @@ export const loadVaultModal = (config) => {
     handleError("hehedges-specials/preloadCharacterVault", error);
   });
 
-  document.querySelectorAll(".vault").forEach((button) => {
+  document.querySelectorAll("[data-vault-href]").forEach((button) => {
     if (initializedButtons.has(button)) {
       return;
     }
@@ -80,7 +80,7 @@ export const loadVaultModal = (config) => {
     initializedButtons.add(button);
     button.addEventListener("click", async (event) => {
       const trigger = /** @type {HTMLElement} */ (event.currentTarget);
-      const dataHref = trigger.dataset.href;
+      const dataHref = trigger.dataset.vaultHref;
       if (!dataHref) {
         return;
       }
