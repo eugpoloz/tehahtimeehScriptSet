@@ -1,6 +1,7 @@
 /**
  * @typedef {object} Character
  * @property {number | string} id
+ * @property {number} anketa
  * @property {string} [en]
  * @property {string} ru
  * @property {string} dob
