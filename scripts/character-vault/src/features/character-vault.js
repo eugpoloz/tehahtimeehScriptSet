@@ -29,6 +29,16 @@ const getTarget = (root, name) => {
   return target instanceof HTMLElement ? target : null;
 };
 
+/** @param {HTMLElement} target */
+const updateCollectionVisibility = (target) => {
+  const section = target.closest("section");
+  if (!section) {
+    return;
+  }
+
+  section.toggleAttribute("hidden", target.childElementCount === 0);
+};
+
 /**
  * Initializes a character collection page or its content inside the vault modal.
  *
@@ -96,6 +106,7 @@ const characterVault = async (root = null) => {
     parseCollection(root, key).forEach((item) => {
       target.insertAdjacentHTML("beforeend", markup(item));
     });
+    updateCollectionVisibility(target);
   }
 
   const readCharParam = () => {
@@ -183,6 +194,7 @@ const characterVault = async (root = null) => {
             );
           });
         });
+      updateCollectionVisibility(giftTarget);
     };
     const applySelection = (/** @type {string} */ nextChar) => {
       selectedChar = nextChar;
