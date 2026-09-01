@@ -22,26 +22,15 @@ export const parseCoupon = (value) => {
   const source = value.trim();
   let content = source;
   let quantity = 1;
-  let state = /** @type {Coupon["state"]} */ ("normal");
+  let reusable = false;
 
   const reusableMatch = source.match(/^(.*)\|\s*reusable\s*$/i);
   if (reusableMatch) {
-    state = "reusable";
+    reusable = true;
     content = reusableMatch[1].trim();
-
-    const quantityMatch = content.match(/^(.*)\|\s*([1-9]\d*)\s*$/);
-    if (quantityMatch) {
-      const parsedQuantity = Number(quantityMatch[2]);
-      if (Number.isSafeInteger(parsedQuantity)) {
-        quantity = parsedQuantity;
-        content = quantityMatch[1].trim();
-      }
-    }
-
-    return { content, quantity, state };
   }
 
-  const quantityMatch = source.match(/^(.*)\|\s*([1-9]\d*)\s*$/);
+  const quantityMatch = content.match(/^(.*)\|\s*([1-9]\d*)\s*$/);
   if (quantityMatch) {
     const parsedQuantity = Number(quantityMatch[2]);
     if (Number.isSafeInteger(parsedQuantity)) {
@@ -50,7 +39,7 @@ export const parseCoupon = (value) => {
     }
   }
 
-  return { content, quantity, state };
+  return { content, quantity, reusable };
 };
 
 /**
