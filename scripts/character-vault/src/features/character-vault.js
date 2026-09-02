@@ -6,9 +6,11 @@ import {
   parseDataFromElement,
   sortCharacterKeys
 } from "../helpers/character-vault.js";
+import getBlogTopics from "../helpers/get-blog-topics.js";
 import getProfile from "../helpers/get-profile.js";
 import {
   adminActionMarkup,
+  blogTopicsMarkup,
   characterMarkup,
   couponMarkup,
   filtersMarkup,
@@ -152,11 +154,26 @@ const characterVault = async (root = null) => {
     let selectedChar = keys.includes(readCharParam()) ? readCharParam() : "";
     /** @type {Record<string, import("../types.js").Profile | undefined>} */
     let profiles = {};
+    /** @type {Map<string, import("../types.js").BlogTopic[]>} */
+    const blogTopics = new Map();
+    const requestedBlogTopics = new Set();
 
     const renderFilters = () => {
       selectedCharTarget.textContent = selectedChar || "Вся коллекция";
       filters.innerHTML = filtersMarkup(keys, selectedChar, profiles);
       enableAvatarFallbacks(filters);
+    };
+    const renderBlogTopics = (
+      /** @type {import("../types.js").BlogTopic[]} */ topics
+    ) => {
+      const markup = blogTopicsMarkup(topics);
+      if (!markup) {
+        return;
+      }
+
+      characterTarget
+        .querySelector(".char-info > .meta")
+        ?.insertAdjacentHTML("beforeend", markup);
     };
     const renderCharacter = () => {
       const key = selectedChar || mainKey;
@@ -174,6 +191,25 @@ const characterVault = async (root = null) => {
         describeCharacter(character)
       );
       enableAvatarFallbacks(characterTarget);
+
+      if (blogTopics.has(key)) {
+        renderBlogTopics(blogTopics.get(key) ?? []);
+      }
+    };
+    const loadBlogTopics = (/** @type {string} */ key) => {
+      if (blogTopics.has(key) || requestedBlogTopics.has(key)) {
+        return;
+      }
+
+      requestedBlogTopics.add(key);
+      void getBlogTopics(key).then((loadedTopics) => {
+        blogTopics.set(key, loadedTopics);
+        if ((selectedChar || mainKey) !== key) {
+          return;
+        }
+
+        renderBlogTopics(loadedTopics);
+      });
     };
     const renderGifts = () => {
       giftTarget.replaceChildren();
@@ -202,6 +238,7 @@ const characterVault = async (root = null) => {
       renderFilters();
       renderCharacter();
       renderGifts();
+      loadBlogTopics(selectedChar || mainKey);
     };
 
     filters.addEventListener("change", (event) => {
