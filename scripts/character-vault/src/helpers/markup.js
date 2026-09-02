@@ -1,9 +1,24 @@
 /** @typedef {import("../types.js").Character} Character */
+/** @typedef {import("../types.js").BlogTopic} BlogTopic */
 /** @typedef {import("../types.js").Profile} Profile */
 
 import { ALL_FILTER } from "../constants.js";
 import { parseCoupon } from "./character-vault.js";
 import { IMAGE_PROXY } from "@teh/utils";
+
+const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
+/** @type {Record<string, string>} */
+const HTML_ENTITIES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+
+/** @param {string} value @returns {string} */
+const escapeHTML = (value) =>
+  value.replace(/[&<>"']/g, (character) => HTML_ENTITIES[character]);
 
 /** @param {boolean} isDirectPage */
 export const vaultMarkup = (isDirectPage) => `
@@ -135,6 +150,18 @@ export const filtersMarkup = (keys, selectedChar, profiles) => {
   return allCharacters + characterFilters;
 };
 
+/** @param {BlogTopic[]} blogs */
+export const blogTopicsMarkup = (blogs) => {
+  const links = blogs
+    .map(
+      (blog) =>
+        `<a href="${blog.url}" rel="noopener noreferrer" target="_blank">${escapeHTML(blog.title)}</a>`
+    )
+    .join(META_SEPARATOR_MARKUP);
+
+  return links ? `${META_SEPARATOR_MARKUP}${links}` : "";
+};
+
 /**
  * @param {Character} character
  * @param {Profile | undefined} profile
@@ -153,7 +180,7 @@ export const characterMarkup = (character, profile, details) => {
     </h3>
     <div class="meta">
       <a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a>
-      <span aria-hidden="true">·</span>
+      ${META_SEPARATOR_MARKUP}
       <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a>
     </div>
     ${content ? `<p class="desc">${content}</p>` : ""}

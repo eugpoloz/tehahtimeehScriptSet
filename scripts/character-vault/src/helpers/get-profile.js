@@ -4,7 +4,8 @@
 const getProfile = async (id) => {
   try {
     const response = await fetch(`/profile.php?id=${id}&nohead`, {
-      credentials: "include"
+      credentials: "include",
+      priority: "high"
     });
     const html = new TextDecoder("windows-1251").decode(
       await response.arrayBuffer()
