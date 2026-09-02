@@ -13,6 +13,12 @@
  */
 
 /**
+ * @typedef {object} BlogTopic
+ * @property {string} title
+ * @property {string} url
+ */
+
+/**
  * @typedef {object} Profile
  * @property {string} [avatar]
  * @property {string} [fld4]
