@@ -20,24 +20,29 @@ const HTML_ENTITIES = {
 const escapeHTML = (value) =>
   value.replace(/[&<>"']/g, (character) => HTML_ENTITIES[character]);
 
-/** @param {boolean} isDirectPage */
-export const vaultMarkup = (isDirectPage) => `
+const characterSelectorMarkup = () => `<fieldset class="char-select">
+  <legend class="sr-only">Выберите персонажа:</legend>
+  <button class="char-select__btn" type="button" popovertarget="character-filter-popover">
+    <span class="char-select__value" data-vault="selected-char"></span>
+    <i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i>
+  </button>
+  <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
+    <div data-vault="all-chars"></div>
+  </div>
+</fieldset>`;
+
+/**
+ * @param {boolean} isDirectPage
+ * @param {boolean} showCharacterSelector
+ */
+export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
   <article class="vault-toolbar sticky">
     <div class="motherlode">
       <i class="material-symbols-sharp" aria-hidden="true">savings</i>
       <strong class="subtitle" data-vault="motherlode"></strong>
       <span class="sr-only">тугриков</span>
     </div>
-    <fieldset class="char-select">
-      <legend class="sr-only">Выберите персонажа:</legend>
-      <button class="char-select__btn" type="button" popovertarget="character-filter-popover">
-        <span class="char-select__value" data-vault="selected-char"></span>
-        <i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i>
-      </button>
-      <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
-        <div data-vault="all-chars"></div>
-      </div>
-    </fieldset>
+    ${showCharacterSelector ? characterSelectorMarkup() : ""}
     <div class="actions">
       <div class="ams-only" data-vault="actions"></div>
       ${isDirectPage ? "" : '<button commandfor="vault-modal" command="close" class="vault-modal__close"><span class="sr-only">Закрыть</span><i class="material-symbols-sharp" aria-hidden="true">close</i></button>'}

@@ -63,21 +63,35 @@ const characterVault = async (root = null) => {
   root.dataset.characterVaultReady = "";
   const isDirectPage = window.location.pathname.startsWith("/pages/");
   const pageHref = root.dataset.href ?? "";
+  let characters;
+  try {
+    characters = await loadCharacters();
+  } catch (error) {
+    console.error("characterVault", error);
 
-  content.insertAdjacentHTML("beforeend", vaultMarkup(isDirectPage));
+    return;
+  }
+
+  const mainCharacter = root.querySelector("h1")?.textContent?.trim() ?? "";
+  const filteredCharacters = Object.fromEntries(
+    Object.entries(characters).filter(
+      ([key, character]) =>
+        key === mainCharacter || character.main === mainCharacter
+    )
+  );
+  const keys = sortCharacterKeys(filteredCharacters);
+
+  content.insertAdjacentHTML(
+    "beforeend",
+    vaultMarkup(isDirectPage, keys.length !== 1)
+  );
 
   const filters = getTarget(root, "all-chars");
   const selectedCharTarget = getTarget(root, "selected-char");
   const characterTarget = getTarget(root, "character");
   const giftTarget = getTarget(root, "gift");
   const actionsTarget = getTarget(root, "actions");
-  if (
-    !filters ||
-    !selectedCharTarget ||
-    !characterTarget ||
-    !giftTarget ||
-    !actionsTarget
-  ) {
+  if (!characterTarget || !giftTarget || !actionsTarget) {
     return;
   }
 
@@ -141,15 +155,6 @@ const characterVault = async (root = null) => {
   };
 
   try {
-    const characters = await loadCharacters();
-    const mainCharacter = root.querySelector("h1")?.textContent?.trim() ?? "";
-    const filteredCharacters = Object.fromEntries(
-      Object.entries(characters).filter(
-        ([key, character]) =>
-          key === mainCharacter || character.main === mainCharacter
-      )
-    );
-    const keys = sortCharacterKeys(filteredCharacters);
     const mainKey = keys.find((key) => key === mainCharacter) ?? keys[0];
     let selectedChar = keys.includes(readCharParam()) ? readCharParam() : "";
     /** @type {Record<string, import("../types.js").Profile | undefined>} */
@@ -159,6 +164,10 @@ const characterVault = async (root = null) => {
     const requestedBlogTopics = new Set();
 
     const renderFilters = () => {
+      if (!filters || !selectedCharTarget) {
+        return;
+      }
+
       selectedCharTarget.textContent = selectedChar || "Вся коллекция";
       filters.innerHTML = filtersMarkup(keys, selectedChar, profiles);
       enableAvatarFallbacks(filters);
@@ -215,14 +224,15 @@ const characterVault = async (root = null) => {
       giftTarget.replaceChildren();
       Array.from(
         /** @type {NodeListOf<HTMLElement>} */ (
-          root.querySelectorAll('[data-collection="gift"][data-profile]')
+          root.querySelectorAll('[data-collection="gift"]')
         )
       )
         .filter(
-          (group) => !selectedChar || group.dataset.profile === selectedChar
+          (group) =>
+            !selectedChar || (group.dataset.profile || mainKey) === selectedChar
         )
         .forEach((group) => {
-          const profile = group.dataset.profile ?? "";
+          const profile = group.dataset.profile || mainKey;
           parseDataFromElement(group).forEach((gift, index) => {
             giftTarget.insertAdjacentHTML(
               "beforeend",
@@ -241,7 +251,7 @@ const characterVault = async (root = null) => {
       loadBlogTopics(selectedChar || mainKey);
     };
 
-    filters.addEventListener("change", (event) => {
+    filters?.addEventListener("change", (event) => {
       /** @type {HTMLInputElement | null} */
       let input = null;
       if (event.target instanceof Element) {
