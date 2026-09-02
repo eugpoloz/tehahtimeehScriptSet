@@ -46,14 +46,6 @@ export const loadCharacterVaultPage = (config) => {
  * @returns {void}
  */
 export const loadVaultModal = (config) => {
-  if (Number(UserID) !== 3) {
-    return;
-  }
-
-  if (!document.body) {
-    return;
-  }
-
   if (!document.getElementById("vault-modal")) {
     document.body.insertAdjacentHTML("beforeend", VAULT_MODAL_HTML);
   }
