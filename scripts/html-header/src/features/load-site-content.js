@@ -31,7 +31,12 @@ function loadSiteContent(url) {
         );
       }
 
-      return response.json();
+      return response.arrayBuffer();
+    })
+    .then((buffer) => {
+      const text = new TextDecoder("windows-1251").decode(buffer);
+
+      return JSON.parse(text);
     })
     .then((data) => {
       if (data === null || typeof data !== "object" || Array.isArray(data)) {
