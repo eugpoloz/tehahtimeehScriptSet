@@ -5,6 +5,17 @@ Header setup for Rusff features, the editor, and visual controls.
 The bundle disables unused `RusffCore` features when loaded after
 `RusffCore` becomes available.
 
+## Site content
+
+```js
+const content = await teh.loadSiteContent("/path/to/content.json");
+```
+
+The URL must be a non-empty string. The JSON request is made with high
+priority and resolves only for a non-null object (arrays are rejected). Requests
+and successful results are memoized by URL, so repeated calls share the same
+Promise. Rejected requests are removed from the cache and can be retried.
+
 ## Editor
 
 Call after `FORUM.editor` is available:
