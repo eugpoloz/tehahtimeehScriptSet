@@ -4,6 +4,7 @@ const MODULE_NAME = "add-episode-templates";
 
 const BUTTON_ID = "button-ep-templates";
 const MENU_ID = "teh-ep-templates-menu";
+const ANCHOR_NAME = "--teh-ep-templates";
 
 /** @typedef {{ id?: string, label: string, body: string, icon?: string }} EpisodeTemplate */
 
@@ -121,12 +122,12 @@ const addEpisodeTemplates = ({
 
     btnTarget.insertAdjacentHTML(
       "afterend",
-      `<td id="${BUTTON_ID}" title="${buttonLabel}"><button type="button" popovertarget="${MENU_ID}" aria-label="${buttonLabel}"></button></td>`
+      `<td id="${BUTTON_ID}" title="${buttonLabel}"><button type="button" popovertarget="${MENU_ID}" aria-label="${buttonLabel}" style="anchor-name: ${ANCHOR_NAME}"></button></td>`
     );
 
     tags.insertAdjacentHTML(
       "beforeend",
-      `<div id="${MENU_ID}" class="teh-ep-templates-menu" popover="auto" role="menu">
+      `<div id="${MENU_ID}" class="teh-ep-templates-menu popover-custom" popover="auto" role="menu" style="position-anchor: ${ANCHOR_NAME}">
   <p class="teh-ep-templates-menu__heading">${menuHeading}</p>
   ${itemsHtml}
 </div>`
