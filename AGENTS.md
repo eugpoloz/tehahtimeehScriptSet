@@ -10,17 +10,25 @@ These instructions apply to the entire repository.
   scans.
 - Requests to “outline,” “scaffold,” or “prepare for” a feature authorize only
   that preparatory work, not the feature itself.
-- When implementing a larger feature or refactor, prefer small, reviewable
-  steps. After each step, summarize the changes and validation, then wait for
-  review before starting the next step.
-- Backwards compatibility is not required: this repository is in beta and is
-  used only by the repository owner. Make breaking changes when they directly
-  satisfy the current task.
 - Keep changes focused. Do not include unrelated cleanup.
 - If the requested boundary or file structure is unclear, present the proposed
   structure and wait for approval before editing.
 - Before adding any dependency, explain why it is necessary and wait for
   explicit approval.
+- For a larger feature or refactor, agree on implementation milestones before
+  starting. Complete and validate each agreed milestone, then wait for review;
+  treat a small task as one milestone.
+- This repository overrides the global compatibility default: breaking changes
+  are allowed when necessary for the requested behavior. Preserve unrelated
+  behavior and APIs.
+
+## Workspace boundaries
+
+- Before working in the sibling `hehedges-backups` repository, read its
+  `AGENTS.md` as well. Apply each repository's instructions only to files
+  within that repository.
+- Work in one repository does not authorize synchronizing, copying, or
+  modifying files in the other repository.
 
 ## Repository architecture
 
