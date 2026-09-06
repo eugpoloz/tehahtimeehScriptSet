@@ -7,6 +7,7 @@ import loadCharacterVault, {
   loadVaultModal
 } from "./features/load-character-vault";
 import loadFriendsBanners from "./features/load-friends-banners";
+import loadRandomQuote from "./features/load-random-quote";
 
 customElements.define("theme-subject", ThemeSubject);
 
@@ -15,6 +16,7 @@ export {
   loadCharacterVault,
   loadCharacterVaultPage,
   loadFriendsBanners,
+  loadRandomQuote,
   loadVaultModal
 };
 
