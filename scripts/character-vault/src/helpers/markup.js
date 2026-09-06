@@ -4,21 +4,9 @@
 
 import { ALL_FILTER } from "../constants.js";
 import { parseCoupon } from "./character-vault.js";
-import { IMAGE_PROXY } from "@teh/utils";
+import { escapeHtml, IMAGE_PROXY } from "@teh/utils";
 
 const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
-/** @type {Record<string, string>} */
-const HTML_ENTITIES = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;"
-};
-
-/** @param {string} value @returns {string} */
-const escapeHTML = (value) =>
-  value.replace(/[&<>"']/g, (character) => HTML_ENTITIES[character]);
 
 const characterSelectorMarkup = () => `<fieldset class="char-select">
   <legend class="sr-only">Выберите персонажа:</legend>
@@ -160,7 +148,7 @@ export const blogTopicsMarkup = (blogs) => {
   const links = blogs
     .map(
       (blog) =>
-        `<a href="${blog.url}" rel="noopener noreferrer" target="_blank">${escapeHTML(blog.title)}</a>`
+        `<a href="${blog.url}" rel="noopener noreferrer" target="_blank">${escapeHtml(blog.title)}</a>`
     )
     .join(META_SEPARATOR_MARKUP);
 
