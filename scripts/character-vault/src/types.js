@@ -25,11 +25,4 @@
  * @property {string} [posts]
  */
 
-/**
- * @typedef {object} Coupon
- * @property {string} content
- * @property {number} quantity
- * @property {boolean} reusable
- */
-
 export {};
