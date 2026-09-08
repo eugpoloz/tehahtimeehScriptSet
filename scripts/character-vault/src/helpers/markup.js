@@ -3,8 +3,7 @@
 /** @typedef {import("../types.js").Profile} Profile */
 
 import { ALL_FILTER } from "../constants.js";
-import { parseCoupon } from "./character-vault.js";
-import { escapeHtml, getProxiedImageUrl, IMAGE_PROXY } from "@teh/utils";
+import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
 
 const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
 
@@ -45,7 +44,7 @@ export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
   <article class="content">
     <section class="wallet relative" hidden>
       <div class="sticky"><small><strong>купоны</strong></small></div>
-      <ul class="collection scrollable coupons" data-vault="coupon"></ul>
+      <div class="collection scrollable coupons" data-vault="coupon"></div>
     </section>
     <section class="plashkas relative" hidden>
       <div class="sticky"><small><strong>плашки</strong></small></div>
@@ -75,30 +74,15 @@ export const adminActionMarkup = (
 </a>`;
 
 /** @param {string} icon */
-export const iconMarkup = (icon) => `<div data-custom-fld="icon"><i>
-  <img src="${IMAGE_PROXY + icon}" alt="Кастомная иконка">
-</i></div>`;
+export const iconMarkup = (icon) =>
+  `<profile-icon src="${escapeHtml(icon)}"></profile-icon>`;
 
 /** @param {string} plashka */
-export const plashkaMarkup = (plashka) => `<div data-custom-fld="plashka">
-  <img src="${IMAGE_PROXY + plashka}" alt="Кастомная плашка">
-</div>`;
+export const plashkaMarkup = (plashka) =>
+  `<profile-plashka src="${escapeHtml(plashka)}"></profile-plashka>`;
 
 /** @param {string} coupon */
-export const couponMarkup = (coupon) => {
-  const { content, quantity, reusable } = parseCoupon(coupon);
-
-  const quantityMarkup =
-    quantity > 1
-      ? `<span class="coupon__quantity">${quantity}<em class="sr-only"> шт.</em></span>`
-      : "";
-
-  return `<li class="coupon${reusable ? " coupon--reusable" : ""}">
-    ${quantityMarkup}
-    <span class="coupon__content">${content}</span>
-    ${reusable ? '<span class="sr-only">Несгораемый купон</span>' : ""}
-  </li>`;
-};
+export const couponMarkup = (coupon) => `<coupon-card>${coupon}</coupon-card>`;
 
 /**
  * @param {string} label

@@ -15,7 +15,10 @@ explicit: direct pages and modal loaders call it after loading the script.
 - `teh.loadCharacters()`: load and return `window.characters`
 - `teh.describeCharacter(character)`: format a species/status label
 
-On hehedges, load assets through `hehedges-specials`:
+On hehedges, load the `hehedges-specials` bundle before character-vault. It
+registers the `profile-icon`, `profile-plashka`, and `coupon-card` elements
+that character-vault renders for these collections. Then load vault assets
+through `hehedges-specials`:
 
 ```js
 teh.loadCharacterVault({
