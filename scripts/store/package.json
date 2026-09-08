@@ -1,0 +1,14 @@
+{
+  "name": "@teh/store",
+  "version": "0.7.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "../../dist/teh.store.iife.js",
+  "exports": {
+    ".": "../../dist/teh.store.iife.js"
+  },
+  "scripts": {
+    "build": "yarn run -T vite build",
+    "dev": "yarn run -T vite build --watch"
+  }
+}
