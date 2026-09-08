@@ -271,6 +271,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teh/store@workspace:scripts/store":
+  version: 0.0.0-use.local
+  resolution: "@teh/store@workspace:scripts/store"
+  languageName: unknown
+  linkType: soft
+
 "@teh/utils@workspace:*, @teh/utils@workspace:lib/utils":
   version: 0.0.0-use.local
   resolution: "@teh/utils@workspace:lib/utils"
