@@ -12,7 +12,8 @@ import {
   readInputContents,
   maskInputValue,
   getOptionLabel,
-  updatePreview
+  updatePreview,
+  componentMarkup
 } from "../helpers";
 
 /**
@@ -175,9 +176,11 @@ const generateCustomFields = async ({
       const sectionInputsArr = /** @type {HTMLInputElement[]} */ (
         Array.from(sectionEl.querySelectorAll(`input[type="text"]`))
       );
+      const componentValues = new Map();
 
       section.inputs.forEach((input, i) => {
         const currentValue = sectionInputsArr[i]?.value ?? "";
+        componentValues.set(input.name, currentValue);
 
         if (input.type === "className") {
           fldClassNames += fldClassNames.length
@@ -197,6 +200,17 @@ const generateCustomFields = async ({
         ? ` class="${fldClassNames.trim()}"`
         : "";
 
+      if (section.component) {
+        const markup = componentMarkup(
+          section.component,
+          section.inputs,
+          componentValues,
+          proxy
+        );
+        updatedContents += markup ? `${markup}\n` : "";
+        return;
+      }
+
       if (outputMode === "single") {
         updatedContents += fldContents;
         return;
@@ -215,10 +229,18 @@ const generateCustomFields = async ({
       return;
     }
 
-    const initialFldContainer =
-      outputMode === "single"
-        ? initialContainer
-        : initialContainer.querySelector(`[data-custom-fld="${section.name}"]`);
+    /** @type {Element | null} */
+    let initialFldContainer = initialContainer;
+    if (section.component) {
+      const legacySelector = `[data-custom-fld="${section.name}"]`;
+      initialFldContainer =
+        initialContainer.querySelector(section.component) ??
+        initialContainer.querySelector(legacySelector);
+    } else if (outputMode !== "single") {
+      initialFldContainer = initialContainer.querySelector(
+        `[data-custom-fld="${section.name}"]`
+      );
+    }
 
     const sectionId = getSectionId(section.name);
     const sectionFldsId = sectionId + "_flds";
@@ -245,12 +267,28 @@ const generateCustomFields = async ({
       return;
     }
 
+    const componentValues = new Map();
+    const renderComponentPreview = () => {
+      if (!section.component) {
+        return null;
+      }
+
+      previewContainer.innerHTML = componentMarkup(
+        section.component,
+        section.inputs,
+        componentValues,
+        proxy
+      );
+      return previewContainer.firstElementChild;
+    };
+
     section.inputs.forEach((input) => {
       const contents = readInputContents(
         input,
         initialFldContainer,
         proxy,
-        outputMode === "single" ? valueAttribute : ""
+        outputMode === "single" ? valueAttribute : "",
+        section.component
       );
 
       handleLogs(
@@ -288,10 +326,18 @@ const generateCustomFields = async ({
               ? ` data-custom-fld="${section.name}"`
               : "";
 
-          const optionLabelHTML =
-            !!optionValue && !!input.mask
-              ? input.mask?.(optionLabel)
-              : optionLabel;
+          const optionValues = new Map([[input.name, optionValue]]);
+          let optionLabelHTML = optionLabel;
+          if (section.component && input.type === "img" && optionValue) {
+            optionLabelHTML = componentMarkup(
+              section.component,
+              section.inputs,
+              optionValues,
+              proxy
+            );
+          } else if (optionValue && input.mask) {
+            optionLabelHTML = input.mask(optionLabel);
+          }
 
           optionsHTML += `<label>
             <span${dataAttr}>${optionLabelHTML}</span>
@@ -316,27 +362,29 @@ const generateCustomFields = async ({
       /** @type {Element | null} */
       let previewNode = null;
 
-      switch (input.type) {
-        case "className":
-          if (contents.length) {
-            setClassTokens(previewContainer.classList, contents);
-          }
-          break;
-        case "text":
-          previewContainer.insertAdjacentHTML(
-            "beforeend",
-            maskInputValue(input, contents, proxy)
-          );
-          previewNode = previewContainer.lastElementChild;
-          break;
-        case "img":
-          previewContainer.insertAdjacentHTML(
-            "beforeend",
-            contents.length
-              ? maskInputValue(input, contents, proxy)
-              : (input.mask?.("") ?? "")
-          );
-          previewNode = previewContainer.lastElementChild;
+      if (!section.component) {
+        switch (input.type) {
+          case "className":
+            if (contents.length) {
+              setClassTokens(previewContainer.classList, contents);
+            }
+            break;
+          case "text":
+            previewContainer.insertAdjacentHTML(
+              "beforeend",
+              maskInputValue(input, contents, proxy)
+            );
+            previewNode = previewContainer.lastElementChild;
+            break;
+          case "img":
+            previewContainer.insertAdjacentHTML(
+              "beforeend",
+              contents.length
+                ? maskInputValue(input, contents, proxy)
+                : (input.mask?.("") ?? "")
+            );
+            previewNode = previewContainer.lastElementChild;
+        }
       }
 
       const inputContainer = fieldContainer.querySelector(
@@ -375,21 +423,27 @@ const generateCustomFields = async ({
 
       /** @param {string} value */
       const syncFromValue = (value) => {
-        previewNode = updatePreview({
-          input,
-          value,
-          previewNode,
-          previewContainer,
-          proxy
-        });
+        componentValues.set(input.name, value);
+        if (section.component) {
+          previewNode = renderComponentPreview();
+        } else {
+          previewNode = updatePreview({
+            input,
+            value,
+            previewNode,
+            previewContainer,
+            proxy
+          });
+        }
         refreshCustomizationFld();
         selectExistingOption(value);
       };
 
       inputNode.value = contents;
+      componentValues.set(input.name, contents);
       selectExistingOption(contents);
 
-      if (input.type === "img") {
+      if (!section.component && input.type === "img") {
         updatePreview({
           input,
           value: contents,
@@ -424,6 +478,10 @@ const generateCustomFields = async ({
         });
       }
     });
+
+    if (section.component) {
+      renderComponentPreview();
+    }
   });
 
   customFldsContainer.removeAttribute("hidden");

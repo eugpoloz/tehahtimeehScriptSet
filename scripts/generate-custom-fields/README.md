@@ -21,21 +21,55 @@ Inputs support `img`, `text`, and `className`. Set `collection: true` on an imag
 input to add choices from `[data-collection="<input name>"]` on the collection
 page.
 
+Sections may set `component` to `profile-icon`, `profile-plashka`, or
+`coupon-card`. Their saved markup, option thumbnails, and live previews use
+that element, so `hehedges-specials` must already be loaded. Component sections
+ignore individual input `mask` functions. `profile-plashka` keeps alignment on
+its `justify-start`/`justify-end` class and sanitizes text content to
+text-oriented markup; images and executable markup are excluded. `coupon-card`
+preserves rich text and parses any trailing quantity/reusable metadata itself.
+
 ```js
 teh.generateCustomFields({
   fldId: "3",
   config: [
     {
-      name: "badge",
+      name: "plashka",
+      component: "profile-plashka",
       userAccess: true,
       inputs: [
         {
           label: "Плашка",
-          name: "badge",
+          name: "plashka",
           type: "img",
           collection: true,
-          mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
           options: [{ value: "" }, { value: "https://example.com/badge.png" }]
+        },
+        {
+          label: "Текст плашки",
+          name: "plashka-text",
+          type: "text",
+          maxlength: "100"
+        },
+        {
+          label: "Расположение текста",
+          name: "justify",
+          type: "className",
+          options: [
+            {
+              label: "Слева",
+              value: "justify-start"
+            },
+            {
+              label: "По центру",
+              value: ""
+            },
+            {
+              label: "Справа",
+              value: "justify-end"
+            }
+          ],
+          strict: true
         }
       ]
     }
