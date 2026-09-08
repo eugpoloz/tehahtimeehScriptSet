@@ -2,6 +2,9 @@
 
 import ThemeSubject from "./features/web-components/theme-subject";
 import defineAgeFromBirthday from "./features/web-components/age-from-birthday";
+import CouponCard from "./features/web-components/coupon-card";
+import ProfileIcon from "./features/web-components/profile-icon";
+import ProfilePlashka from "./features/web-components/profile-plashka";
 import loadCharacterVault, {
   loadCharacterVaultPage,
   loadVaultModal
@@ -9,7 +12,21 @@ import loadCharacterVault, {
 import loadFriendsBanners from "./features/load-friends-banners";
 import loadRandomQuote from "./features/load-random-quote";
 
-customElements.define("theme-subject", ThemeSubject);
+/**
+ * @param {string} name
+ * @param {CustomElementConstructor} Component
+ * @returns {void}
+ */
+const defineCustomElement = (name, Component) => {
+  if (!customElements.get(name)) {
+    customElements.define(name, Component);
+  }
+};
+
+defineCustomElement("theme-subject", ThemeSubject);
+defineCustomElement("profile-icon", ProfileIcon);
+defineCustomElement("profile-plashka", ProfilePlashka);
+defineCustomElement("coupon-card", CouponCard);
 
 export {
   defineAgeFromBirthday,
