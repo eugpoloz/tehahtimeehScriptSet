@@ -57,13 +57,24 @@ import { storeMarkup } from "../helpers/markup";
  */
 const store = () => {
   const source = document.querySelector("[data-store-source]");
-  const store = document.querySelector("[data-store]");
 
-  if (!(source instanceof HTMLElement) || !(store instanceof HTMLElement)) {
+  if (!(source instanceof HTMLElement)) {
     return;
   }
 
-  source.insertAdjacentHTML("afterend", storeMarkup());
+  if (source.dataset.storeInitialized === "true") {
+    return;
+  }
+
+  let store = source.nextElementSibling;
+  if (!(store instanceof HTMLElement) || !store.matches("[data-store]")) {
+    source.insertAdjacentHTML("afterend", storeMarkup());
+    store = source.nextElementSibling;
+  }
+
+  if (!(store instanceof HTMLElement)) {
+    return;
+  }
 
   const categoriesRoot = store.querySelector("[data-store-categories]");
   const cart = store.querySelector("[data-store-cart]");
@@ -89,6 +100,9 @@ const store = () => {
   ) {
     return;
   }
+
+  source.dataset.storeInitialized = "true";
+
   const CHARACTERS_SCRIPT_URL = "//forumstatic.ru/files/001c/ab/7e/10010.js";
   const forumWindow =
     /** @type {Window & { characters?: Record<string, StoreProfile> }} */ (

@@ -2,6 +2,16 @@
 
 import store from "./features/store";
 
-export default store;
+const initializeStore = () => {
+  store();
+};
 
-// Usage: teh.store();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeStore, {
+    once: true
+  });
+} else {
+  initializeStore();
+}
+
+export default store;
