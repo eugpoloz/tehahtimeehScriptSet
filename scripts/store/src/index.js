@@ -2,6 +2,6 @@
 
 import store from "./features/store";
 
-store();
-
 export default store;
+
+// Usage: teh.store();
