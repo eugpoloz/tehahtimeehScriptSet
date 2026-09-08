@@ -3,6 +3,8 @@
  * @typedef {import("../types.js").CustomFieldInput} CustomFieldInput
  */
 
+import { getProxiedImageUrl, getUnproxiedImageUrl } from "@teh/utils";
+
 /**
  * @param {Element | null | undefined} container
  * @param {string} proxy
@@ -11,7 +13,7 @@
 export const getImgSrc = (container, proxy) => {
   const src = container?.querySelector("img")?.getAttribute("src") ?? "";
 
-  return proxy && src.startsWith(proxy) ? src.split(proxy)[1] : src;
+  return getUnproxiedImageUrl(src, proxy);
 };
 
 /**
@@ -90,7 +92,7 @@ export const readInputContents = (
 export const maskInputValue = (input, value, proxy) => {
   switch (input.type) {
     case "img": {
-      const proxifiedValue = proxy + value;
+      const proxifiedValue = getProxiedImageUrl(value, proxy);
       return input.mask?.(proxifiedValue) ?? proxifiedValue;
     }
     case "text":
@@ -109,7 +111,11 @@ export const maskInputValue = (input, value, proxy) => {
  */
 export const getOptionLabel = (input, optionValue, optionLabel, proxy) => {
   if (input.type === "img") {
-    return optionValue ? proxy + optionValue : (optionLabel ?? optionValue);
+    if (!optionValue) {
+      return optionLabel ?? optionValue;
+    }
+
+    return getProxiedImageUrl(optionValue, proxy) || optionLabel || "";
   }
 
   return optionLabel ?? optionValue;
@@ -146,8 +152,9 @@ export const updatePreview = ({
         return previewNode;
       }
 
-      if (value.length) {
-        previewImg.setAttribute("src", proxy + value);
+      const imageUrl = getProxiedImageUrl(value, proxy);
+      if (imageUrl) {
+        previewImg.setAttribute("src", imageUrl);
         previewImg.removeAttribute("hidden");
       } else {
         previewImg.removeAttribute("src");

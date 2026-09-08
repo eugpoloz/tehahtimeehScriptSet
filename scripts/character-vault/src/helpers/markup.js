@@ -4,7 +4,7 @@
 
 import { ALL_FILTER } from "../constants.js";
 import { parseCoupon } from "./character-vault.js";
-import { escapeHtml, IMAGE_PROXY } from "@teh/utils";
+import { escapeHtml, getProxiedImageUrl, IMAGE_PROXY } from "@teh/utils";
 
 const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
 
@@ -184,6 +184,10 @@ export const characterMarkup = (character, profile, details) => {
 /** @param {string} gift @param {number} index @param {string} profile */
 export const giftMarkup = (gift, index, profile) => {
   const [image, comment, sign] = gift.split("|");
+  const imageUrl = getProxiedImageUrl(image);
+  if (!imageUrl) {
+    return "";
+  }
 
   const id = `gift_${profile.split(" ").join("_").toLowerCase()}_${index + 1}`;
   const signature = sign ? `<br><em>от</em> ${sign}` : "";
@@ -191,7 +195,7 @@ export const giftMarkup = (gift, index, profile) => {
   return `
     <li class="gift">
       <button type="button" popovertarget="${id}">
-        <img src="${IMAGE_PROXY + image}" alt="">
+        <img src="${imageUrl}" alt="">
         <span class="sr-only">Подарок #${index + 1}</span>
       </button>
       <div class="tooltip gift__info" popover="hint" id="${id}">
