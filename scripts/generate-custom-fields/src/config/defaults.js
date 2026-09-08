@@ -9,12 +9,12 @@ import { IMAGE_PROXY } from "@teh/utils";
 const fieldConfig = [
   {
     name: "icon", // [data-custom-fld="${name}"]
+    component: "profile-icon",
     inputs: [
       {
         label: "Иконка",
         name: "icon",
         type: "img",
-        mask: (src) => `<i><img src="${src}" alt="Кастомная иконка" /></i>`,
         options: [
           {
             label: "<i class='material-symbols-sharp'>close</i>",
@@ -34,12 +34,12 @@ const fieldConfig = [
   },
   {
     name: "plashka",
+    component: "profile-plashka",
     inputs: [
       {
         label: "Плашка",
         name: "plashka",
         type: "img",
-        mask: (src) => `<img src="${src}" alt="Кастомная плашка" />`,
         options: [
           {
             label: "<i class='material-symbols-sharp'>close</i>",
@@ -58,8 +58,7 @@ const fieldConfig = [
         label: "Текст плашки",
         name: "plashka-txt",
         type: "text",
-        maxlength: "50",
-        mask: (text) => `<p>${text}</p>`
+        maxlength: "50"
       },
       {
         label: "Расположение текста плашки",

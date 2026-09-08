@@ -13,7 +13,7 @@
  * @property {string} label Field label shown in the editor UI.
  * @property {string} name Input name; also used as `data-collection` when `collection` is `true`.
  * @property {CustomFieldInputType} type How the value is read/written into the custom field HTML.
- * @property {(value: string) => string} [mask] Wraps the value for preview / saved HTML.
+ * @property {(value: string) => string} [mask] Wraps the value for preview / saved HTML. Ignored when the parent section uses `component`.
  * @property {CustomFieldOption[]} [options] Built-in radio options (defaults before collection merge).
  * @property {boolean | string} [collection] Load extra options from `[data-collection]` on the personal page. `true` uses `name`; a string sets the collection key explicitly.
  * @property {string} [maxlength] Max length for free-text inputs.
@@ -21,10 +21,15 @@
  */
 
 /**
+ * @typedef {"profile-icon" | "profile-plashka" | "coupon-card"} CustomFieldComponent
+ */
+
+/**
  * @typedef {object} CustomFieldSection
  * @property {string} name Section key written as `[data-custom-fld="${name}"]`.
  * @property {CustomFieldInput[]} inputs Controls rendered for this section.
  * @property {boolean} userAccess Whether non-admin character groups may edit this section.
+ * @property {CustomFieldComponent} [component] Web component used for saved markup and previews.
  */
 
 /**

@@ -10,6 +10,7 @@ export {
   getImgSrc,
   getMaxLength,
   getOptionLabel,
+  componentMarkup,
   maskInputValue,
   readInputContents,
   setClassTokens,
