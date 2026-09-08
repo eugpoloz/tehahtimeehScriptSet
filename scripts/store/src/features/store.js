@@ -1,5 +1,7 @@
 "use strict";
 
+import { storeMarkup } from "../helpers/markup";
+
 /**
  * @typedef {object} StoreProfile
  * @property {number} [id]
@@ -60,6 +62,9 @@ const store = () => {
   if (!(source instanceof HTMLElement) || !(store instanceof HTMLElement)) {
     return;
   }
+
+  source.insertAdjacentHTML("afterend", storeMarkup());
+
   const categoriesRoot = store.querySelector("[data-store-categories]");
   const cart = store.querySelector("[data-store-cart]");
   const cartList = store.querySelector("[data-store-cart-list]");
