@@ -104,6 +104,13 @@ const replaceFldContentWithHTML = (parent, selector) => {
       const cleanContent = DOMPurify.sanitize(fld.textContent, {
         ADD_ATTR: ["target"],
         ADD_TAGS: ["strong"],
+        CUSTOM_ELEMENT_HANDLING: {
+          tagNameCheck: /^(?:profile-icon|profile-plashka|coupon-card)$/,
+          attributeNameCheck: (attributeName, tagName) =>
+            attributeName === "src" &&
+            (tagName === "profile-icon" || tagName === "profile-plashka"),
+          allowCustomizedBuiltInElements: false
+        },
         IN_PLACE: true
       });
 
