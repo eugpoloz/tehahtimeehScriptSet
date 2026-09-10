@@ -3,7 +3,7 @@
 /** @typedef {import("../types.js").Profile} Profile */
 
 import { ALL_FILTER } from "../constants.js";
-import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
+import { escapeHtml, getImageUrl } from "@teh/utils";
 
 const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
 
@@ -168,7 +168,7 @@ export const characterMarkup = (character, profile, details) => {
 /** @param {string} gift @param {number} index @param {string} profile */
 export const giftMarkup = (gift, index, profile) => {
   const [image, comment, sign] = gift.split("|");
-  const imageUrl = getProxiedImageUrl(image);
+  const imageUrl = getImageUrl(image);
   if (!imageUrl) {
     return "";
   }
@@ -179,7 +179,7 @@ export const giftMarkup = (gift, index, profile) => {
   return `
     <li class="gift">
       <button type="button" popovertarget="${id}">
-        <img src="${imageUrl}" alt="">
+        <img src="${escapeHtml(imageUrl)}" alt="">
         <span class="sr-only">Подарок #${index + 1}</span>
       </button>
       <div class="tooltip gift__info" popover="hint" id="${id}">
