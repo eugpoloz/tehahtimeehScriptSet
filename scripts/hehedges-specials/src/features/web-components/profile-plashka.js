@@ -1,4 +1,4 @@
-import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
+import { escapeHtml, getImageUrl } from "@teh/utils";
 
 const IMAGE_SELECTOR = ":scope > img";
 const CONTENT_SELECTOR = ":scope > [data-profile-plashka-content]";
@@ -16,12 +16,15 @@ const hasMeaningfulContent = (content) =>
     return node.nodeType === Node.ELEMENT_NODE;
   });
 
-/** Displays a proxied profile plashka while retaining its light-DOM content. */
+/** Displays a profile plashka while retaining its light-DOM content. */
 class ProfilePlashka extends HTMLElement {
   static observedAttributes = ["src"];
 
   /** @type {MutationObserver | undefined} */
   _observer;
+
+  /** @type {string | undefined} */
+  _source;
 
   /** @returns {void} */
   connectedCallback() {
@@ -49,7 +52,7 @@ class ProfilePlashka extends HTMLElement {
 
   /** @returns {void} */
   _render() {
-    const imageUrl = getProxiedImageUrl(this.getAttribute("src"));
+    const imageUrl = getImageUrl(this.getAttribute("src"));
     const image = /** @type {HTMLImageElement | null} */ (
       this.querySelector(IMAGE_SELECTOR)
     );
@@ -79,17 +82,23 @@ class ProfilePlashka extends HTMLElement {
     content.append(...authorNodes);
 
     if (!imageUrl) {
+      this._source = imageUrl;
       image?.remove();
       this.hidden = !hasMeaningfulContent(content);
       return;
     }
 
     if (image) {
-      image.src = imageUrl;
+      // Preserve fallback URLs across content updates.
+      if (this._source !== imageUrl) {
+        image.src = imageUrl;
+      }
+      this._source = imageUrl;
       this.hidden = false;
       return;
     }
 
+    this._source = imageUrl;
     this.insertAdjacentHTML(
       "afterbegin",
       `<img src="${escapeHtml(imageUrl)}" alt="Кастомная плашка" loading="lazy">`

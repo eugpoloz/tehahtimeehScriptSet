@@ -193,7 +193,7 @@ const generateCustomFields = async ({
           return;
         }
 
-        fldContents += maskInputValue(input, currentValue, proxy);
+        fldContents += maskInputValue(input, currentValue);
       });
 
       const fldClassNamesStr = fldClassNames.length
@@ -204,8 +204,7 @@ const generateCustomFields = async ({
         const markup = componentMarkup(
           section.component,
           section.inputs,
-          componentValues,
-          proxy
+          componentValues
         );
         updatedContents += markup ? `${markup}\n` : "";
         return;
@@ -276,8 +275,7 @@ const generateCustomFields = async ({
       previewContainer.innerHTML = componentMarkup(
         section.component,
         section.inputs,
-        componentValues,
-        proxy
+        componentValues
       );
       return previewContainer.firstElementChild;
     };
@@ -314,12 +312,7 @@ const generateCustomFields = async ({
       if (resolvedOptions.length) {
         resolvedOptions.forEach((option) => {
           const optionValue = option.value ?? "";
-          const optionLabel = getOptionLabel(
-            input,
-            optionValue,
-            option.label,
-            proxy
-          );
+          const optionLabel = getOptionLabel(input, optionValue, option.label);
 
           const dataAttr =
             input.name === section.name
@@ -332,8 +325,7 @@ const generateCustomFields = async ({
             optionLabelHTML = componentMarkup(
               section.component,
               section.inputs,
-              optionValues,
-              proxy
+              optionValues
             );
           } else if (optionValue && input.mask) {
             optionLabelHTML = input.mask(optionLabel);
@@ -372,7 +364,7 @@ const generateCustomFields = async ({
           case "text":
             previewContainer.insertAdjacentHTML(
               "beforeend",
-              maskInputValue(input, contents, proxy)
+              maskInputValue(input, contents)
             );
             previewNode = previewContainer.lastElementChild;
             break;
@@ -380,7 +372,7 @@ const generateCustomFields = async ({
             previewContainer.insertAdjacentHTML(
               "beforeend",
               contents.length
-                ? maskInputValue(input, contents, proxy)
+                ? maskInputValue(input, contents)
                 : (input.mask?.("") ?? "")
             );
             previewNode = previewContainer.lastElementChild;
@@ -431,8 +423,7 @@ const generateCustomFields = async ({
             input,
             value,
             previewNode,
-            previewContainer,
-            proxy
+            previewContainer
           });
         }
         refreshCustomizationFld();
@@ -448,8 +439,7 @@ const generateCustomFields = async ({
           input,
           value: contents,
           previewNode,
-          previewContainer,
-          proxy
+          previewContainer
         });
       }
 

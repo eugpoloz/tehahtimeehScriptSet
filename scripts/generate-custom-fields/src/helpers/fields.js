@@ -4,11 +4,7 @@
  * @typedef {import("../types.js").CustomFieldInput} CustomFieldInput
  */
 
-import {
-  escapeHtml,
-  getProxiedImageUrl,
-  getUnproxiedImageUrl
-} from "@teh/utils";
+import { escapeHtml, getImageUrl, getUnproxiedImageUrl } from "@teh/utils";
 
 const PLASHKA_TAGS = new Set(["a", "br", "em", "p", "span", "strong"]);
 const COUPON_TAGS = new Set([
@@ -122,24 +118,21 @@ const getClassNames = (inputs, values) =>
     .trim();
 
 /**
- * Generates component markup from editor values without proxying the saved
- * source URL; the receiving component owns that work.
+ * Builds custom-field component markup.
  *
  * @param {CustomFieldComponent} component
  * @param {CustomFieldInput[]} inputs
  * @param {Map<string, string>} values
- * @param {string} proxy
  * @returns {string}
  */
-export const componentMarkup = (component, inputs, values, proxy) => {
-  const imageValue = getInputValue(inputs, values, "img").trim();
-  const imageUrl = getProxiedImageUrl(imageValue, proxy);
+export const componentMarkup = (component, inputs, values) => {
+  const imageUrl = getImageUrl(getInputValue(inputs, values, "img"));
   const textValue = getInputValue(inputs, values, "text");
 
   switch (component) {
     case "profile-icon":
       return imageUrl
-        ? `<profile-icon src="${escapeHtml(imageValue)}"></profile-icon>`
+        ? `<profile-icon src="${escapeHtml(imageUrl)}"></profile-icon>`
         : "";
     case "profile-plashka": {
       const text = sanitizePlashkaContent(textValue);
@@ -151,7 +144,7 @@ export const componentMarkup = (component, inputs, values, proxy) => {
       const classAttribute = classNames
         ? ` class="${escapeHtml(classNames)}"`
         : "";
-      const srcAttribute = imageUrl ? ` src="${escapeHtml(imageValue)}"` : "";
+      const srcAttribute = imageUrl ? ` src="${escapeHtml(imageUrl)}"` : "";
 
       return `<profile-plashka${classAttribute}${srcAttribute}>${text}</profile-plashka>`;
     }
@@ -173,7 +166,8 @@ export const getImgSrc = (container, proxy) => {
     container?.querySelector("img")?.getAttribute("src") ??
     "";
 
-  return getUnproxiedImageUrl(src, proxy);
+  // Decode configured and default proxy URLs.
+  return getUnproxiedImageUrl(getUnproxiedImageUrl(src, proxy));
 };
 
 /**
@@ -263,14 +257,13 @@ export const readInputContents = (
 /**
  * @param {CustomFieldInput} input
  * @param {string} value
- * @param {string} proxy
  * @returns {string}
  */
-export const maskInputValue = (input, value, proxy) => {
+export const maskInputValue = (input, value) => {
   switch (input.type) {
     case "img": {
-      const proxifiedValue = getProxiedImageUrl(value, proxy);
-      return input.mask?.(proxifiedValue) ?? proxifiedValue;
+      const imageValue = escapeHtml(getImageUrl(value));
+      return input.mask?.(imageValue) ?? imageValue;
     }
     case "text":
       return input.mask?.(value) ?? value;
@@ -283,16 +276,15 @@ export const maskInputValue = (input, value, proxy) => {
  * @param {CustomFieldInput} input
  * @param {string} optionValue
  * @param {string | undefined} optionLabel
- * @param {string} proxy
  * @returns {string}
  */
-export const getOptionLabel = (input, optionValue, optionLabel, proxy) => {
+export const getOptionLabel = (input, optionValue, optionLabel) => {
   if (input.type === "img") {
     if (!optionValue) {
       return optionLabel ?? optionValue;
     }
 
-    return getProxiedImageUrl(optionValue, proxy) || optionLabel || "";
+    return escapeHtml(getImageUrl(optionValue)) || optionLabel || "";
   }
 
   return optionLabel ?? optionValue;
@@ -304,15 +296,13 @@ export const getOptionLabel = (input, optionValue, optionLabel, proxy) => {
  * @param {string} params.value
  * @param {Element | null} params.previewNode
  * @param {Element} params.previewContainer
- * @param {string} params.proxy
  * @returns {Element | null}
  */
 export const updatePreview = ({
   input,
   value,
   previewNode,
-  previewContainer,
-  proxy
+  previewContainer
 }) => {
   switch (input.type) {
     case "img": {
@@ -329,7 +319,7 @@ export const updatePreview = ({
         return previewNode;
       }
 
-      const imageUrl = getProxiedImageUrl(value, proxy);
+      const imageUrl = getImageUrl(value);
       if (imageUrl) {
         previewImg.setAttribute("src", imageUrl);
         previewImg.removeAttribute("hidden");

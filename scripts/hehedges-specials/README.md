@@ -23,12 +23,10 @@ styles, so do not use a Shadow DOM.
 </coupon-card>
 ```
 
-`profile-icon` accepts its URL either through `src` or as plain text content.
-`profile-plashka` accepts its image URL through `src`. Both accept only absolute
-or protocol-relative HTTP(S) URLs. Each image is loaded lazily through the
-configured image proxy; an already proxied URL is retained. `profile-plashka`
-preserves its child markup. Its alignment is controlled only by the optional
-`justify-start` or `justify-end` class; no class centers it.
+`profile-icon` accepts a URL through `src` or text content. `profile-plashka`
+uses `src` and preserves child markup. Both load absolute or protocol-relative
+HTTP(S) URLs lazily. Use `justify-start` or `justify-end` to align plashka text;
+the default is centered.
 
 `coupon-card` preserves rich child markup and recognizes trailing plain-text
 metadata: `| N`, `| reusable`, or `| N | reusable`. It only represents a coupon
