@@ -8,6 +8,7 @@ import disableProfiles from "./features/disable-profiles";
 import referQuoteToOriginal from "./features/refer-quote-to-original";
 import addTitlePopovers from "./features/add-title-popovers";
 import renderPostHtml from "./features/render-post-html";
+import proxyImages from "./features/proxy-images";
 
 // module exports
 export {
@@ -18,7 +19,8 @@ export {
   referQuoteToOriginal,
   transformProfiles,
   addTitlePopovers,
-  renderPostHtml
+  renderPostHtml,
+  proxyImages
 };
 
 // possible config for reference:
@@ -62,3 +64,4 @@ export {
 //]);
 //teh.addTitlePopovers(["abbr[title]", "button[title]"]);
 //teh.renderPostHtml({ userIds: [3], groupIds: [1] });
+//teh.proxyImages();
