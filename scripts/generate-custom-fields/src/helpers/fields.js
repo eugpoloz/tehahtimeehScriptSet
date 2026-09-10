@@ -244,7 +244,7 @@ export const readInputContents = (
       if (component === "profile-plashka") {
         if (container?.matches("profile-plashka")) {
           const managedContent = container.querySelector(
-            ":scope > p[data-profile-plashka-content]"
+            ":scope > [data-profile-plashka-content]"
           );
           return managedContent?.innerHTML ?? container.innerHTML;
         }
