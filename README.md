@@ -42,3 +42,8 @@ make new-script NAME=my-tool # scaffold scripts/my-tool
 `make new-script` creates the package, installs workspace dependencies, and
 exposes its API under the camel-cased `teh` property. The Makefile and
 TypeScript configuration discover packages automatically.
+
+## Image fallback
+
+[`teh.proxyImages()`](scripts/html-footer/README.md#image-proxy-fallback) in
+`html-footer` retries failed images through a proxy.

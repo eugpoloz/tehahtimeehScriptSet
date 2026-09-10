@@ -1,6 +1,7 @@
 # @teh/html-footer
 
-Footer features for trusted post HTML and accessible title popovers.
+Footer features for trusted post HTML, accessible title popovers, and image proxy
+fallback.
 
 ## Post HTML
 
@@ -34,3 +35,17 @@ teh.addTitlePopovers([
 With no arguments, it handles every `[title]` element. `insertPosition` accepts
 the standard `insertAdjacentHTML` positions and defaults to `beforeend`
 (`afterend` for void elements). The first matching configuration wins.
+
+## Image proxy fallback
+
+Load `core`, then `html-footer`, and call:
+
+```js
+teh.proxyImages();
+```
+
+Retries failed HTML images through DuckDuckGo, once per URL per image.
+An optional argument sets the proxy prefix: `teh.proxyImages("https://proxy.example/?url=")`.
+Repeated calls keep the first configuration.
+
+Loaded placeholders, CSS backgrounds, iframe contents, and shadow roots are excluded.
