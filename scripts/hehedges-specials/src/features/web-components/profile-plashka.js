@@ -1,7 +1,7 @@
 import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
 
 const IMAGE_SELECTOR = ":scope > img";
-const CONTENT_SELECTOR = ":scope > p[data-profile-plashka-content]";
+const CONTENT_SELECTOR = ":scope > [data-profile-plashka-content]";
 
 /**
  * @param {HTMLElement} content
@@ -53,7 +53,7 @@ class ProfilePlashka extends HTMLElement {
     const image = /** @type {HTMLImageElement | null} */ (
       this.querySelector(IMAGE_SELECTOR)
     );
-    let content = /** @type {HTMLParagraphElement | null} */ (
+    let content = /** @type {HTMLElement | null} */ (
       this.querySelector(CONTENT_SELECTOR)
     );
 
@@ -62,9 +62,9 @@ class ProfilePlashka extends HTMLElement {
     if (!content) {
       this.insertAdjacentHTML(
         "beforeend",
-        "<p data-profile-plashka-content></p>"
+        "<span data-profile-plashka-content></span>"
       );
-      content = /** @type {HTMLParagraphElement | null} */ (
+      content = /** @type {HTMLElement | null} */ (
         this.querySelector(CONTENT_SELECTOR)
       );
     }
