@@ -32,6 +32,7 @@ tooling/                     # Repository build and scaffolding tools
 ```bash
 make install                 # install dependencies
 make build                   # build every script
+make build WINDOWS_1251=1    # also emit Windows-1251 copies
 make <script>                # build one script, e.g. make html-footer
 make typecheck               # check JavaScript and JSDoc types
 make format                  # format the repository

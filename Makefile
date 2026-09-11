@@ -2,7 +2,7 @@ SCRIPTS := $(shell find scripts -mindepth 1 -maxdepth 1 -type d | sed 's|^script
 OTHER_SCRIPTS := $(filter-out core,$(SCRIPTS))
 JOBS ?= $(shell sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)
 
-.PHONY: install build clean typecheck format new-script $(SCRIPTS)
+.PHONY: install build windows-1251 clean typecheck format new-script $(SCRIPTS)
 
 install:
 	yarn install
@@ -22,6 +22,12 @@ endif
 # core first; remaining packages build in parallel
 build: core
 	$(MAKE) -j$(JOBS) $(OTHER_SCRIPTS)
+ifeq ($(WINDOWS_1251),1)
+	$(MAKE) windows-1251
+endif
+
+windows-1251:
+	node tooling/convert-dist.mjs
 
 $(SCRIPTS):
 	yarn workspace @teh/$@ build
