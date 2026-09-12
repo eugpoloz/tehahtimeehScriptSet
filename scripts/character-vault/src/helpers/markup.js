@@ -23,7 +23,7 @@ const characterSelectorMarkup = () => `<fieldset class="char-select">
  * @param {boolean} showCharacterSelector
  */
 export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
-  <article class="vault-toolbar sticky">
+  <article class="toolbar sticky">
     <div class="motherlode">
       <i class="mgc mgc-copper-coin-core-regular" aria-hidden="true"></i>
       <strong class="subtitle" data-vault="motherlode"></strong>
