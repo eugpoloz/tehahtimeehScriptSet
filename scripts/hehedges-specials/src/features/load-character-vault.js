@@ -54,7 +54,7 @@ export const loadVaultModal = (config) => {
     document.getElementById("vault-modal")
   );
   const modal = /** @type {HTMLElement | null} */ (
-    document.querySelector("#vault-modal .vault-modal")
+    document.getElementById("vault-content")
   );
   if (!pageModal || !modal) {
     return;
