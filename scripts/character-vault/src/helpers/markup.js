@@ -7,8 +7,9 @@ import { escapeHtml, getImageUrl } from "@teh/utils";
 
 const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
 
-const characterSelectorMarkup = () => `<fieldset class="char-select">
-  <legend class="sr-only">Выберите персонажа:</legend>
+const characterSelectorMarkup =
+  () => `<div class="char-select" role="group" aria-labelledby="char-select-label">
+  <span class="sr-only" id="char-select-label">Выберите персонажа:</span>
   <button class="char-select__btn" type="button" popovertarget="character-filter-popover">
     <span class="char-select__value" data-vault="selected-char"></span>
     <i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i>
@@ -16,7 +17,7 @@ const characterSelectorMarkup = () => `<fieldset class="char-select">
   <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
     <div data-vault="all-chars"></div>
   </div>
-</fieldset>`;
+</div>`;
 
 /**
  * @param {boolean} isDirectPage
