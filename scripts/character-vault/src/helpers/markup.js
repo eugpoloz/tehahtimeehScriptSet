@@ -42,7 +42,7 @@ export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
       <section class="character" data-vault="character"></section>
     </div>
   </article>
-  <article class="content">
+  <article class="vault-content">
     <section class="wallet relative" hidden>
       <div class="sticky"><small><strong>купоны</strong></small></div>
       <div class="collection scrollable coupons" data-vault="coupon"></div>
