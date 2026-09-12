@@ -1,5 +1,5 @@
 export const VAULT_MODAL_HTML = `<dialog id="vault-modal" closedby="any">
-  <article id="vault-content" class="content"></article>
+  <article id="vault-content" class="content vault-modal"></article>
 </dialog>`;
 
 /** @typedef {(root?: HTMLElement | null) => Promise<void>} CharacterVault */
