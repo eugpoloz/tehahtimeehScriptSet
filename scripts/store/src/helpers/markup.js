@@ -1,6 +1,6 @@
 export const storeMarkup = () => `<section class="store" data-store>
   <h3 class="sr-only">Магазин</h3>
-  <div class="store-toolbar">
+  <div class="toolbar">
     <button
       class="button store-cart-toggle"
       data-store-cart-toggle
