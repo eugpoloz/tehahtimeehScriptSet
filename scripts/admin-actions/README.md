@@ -1,11 +1,18 @@
-# Admin checks
+# Admin actions
 
-Build with `make admin-actions`. Load `dist/teh.core.iife.js` first, then
+Build with `make admin-actions`. Load `dist/teh.core.iife.js` before
 `dist/teh.admin-actions.iife.js`.
 
-The admin-check helpers are currently internal and are not exported by the
-package entry point.
+Initialize after the topic DOM is ready:
 
-The admin-index check loads the server-rendered marker from the current DOM.
-Users can modify that DOM or bypass browser code, so it is not an authorization
-boundary for sensitive data or operations.
+```js
+teh.acceptNewFullCharacter({
+  configUrl: "//forumstatic.ru/files/001c/ab/7e/10010.js",
+  stylesUrl: "//forumstatic.ru/files/path/to/config-form.css",
+  forumId: 10
+});
+```
+
+The button is added to `#topic-modmenu` for users in group 1 on the configured
+forum. The initializer does not run automatically. The config script and
+stylesheet are loaded from the supplied URLs.
