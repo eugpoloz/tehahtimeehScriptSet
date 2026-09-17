@@ -21,7 +21,7 @@ export const getQuickLoginFormHTML = () => {
     </div>
   </fieldset>
 
-  <label>
+  <label class="checkbox">
     <input type="checkbox" name="remember-acc"> <span>Запомнить для быстрого входа</span>
   </label>
             
@@ -32,16 +32,16 @@ export const getQuickLoginFormHTML = () => {
 };
 
 export const MULTIACC_LIST_LOCAL_HTML = `
-<div class="multiacc-list--local">
-  <h4>Локальные профили:</h4>
-  <ul id="multiacc-list-local" class="loading"></ul>
+<div>
+  <h4 class="quick-login-section-title">Локальные профили:</h4>
+  <ul id="multiacc-list-local" class="list loading"></ul>
 </div>
 `;
 
 export const MULTIACC_LIST_VIP_HTML = `
-<div class="multiacc-list--vip">
-  <h4>Мультиаккаунт:</h4>
-  <ul id="multiacc-list-vip" class="loading"></ul>
+<div>
+  <h4 class="quick-login-section-title">Мультиаккаунт:</h4>
+  <ul id="multiacc-list-vip" class="list loading"></ul>
 </div>
 `;
 
@@ -50,10 +50,10 @@ export const getMultiaccItemHTML = (login) => {
   let loginHTML = "";
 
   if (login !== window.UserLogin) {
-    loginHTML = `<a href="javascript:void(0)" class="multiacc-item-login" data-multiacc-login>Зайти</a>, `;
+    loginHTML = `<a href="javascript:void(0)" data-multiacc-login>Зайти</a>, `;
   }
 
-  return `<li class="multiacc-item" data-login="${login}">
-    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" class="multiacc-item-remove" data-multiacc-remove>Удалить</a>)
+  return `<li data-login="${login}">
+    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" data-multiacc-remove>Удалить</a>)
   </li>`;
 };
