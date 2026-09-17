@@ -43,13 +43,13 @@ const multiaccQuickLogin = () => {
   const lang = getLang();
   const link = { en: "Re-login", ru: "Перезайти" }[lang] ?? "Перезайти";
 
-  const html = `<div id="teh-multiacc-quick-login" class="teh-multiacc-quick-login">
+  const html = `<div id="teh-multiacc-quick-login" class="teh-quick-login">
     <div class="container">
-      <div class="wrapper" data-multiacc-wrapper>
-          <h3>Быстрый вход</h3>
-          <section id="multiacc-form" class="form">
+      <div class="panel" data-multiacc-wrapper>
+          <h3 class="quick-login-title">Быстрый вход</h3>
+          <section id="multiacc-form" class="layout">
             ${getQuickLoginFormHTML()}
-            <article class="relative multiacc-list">
+            <article class="relative lists">
               <div id="multiacc-list" class="scrollable">${MULTIACC_LIST_LOCAL_HTML}</div>
             </article>
           </section>
