@@ -10,12 +10,12 @@ const META_SEPARATOR_MARKUP = '<span aria-hidden="true">·</span>';
 const characterSelectorMarkup =
   () => `<div class="char-select" role="group" aria-labelledby="char-select-label">
   <span class="sr-only" id="char-select-label">Выберите персонажа:</span>
-  <button class="char-select__btn" type="button" popovertarget="character-filter-popover">
-    <span class="char-select__value" data-vault="selected-char"></span>
-    <i class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</i>
+  <button class="char-select__btn items-center w-full" type="button" popovertarget="character-filter-popover">
+    <span class="char-select__value flex items-center gap-xs" data-vault="selected-char"></span>
+    <i class="material-symbols-sharp ms-auto" aria-hidden="true">keyboard_arrow_down</i>
   </button>
   <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
-    <div data-vault="all-chars"></div>
+    <div class="flex flex-col flex-nowrap" data-vault="all-chars"></div>
   </div>
 </div>`;
 
@@ -25,9 +25,9 @@ const characterSelectorMarkup =
  */
 export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
   <article class="toolbar sticky">
-    <div class="motherlode">
+    <div class="motherlode relative flex flex-nowrap items-center justify-center gap-xs">
       <i class="mgc mgc-copper-coin-core-regular" aria-hidden="true"></i>
-      <strong class="subtitle" data-vault="motherlode"></strong>
+      <strong class="subtitle relative flex flex-nowrap items-center justify-center" data-vault="motherlode"></strong>
       <span class="sr-only">тугриков</span>
     </div>
     ${showCharacterSelector ? characterSelectorMarkup() : ""}
@@ -42,26 +42,26 @@ export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
       <section class="character" data-vault="character"></section>
     </div>
   </article>
-  <article class="vault-content">
-    <section class="wallet relative" hidden>
+  <article class="vault-content flex">
+    <section class="wallet relative flex" hidden>
       <div class="sticky"><small><strong>купоны</strong></small></div>
-      <div class="collection scrollable coupons" data-vault="coupon"></div>
+      <div class="collection scrollable coupons flex flex-nowrap" data-vault="coupon"></div>
     </section>
-    <section class="plashkas relative" hidden>
+    <section class="plashkas relative flex flex-col flex-nowrap" hidden>
       <div class="sticky"><small><strong>плашки</strong></small></div>
-      <div class="collection scrollable plashkas" data-vault="plashka"></div>
+      <div class="collection scrollable plashkas flex" data-vault="plashka"></div>
     </section>
-    <section class="icons relative" hidden>
+    <section class="icons relative flex flex-col flex-nowrap" hidden>
       <div class="sticky"><small><strong>иконки</strong></small></div>
-      <div class="collection scrollable icons" data-vault="icon"></div>
+      <div class="collection scrollable icons flex w-full" data-vault="icon"></div>
     </section>
-    <section class="gifts relative" hidden>
+    <section class="gifts relative flex flex-col flex-nowrap" hidden>
       <div class="sticky"><small><strong>подарки</strong></small></div>
-      <ul class="collection scrollable gifts" data-vault="gift"></ul>
+      <ul class="collection scrollable gifts flex" data-vault="gift"></ul>
     </section>
-    <section class="achievements relative" hidden>
+    <section class="achievements relative flex flex-col flex-nowrap" hidden>
       <div class="sticky"><small><strong>ачивки?</strong></small></div>
-      <ul class="collection scrollable achievements" data-vault="achievement"></ul>
+      <ul class="collection scrollable achievements flex w-full" data-vault="achievement"></ul>
     </section>
   </article>
 `;
@@ -93,15 +93,17 @@ export const couponMarkup = (coupon) => `<coupon-card>${coupon}</coupon-card>`;
  * @param {boolean} [isAllFilter]
  */
 const filterMarkup = (label, value, checked, avatar, isAllFilter = false) => {
-  const avatarHTML = avatar ? `<img src="${avatar}" alt="">` : "";
+  const avatarHTML = avatar
+    ? `<img class="w-full" src="${avatar}" alt="">`
+    : "";
 
-  return `<div class="char-filter${isAllFilter ? " char-filter--all" : ""}">
-    <label>
+  return `<div class="char-filter relative w-full${isAllFilter ? " char-filter--all" : ""}">
+    <label class="flex items-center gap-xs w-full">
       <input class="sr-only" type="radio" name="character" value="${value}" ${checked ? "checked" : ""}>
-      <span class="char-filter__avatar">${avatarHTML}</span>
+      <span class="char-filter__avatar flex items-center justify-center">${avatarHTML}</span>
       <span>${label}</span>
 
-      <span class="char-filter__check material-symbols-sharp" aria-hidden="true">check</span>
+      <span class="char-filter__check material-symbols-sharp ms-auto" aria-hidden="true">check</span>
     </label>
   </div>`;
 };
@@ -148,15 +150,17 @@ export const blogTopicsMarkup = (blogs) => {
 export const characterMarkup = (character, profile, details) => {
   const description = character.desc ?? "";
   const content = [description, details].filter(Boolean).join(" • ");
-  const avatar = profile?.avatar ? `<img src="${profile.avatar}" alt="">` : "";
+  const avatar = profile?.avatar
+    ? `<img class="w-full" src="${profile.avatar}" alt="">`
+    : "";
 
-  return `<article class="char-card">
-  <div class="char-avatar">${avatar}</div>
-  <div class="char-info">
+  return `<article class="char-card flex flex-nowrap items-start w-full">
+  <div class="char-avatar relative">${avatar}</div>
+  <div class="char-info flex flex-col flex-nowrap">
     <h3 class="title">
       <span class="char-name">${character.ru}</span>, <age-from-dob>${character.dob}</age-from-dob>
     </h3>
-    <div class="meta">
+    <div class="meta flex gap-xs">
       <a href="/profile.php?id=${character.id}" rel="noopener noreferrer" target="_blank">@${character.en}</a>
       ${META_SEPARATOR_MARKUP}
       <a href="/viewtopic.php?id=${encodeURIComponent(character.anketa)}" rel="noopener noreferrer" target="_blank">Анкета</a>
@@ -178,7 +182,7 @@ export const giftMarkup = (gift, index, profile) => {
   const signature = sign ? `<br><em>от</em> ${sign}` : "";
 
   return `
-    <li class="gift">
+    <li class="gift relative flex flex-col items-center">
       <button type="button" popovertarget="${id}">
         <img src="${escapeHtml(imageUrl)}" alt="">
         <span class="sr-only">Подарок #${index + 1}</span>
