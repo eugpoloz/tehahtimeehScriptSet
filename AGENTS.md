@@ -60,6 +60,8 @@ These instructions apply to the entire repository.
     before the next statement.
 - Generate markup with HTML template strings. Do not construct generated markup
   element by element with `document.createElement` or equivalent APIs.
+- Use classes as CSS hooks. Reserve data attributes and IDs for JavaScript hooks
+  or required DOM relationships; do not use them as CSS selectors.
 - Preserve Russian user-facing text unless the task explicitly changes the
   copy.
 
