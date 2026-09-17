@@ -114,15 +114,13 @@ const addEpisodeTemplates = ({
     const itemsHtml = templates
       .map((template, index) => {
         const icon = template.icon ?? "";
-        return `<button type="button" role="menuitem" data-teh-ep-template="${index}"${
-          template.id ? ` id="${template.id}"` : ""
-        }>${icon}<span>${template.label}</span></button>`;
+        return `<button class="button item" type="button" role="menuitem" data-teh-ep-template="${index}">${icon}<span>${template.label}</span></button>`;
       })
       .join("");
 
     btnTarget.insertAdjacentHTML(
       "afterend",
-      `<td id="${BUTTON_ID}" title="${buttonLabel}"><button type="button" popovertarget="${MENU_ID}" aria-label="${buttonLabel}" style="anchor-name: ${ANCHOR_NAME}"></button></td>`
+      `<td id="${BUTTON_ID}" title="${buttonLabel}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6.268 3A2 2 0 0 1 8 2h5a2 2 0 0 1 1.732 1H16a2 2 0 0 1 2 2v4h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-1H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM6 5H5v12h4v-6a2 2 0 0 1 2-2h5V5h-1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2m5 6v9h8v-9zm2-7H8v1h5z"/></svg><button type="button" popovertarget="${MENU_ID}" aria-label="${buttonLabel}" style="anchor-name: ${ANCHOR_NAME}"></button></td>`
     );
 
     tags.insertAdjacentHTML(
