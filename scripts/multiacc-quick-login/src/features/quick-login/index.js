@@ -45,12 +45,14 @@ const multiaccQuickLogin = () => {
 
   const html = `<div id="teh-multiacc-quick-login" class="teh-multiacc-quick-login">
     <div class="container">
-      <div class="wrapper">
-        <h3>Быстрый вход</h3>
-        <section class="form">
-          ${getQuickLoginFormHTML()}
-          <article id="multiacc-list">${MULTIACC_LIST_LOCAL_HTML}</article>
-        </section>
+      <div class="wrapper" data-multiacc-wrapper>
+          <h3>Быстрый вход</h3>
+          <section id="multiacc-form" class="form">
+            ${getQuickLoginFormHTML()}
+            <article class="relative multiacc-list">
+              <div id="multiacc-list" class="scrollable">${MULTIACC_LIST_LOCAL_HTML}</div>
+            </article>
+          </section>
       </div>
     </div>
   </div>`;
@@ -67,13 +69,13 @@ const multiaccQuickLogin = () => {
 
   if (loginNavlink) {
     loginNavlink.setAttribute("href", "javascript:void(0)");
-    loginNavlink.classList.add("js_relogin");
+    loginNavlink.setAttribute("data-multiacc-relogin", "");
   } else if (logoutNavlink) {
-    const quickLoginNavlink = `<li id="navrelogin"><a class="js_relogin" href="javascript:void(0)">${link}</a></li>`;
+    const quickLoginNavlink = `<li id="navrelogin"><a href="javascript:void(0)" data-multiacc-relogin>${link}</a></li>`;
     logoutNavlink.insertAdjacentHTML("beforebegin", quickLoginNavlink);
   }
 
-  const reloginLink = document.querySelector(".js_relogin");
+  const reloginLink = document.querySelector("[data-multiacc-relogin]");
   if (!reloginLink) {
     return;
   }
@@ -90,7 +92,7 @@ const multiaccQuickLogin = () => {
         const clickTarget = eClickOutside.target;
         if (
           clickTarget instanceof Element &&
-          !clickTarget.closest("#teh-multiacc-quick-login .wrapper") &&
+          !clickTarget.closest("[data-multiacc-wrapper]") &&
           clickTarget !== e.target
         ) {
           quickForm.classList.remove("visible");
