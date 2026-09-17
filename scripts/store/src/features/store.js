@@ -234,7 +234,7 @@ const store = () => {
       options.innerHTML = profiles
         .map((profile, index) => {
           const optionId = `store-${type}-profile-${index}`;
-          return `<label class="store-cart__profile-option" for="${optionId}">
+          return `<label class="store-cart__profile-option flex items-center justify-between" for="${optionId}">
             <input class="sr-only" data-store-profile-option type="radio" id="${optionId}" name="store-${type}-profile" value="${escapeHtml(profile)}"${profile === defaultProfile ? " checked" : ""}>
             <span>${escapeHtml(profile)}</span>
             <i class="material-symbols-sharp" aria-hidden="true">check</i>
@@ -678,19 +678,19 @@ const store = () => {
     }
 
     const comment = optionalComment
-      ? `<span class="store-card__comment">${optionalComment}</span>`
+      ? `<span class="store-card__comment col-span-full">${optionalComment}</span>`
       : "";
 
     return `
       <button
-        class="button store-card"
+        class="button store-card items-start w-full"
         data-store-add
         data-store-item-id="${itemId}"
         data-store-price="${price}"
         type="button"
       >
         <strong data-store-item-name>${name}</strong>
-        <span class="price">${getPriceMarkup(price)}</span>
+        <span class="price flex items-center">${getPriceMarkup(price)}</span>
         ${comment}
         <span class="store-count-badge" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
       </button>`;
@@ -699,12 +699,13 @@ const store = () => {
   /** @param {StoreCatalogItem} item */
   const renderProfileItem = (item) => {
     if (item.type === "subheader") {
-      return `<p class="sticky">${item.label}</p>`;
+      return `<p class="store-profile-items__subheader col-span-full">${item.label}</p>`;
     }
 
     const itemId = String(nextItemId++);
     const assetMarkup = renderProfileAsset(item);
-    let addButtonClass = "button store-profile__add";
+    let addButtonClass =
+      "button store-profile__add flex items-center justify-center";
     let itemName = "Иконка из магазина";
     if (item.type === "plashka") {
       addButtonClass += " store-profile__add--plashka";
@@ -740,12 +741,12 @@ const store = () => {
       ? `<small class="store-category__comment">${category.comment}</small>`
       : "";
 
-    let categoryClass = "store-category";
+    let categoryClass = "store-category relative";
     if (category.layout !== "profile") {
       categoryClass += " wrapper";
     }
     if (category.wide) {
-      categoryClass += " store-category--wide";
+      categoryClass += " col-span-full";
     }
 
     let itemsMarkup = `<div>${renderedItems}</div>`;
@@ -773,7 +774,7 @@ const store = () => {
 
     return `
       <article class="${categoryClass}">
-        <h5 class="store-category__title">${categoryTitle}</h5>
+        <h5 class="store-category__title relative flex items-center">${categoryTitle}</h5>
         ${categoryComment}
 
         ${itemsMarkup}
@@ -785,7 +786,7 @@ const store = () => {
     <section>
       <h4 class="subtitle">${group.title}</h4>
       
-      <div class="store-group grid-col-2">
+      <div class="store-group">
       ${group.categories.map(renderCategory).join("")}
       </div>
     </section>`;
@@ -882,19 +883,22 @@ const store = () => {
 
     cartTotal.hidden = totalLines.length === 0;
     cartTotal.innerHTML = totalLines.length
-      ? `<span>Итого:</span><span class="store-cart__total-values">${totalLines
-          .map((line) => `<span>${line}</span>`)
-          .join('<span aria-hidden="true">+</span>')}</span>`
+      ? `<span>Итого:</span><span class="store-cart__total-values flex items-center gap-xs">${totalLines
+          .map((line) => `<span class="flex items-center">${line}</span>`)
+          .join(
+            '<span class="flex items-center" aria-hidden="true">+</span>'
+          )}</span>`
       : "";
     cartList.innerHTML = cartItems
       .map((item, index) => {
         let preview = "";
-        let productClass = "store-cart__product";
+        let productClass = "store-cart__product flex items-center";
         let productMarkup = `<span class="store-cart__name">${item.name}</span>`;
         if (item.url && item.type) {
           preview = renderProfileAsset(item);
           if (item.type === "plashka") {
-            productClass += " store-cart__product--plashka";
+            productClass =
+              "store-cart__product store-cart__product--plashka flex flex-col gap-xs";
             productMarkup += preview;
           } else {
             productMarkup = `${preview}${productMarkup}`;
@@ -902,7 +906,7 @@ const store = () => {
         }
 
         const field = item.field
-          ? `<div class="store-cart__field">
+          ? `<div class="store-cart__field col-span-full gap-xs">
                 <label class="store-cart__field-label" for="hehe-store-cart-field-${item.cartItemId}">${escapeHtml(item.field.comment)}</label>
                 <div data-store-cart-field data-store-cart-item-id="${item.cartItemId}"></div>
               </div>`
@@ -913,13 +917,13 @@ const store = () => {
             : "";
 
         return `
-          <li class="store-cart__row">
+          <li class="store-cart__row items-start">
             <div class="${productClass}">
               ${productMarkup}
             </div>
-            <span class="price"${priceHidden}>${getPriceMarkup(item.price)}</span>
+            <span class="price flex items-center"${priceHidden}>${getPriceMarkup(item.price)}</span>
             <button
-              class="button store-cart__remove"
+              class="button store-cart__remove items-center justify-center"
               data-store-cart-remove
               data-store-cart-index="${index}"
               type="button"
@@ -927,7 +931,7 @@ const store = () => {
               <i class="material-symbols-sharp" aria-hidden="true">delete</i>
               <span class="sr-only">Удалить позицию</span>
             </button>
-            <label class="store-cart__coupon">
+            <label class="store-cart__coupon flex items-center gap-xs col-span-full">
               <input
                 data-store-cart-coupon
                 data-store-cart-index="${index}"
