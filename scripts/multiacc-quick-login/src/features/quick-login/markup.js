@@ -50,10 +50,10 @@ export const getMultiaccItemHTML = (login) => {
   let loginHTML = "";
 
   if (login !== window.UserLogin) {
-    loginHTML = `<a href="javascript:void(0)" class="multiacc-item-login">Зайти</a>, `;
+    loginHTML = `<a href="javascript:void(0)" class="multiacc-item-login" data-multiacc-login>Зайти</a>, `;
   }
 
   return `<li class="multiacc-item" data-login="${login}">
-    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" class="multiacc-item-remove">Удалить</a>)
+    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" class="multiacc-item-remove" data-multiacc-remove>Удалить</a>)
   </li>`;
 };
