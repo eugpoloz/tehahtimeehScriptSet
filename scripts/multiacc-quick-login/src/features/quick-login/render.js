@@ -4,7 +4,7 @@ import { getMultiaccEncryptedData, saveMultiaccEncryptedData } from "./storage";
 import { getVIPMultiAccList } from "./vip-accounts";
 
 export const setFormBusy = () => {
-  const form = document.querySelector("#teh-multiacc-quick-login section.form");
+  const form = document.getElementById("multiacc-form");
   if (form) {
     form.classList.add("busy");
   }
@@ -62,16 +62,15 @@ export const renderMultiaccList = async () => {
         multiListLocal.innerHTML += getMultiaccItemHTML(item.login);
       });
 
-      const multiaccLocalItems = multiListLocal.querySelectorAll(
-        ".multiacc-item[data-login]"
-      );
+      const multiaccLocalItems =
+        multiListLocal.querySelectorAll("[data-login]");
 
       multiaccLocalItems.forEach((itemElement) => {
         if (!(itemElement instanceof HTMLElement)) {
           return;
         }
-        const removeItem = itemElement.querySelector(".multiacc-item-remove");
-        const loginItem = itemElement.querySelector(".multiacc-item-login");
+        const removeItem = itemElement.querySelector("[data-multiacc-remove]");
+        const loginItem = itemElement.querySelector("[data-multiacc-login]");
 
         const login = itemElement.dataset.login;
         if (!removeItem || !login) {
