@@ -25,7 +25,7 @@ async function autoReactToPosts() {
     }
 
     const html = `<button type="button" id="${SUPERLIKE_BUTTON_ID}" class="button button--wide ms-auto">Лайкнуть всех</button>
-      <div class="tooltip" popover="manual" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto"></div>`;
+      <div class="tooltip popover-left" popover="manual" id="${SUPERLIKE_TOOLTIP_ID}" role="tooltip" aria-live="polite" aria-atomic="true" style="position-anchor: auto"></div>`;
     controlsContainer.insertAdjacentHTML("beforeend", html);
 
     const superlikeBtn = controlsContainer.querySelector(
