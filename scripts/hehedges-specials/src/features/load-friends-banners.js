@@ -1,5 +1,8 @@
 import { handleError } from "@teh/utils";
 
+const DEFAULT_SOURCE_SELECTOR = "[data-friends-source]";
+const DEFAULT_TARGET_SELECTOR = "[data-friends-target]";
+
 /**
  * @typedef {object} LoadFriendsBannersOptions
  * @property {string} [url] Page URL.
@@ -13,8 +16,8 @@ import { handleError } from "@teh/utils";
  */
 const loadFriendsBanners = async ({
   url = "/pages/friends",
-  source = "#pun-main .container",
-  target = "#html-footer .friends .wrapper"
+  source = DEFAULT_SOURCE_SELECTOR,
+  target = DEFAULT_TARGET_SELECTOR
 } = {}) => {
   const wrapper = /** @type {HTMLElement | null} */ (
     document.querySelector(target)
