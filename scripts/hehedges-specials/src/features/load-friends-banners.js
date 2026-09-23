@@ -1,23 +1,26 @@
 import { handleError } from "@teh/utils";
 
-const DEFAULT_SOURCE_SELECTOR = "[data-friends-source]";
-const DEFAULT_TARGET_SELECTOR = "[data-friends-target]";
+/**
+ * @typedef {object} FriendBanner
+ * @property {string} href
+ * @property {string} src
+ * @property {string} text
+ */
 
 /**
  * @typedef {object} LoadFriendsBannersOptions
- * @property {string} [url] Page URL.
- * @property {string} [source] Container selector on the fetched page.
  * @property {string} [target] Container selector on the current page.
  */
 
 /**
+ * Loads friend banners from the shared site content and renders them into a
+ * target container.
+ *
  * @param {LoadFriendsBannersOptions} [options]
  * @returns {Promise<void>}
  */
 const loadFriendsBanners = async ({
-  url = "/pages/friends",
-  source = DEFAULT_SOURCE_SELECTOR,
-  target = DEFAULT_TARGET_SELECTOR
+  target = "[data-friends-target]"
 } = {}) => {
   const wrapper = /** @type {HTMLElement | null} */ (
     document.querySelector(target)
@@ -27,51 +30,29 @@ const loadFriendsBanners = async ({
   }
 
   try {
-    const response = await fetch(url, { credentials: "same-origin" });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.status}`);
-    }
-
-    const html = new TextDecoder("windows-1251").decode(
-      await response.arrayBuffer()
+    const source = /** @type {Promise<unknown> | undefined} */ (
+      window.teh?.siteContentPromise
     );
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    const container = doc.querySelector(source);
-    if (!container) {
-      return;
+    if (!source) {
+      throw new Error("teh.siteContentPromise must be initialized first");
     }
 
-    const fragment = document.createDocumentFragment();
+    const config = /** @type {{banners?: FriendBanner[]}} */ (await source);
+    const banners = Array.isArray(config.banners) ? config.banners : [];
 
-    container.querySelectorAll("a:has(img)").forEach((banner, index) => {
-      const node = /** @type {HTMLAnchorElement} */ (
-        document.importNode(banner, true)
-      );
-      const img = node.querySelector("img");
-      const title = (
-        img?.getAttribute("title") || node.getAttribute("title")
-      )?.trim();
+    wrapper.innerHTML = banners
+      .map((banner, index) => {
+        const text = banner.text.trim();
+        const tooltipId = `friend-banner-tip-${index}`;
+        const tooltip = text
+          ? `<span class="tooltip" popover="hint" id="${tooltipId}" role="tooltip">${text}</span>`
+          : "";
+        const interestFor = text ? ` interestfor="${tooltipId}"` : "";
 
-      if (title) {
-        const id = `friend-banner-tip-${index}`;
+        return `<a href="${banner.href.trim()}" target="_blank" rel="noopener noreferrer"${interestFor}><img src="${banner.src.trim()}" border="0" width="88" height="31">${tooltip}</a>`;
+      })
+      .join("");
 
-        node.setAttribute("interestfor", id);
-        img?.removeAttribute("title");
-        node.removeAttribute("title");
-        if (img && !img.getAttribute("alt")?.trim()) {
-          img.alt = title;
-        }
-
-        node.insertAdjacentHTML(
-          "beforeend",
-          `<span class="tooltip" popover="hint" id="${id}" role="tooltip">${title}</span>`
-        );
-      }
-
-      fragment.append(node);
-    });
-
-    wrapper.replaceChildren(fragment);
     requestAnimationFrame(() => {
       wrapper.dataset.ready = "";
     });
