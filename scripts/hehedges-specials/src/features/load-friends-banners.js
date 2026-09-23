@@ -4,7 +4,7 @@ import { handleError } from "@teh/utils";
  * @typedef {object} FriendBanner
  * @property {string} href
  * @property {string} src
- * @property {string} text
+ * @property {string} text Link name and tooltip text.
  */
 
 /**
@@ -41,15 +41,10 @@ const loadFriendsBanners = async ({
     const banners = Array.isArray(config.banners) ? config.banners : [];
 
     wrapper.innerHTML = banners
-      .map((banner, index) => {
-        const text = banner.text.trim();
-        const tooltipId = `friend-banner-tip-${index}`;
-        const tooltip = text
-          ? `<span class="tooltip" popover="hint" id="${tooltipId}" role="tooltip">${text}</span>`
-          : "";
-        const interestFor = text ? ` interestfor="${tooltipId}"` : "";
+      .map(({ text, href, src }, idx) => {
+        const tooltipId = `friend-banner-tip-${idx}`;
 
-        return `<a href="${banner.href.trim()}" target="_blank" rel="noopener noreferrer"${interestFor}><img src="${banner.src.trim()}" border="0" width="88" height="31">${tooltip}</a>`;
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" aria-labelledby="${tooltipId}" interestfor="${tooltipId}"><img src="${src}" alt=""><span popover="hint" id="${tooltipId}" role="tooltip">${text}</span></a>`;
       })
       .join("");
 

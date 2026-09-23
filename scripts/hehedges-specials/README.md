@@ -66,5 +66,5 @@ The `@teh/html-header` bundle must load first because it provides
 
 Add `<section data-friends-target></section>`, set `teh.siteContentPromise`
 with `teh.loadSiteContent(...)`, then call `teh.loadFriendsBanners()`. Banner
-entries use `href`, `src`, and optional `text` for the tooltip. Override the
-target with `{ target: ".custom-banners" }`.
+entries use `href`, `src`, and required `text` for the link name and tooltip.
+Override the target with `{ target: ".custom-banners" }`.
