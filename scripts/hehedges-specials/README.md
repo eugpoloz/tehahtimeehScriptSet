@@ -61,3 +61,10 @@ teh.loadRandomQuote({
 
 The `@teh/html-header` bundle must load first because it provides
 `teh.loadSiteContent()`.
+
+## Friend banners
+
+Add `<section data-friends-target></section>`, set `teh.siteContentPromise`
+with `teh.loadSiteContent(...)`, then call `teh.loadFriendsBanners()`. Banner
+entries use `href`, `src`, and optional `text` for the tooltip. Override the
+target with `{ target: ".custom-banners" }`.

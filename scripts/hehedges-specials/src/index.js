@@ -40,11 +40,7 @@ export {
 // config example
 //
 // teh.defineAgeFromBirthday("age-from-dob", "GAME_LATEST_DATE");
-// teh.loadFriendsBanners({
-//   url: "/pages/friends",
-//   source: "[data-friends-source]",
-//   target: "[data-friends-target]"
-// });
+// teh.loadFriendsBanners();
 // teh.loadCharacterVault({
 //   scriptUrl: "//forumstatic.ru/files/001c/ab/7e/61137.js?v=2",
 //   stylesUrl: "//forumstatic.ru/files/001c/ab/7e/37167.css?v=2"
