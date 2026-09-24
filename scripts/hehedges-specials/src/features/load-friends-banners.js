@@ -44,7 +44,7 @@ const loadFriendsBanners = async ({
       .map(({ text, href, src }, idx) => {
         const tooltipId = `friend-banner-tip-${idx}`;
 
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer" aria-labelledby="${tooltipId}" interestfor="${tooltipId}"><img src="${src}" alt=""><span popover="hint" id="${tooltipId}" role="tooltip">${text}</span></a>`;
+        return `<a class="banner" href="${href}" target="_blank" rel="noopener noreferrer" aria-labelledby="${tooltipId}" interestfor="${tooltipId}"><img src="${src}" alt=""><span popover="hint" id="${tooltipId}" role="tooltip">${text}</span></a>`;
       })
       .join("");
 
