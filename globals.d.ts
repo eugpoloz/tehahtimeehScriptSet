@@ -54,6 +54,7 @@ declare function bbcode(open: string, close?: string): void;
 declare function insert(text: string): void;
 
 interface Window {
+  ForumAPITicket?: string;
   UserID?: string | number;
   UserLogin?: string;
   GroupID?: string | number;

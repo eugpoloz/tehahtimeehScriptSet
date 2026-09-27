@@ -2,6 +2,10 @@ import { handleError } from "@teh/utils";
 
 import { insertVisualControls } from "./controls";
 import { initializeFontSizeControls, restoreFontSize } from "./font-size";
+import {
+  restoreNewMsgLink,
+  initializeAddNewMsgLinkControl
+} from "./add-new-msg-link";
 import { initializeThemeControls, restoreTheme } from "./theme";
 
 /** Inserts and connects controls after the page DOM is available. */
@@ -14,6 +18,7 @@ const initializeVisualControls = () => {
 
     initializeFontSizeControls();
     initializeThemeControls();
+    initializeAddNewMsgLinkControl();
   } catch (e) {
     handleError("html-header/changeVisuals", e);
   }
@@ -29,6 +34,7 @@ const changeVisuals = () => {
   try {
     restoreFontSize();
     restoreTheme();
+    restoreNewMsgLink();
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initializeVisualControls, {
