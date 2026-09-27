@@ -1,4 +1,5 @@
 import { fontSizeControlsMarkup } from "./font-size";
+import { newMsgLinkControlMarkup } from "./add-new-msg-link";
 import { themeControlsMarkup } from "./theme";
 
 const VISUAL_CONTROLS_HTML = `
@@ -10,6 +11,7 @@ const VISUAL_CONTROLS_HTML = `
     <div class="theme__menu popover-custom" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
       ${fontSizeControlsMarkup()}
       ${themeControlsMarkup()}
+      ${newMsgLinkControlMarkup()}
     </div>
   </li>`;
 
