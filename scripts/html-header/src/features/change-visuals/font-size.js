@@ -13,14 +13,16 @@ export const fontSizeControlsMarkup = () => `
   <section class="theme flex flex-col flex-nowrap gap-xs">
     <h3 class="theme__heading" id="font-size-controls-title">Размер шрифта</h3>
     <div class="flex flex-nowrap items-center gap-sm">
-      <div class="theme__font-size-stepper" role="group" aria-labelledby="font-size-controls-title">
+      <div class="theme__stepper" role="group" aria-labelledby="font-size-controls-title">
         <button class="button theme__button theme__step flex flex-col flex-nowrap items-center justify-center" type="button" id="text-decrease" aria-label="Уменьшить шрифт">
-          <i class="material-symbols-sharp icon-20" aria-hidden="true">remove</i>
+          <svg class="icon-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 12h14" />
+          </svg>
         </button>
-        <label class="theme__font-size flex items-center justify-center">
+        <label class="theme__value flex items-center justify-center">
           <span class="sr-only">Текущий размер шрифта</span>
           <input
-            class="theme__font-size-input"
+            class="theme__input"
             id="${FONT_SIZE_VALUE_ID}"
             type="number"
             inputmode="decimal"
@@ -29,10 +31,12 @@ export const fontSizeControlsMarkup = () => `
           />
         </label>
         <button class="button theme__button theme__step flex flex-col flex-nowrap items-center justify-center" type="button" id="text-increase" aria-label="Увеличить шрифт">
-          <i class="material-symbols-sharp icon-20" aria-hidden="true">add</i>
+          <svg class="icon-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 12h14m-7 7V5" />
+          </svg>
         </button>
       </div>
-      <button class="button theme__button theme__font-size-reset" type="button" id="text-clear">Сбросить</button>
+      <button class="button theme__button" type="button" id="text-clear">Сбросить</button>
     </div>
   </section>`;
 

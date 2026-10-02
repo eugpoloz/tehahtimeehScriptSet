@@ -19,3 +19,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Third-party attribution
+
+The magic-2, minimize, and add icons in scripts/html-header are adapted from
+MingCute by MingCute Design, licensed under the Apache License, Version 2.0.
+
+MingCute: https://github.com/mingcute-design/mingcute-icons
+Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
