@@ -5,7 +5,7 @@
  * @returns {string}
  */
 export const spinToggleMarkup = (controlId) => `
-  <button class="theme__button theme__spin" type="button" id="${controlId}" aria-label="Переключить тему" aria-pressed="false">
+  <button class="button theme__button theme__spin flex flex-col flex-nowrap items-center justify-center" type="button" id="${controlId}" aria-label="Переключить тему" aria-pressed="false">
     <svg class="theme__spin-icon" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true">
       <defs>
         <clipPath id="theme-spin-clip">

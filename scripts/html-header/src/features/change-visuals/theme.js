@@ -22,11 +22,11 @@ const isResolvedTheme = (value) => value === "light" || value === "dark";
 
 /** @returns {string} */
 export const themeControlsMarkup = () => `
-  <section class="theme" aria-labelledby="theme-controls-title">
-    <h3 id="theme-controls-title">Тема</h3>
-    <div class="theme__controls theme__group" id="theme-preference-controls" role="group" aria-labelledby="theme-controls-title">
+  <section class="theme flex flex-col flex-nowrap gap-xs">
+    <h3 class="theme__heading" id="theme-controls-title">Тема</h3>
+    <div class="theme__controls" role="group" aria-labelledby="theme-controls-title">
       ${spinToggleMarkup(THEME_TOGGLE_ID)}
-      <label class="theme__system-control" for="${SYSTEM_THEME_CONTROL_ID}">
+      <label class="theme__label flex items-center gap-xs" for="${SYSTEM_THEME_CONTROL_ID}">
         <input type="checkbox" id="${SYSTEM_THEME_CONTROL_ID}">
         <span>Cистемная</span>
       </label>

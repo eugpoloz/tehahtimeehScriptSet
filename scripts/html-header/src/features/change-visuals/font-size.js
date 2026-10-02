@@ -10,16 +10,17 @@ const FONT_SIZE_VALUE_ID = "font-size-value";
 
 /** @returns {string} */
 export const fontSizeControlsMarkup = () => `
-  <section class="theme" aria-labelledby="font-size-controls-title">
-    <h3 id="font-size-controls-title">Размер шрифта</h3>
-    <div class="theme__font-size-controls">
+  <section class="theme flex flex-col flex-nowrap gap-xs">
+    <h3 class="theme__heading" id="font-size-controls-title">Размер шрифта</h3>
+    <div class="flex flex-nowrap items-center gap-sm">
       <div class="theme__font-size-stepper" role="group" aria-labelledby="font-size-controls-title">
-        <button type="button" id="text-decrease" aria-label="Уменьшить шрифт">
-          <i class="material-symbols-sharp" aria-hidden="true">remove</i>
+        <button class="button theme__button theme__step flex flex-col flex-nowrap items-center justify-center" type="button" id="text-decrease" aria-label="Уменьшить шрифт">
+          <i class="material-symbols-sharp icon-20" aria-hidden="true">remove</i>
         </button>
-        <label>
+        <label class="theme__font-size flex items-center justify-center">
           <span class="sr-only">Текущий размер шрифта</span>
           <input
+            class="theme__font-size-input"
             id="${FONT_SIZE_VALUE_ID}"
             type="number"
             inputmode="decimal"
@@ -27,11 +28,11 @@ export const fontSizeControlsMarkup = () => `
             aria-live="polite"
           />
         </label>
-        <button type="button" id="text-increase" aria-label="Увеличить шрифт">
-          <i class="material-symbols-sharp" aria-hidden="true">add</i>
+        <button class="button theme__button theme__step flex flex-col flex-nowrap items-center justify-center" type="button" id="text-increase" aria-label="Увеличить шрифт">
+          <i class="material-symbols-sharp icon-20" aria-hidden="true">add</i>
         </button>
       </div>
-      <button class="theme__font-size-reset" type="button" id="text-clear">Сбросить</button>
+      <button class="button theme__button theme__font-size-reset" type="button" id="text-clear">Сбросить</button>
     </div>
   </section>`;
 
