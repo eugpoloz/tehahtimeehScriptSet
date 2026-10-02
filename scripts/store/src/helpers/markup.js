@@ -57,8 +57,8 @@ export const storeMarkup = () => `<section class="store relative" data-store>
               role="dialog"
               aria-labelledby="store-recipient-label"
             >
-              <div class="picker__body relative flex flex-col w-full">
-                <div class="picker__scroll scrollable flex flex-col flex-1 w-full">
+              <div class="picker__body relative w-full">
+                <div class="picker__scroll scrollable w-full">
                   <p class="picker__status" data-store-profile-status>Загрузка профилей...</p>
                   <div class="picker__options flex flex-col" data-store-profile-options></div>
                 </div>
@@ -84,8 +84,8 @@ export const storeMarkup = () => `<section class="store relative" data-store>
               role="dialog"
               aria-labelledby="store-payer-label"
             >
-              <div class="picker__body relative flex flex-col w-full">
-                <div class="picker__scroll scrollable flex flex-col flex-1 w-full">
+              <div class="picker__body relative w-full">
+                <div class="picker__scroll scrollable w-full">
                   <p class="picker__status" data-store-profile-status>Загрузка профилей...</p>
                   <div class="picker__options flex flex-col" data-store-profile-options></div>
                 </div>
