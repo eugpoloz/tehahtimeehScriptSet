@@ -33,7 +33,7 @@ export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
     ${showCharacterSelector ? characterSelectorMarkup() : ""}
     <div class="actions">
       <div class="ams-only" data-vault="actions"></div>
-      ${isDirectPage ? "" : '<button commandfor="vault-modal" command="close" class="vault-modal__close"><span class="sr-only">Закрыть</span><i class="material-symbols-sharp" aria-hidden="true">close</i></button>'}
+      ${isDirectPage ? "" : '<button commandfor="vault-modal" command="close" class="button-icon vault-modal__close"><span class="sr-only">Закрыть</span><i class="material-symbols-sharp icon-20" aria-hidden="true">close</i></button>'}
     </div>
   </article>
   <article class="vault-header">
@@ -69,9 +69,9 @@ export const vaultMarkup = (isDirectPage, showCharacterSelector) => `
 /** @param {string} handle */
 export const adminActionMarkup = (
   handle
-) => `<a href="/admin_pages.php?edit_page=${handle}" target="_blank" rel="noopener noreferrer">
+) => `<a class="button-icon" href="/admin_pages.php?edit_page=${handle}" target="_blank" rel="noopener noreferrer">
   <span class="sr-only">Редактировать страницу</span>
-  <i class="material-symbols-sharp" aria-hidden="true">edit</i>
+  <i class="material-symbols-sharp icon-16" aria-hidden="true">edit</i>
 </a>`;
 
 /** @param {string} icon */
