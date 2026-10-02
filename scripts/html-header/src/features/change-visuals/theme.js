@@ -104,7 +104,6 @@ const synchronizeThemeControls = (preference) => {
 
     themeToggle.disabled = usesSystemTheme;
     themeToggle.setAttribute("aria-label", label);
-    themeToggle.setAttribute("aria-pressed", String(usesDarkTheme));
     themeToggle.title = label;
   }
 

@@ -48,3 +48,10 @@ are restored immediately while control insertion and event setup wait for
 `DOMContentLoaded`.
 
 Font sizing requires `#pun`.
+
+The settings, decrease, and increase icons use inline SVGs from
+[MingCute](https://github.com/mingcute-design/mingcute-icons/tree/main/packages/svg/core-regular):
+`magic-2`, `minimize`, and `add`. They inherit `currentColor` and require no icon
+font or runtime request. The custom animated sun/moon SVG is unchanged.
+MingCute attribution and license links are listed in the
+[repository LICENSE](../../LICENSE).
