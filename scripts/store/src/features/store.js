@@ -232,12 +232,11 @@ const store = () => {
       }
 
       options.innerHTML = profiles
-        .map((profile, index) => {
-          const optionId = `store-${type}-profile-${index}`;
-          return `<label class="store-cart__profile-option flex items-center justify-between" for="${optionId}">
-            <input class="sr-only" data-store-profile-option type="radio" id="${optionId}" name="store-${type}-profile" value="${escapeHtml(profile)}"${profile === defaultProfile ? " checked" : ""}>
+        .map((profile) => {
+          return `<label class="picker__option flex items-center justify-between gap-sm">
+            <input class="picker__radio sr-only" data-store-profile-option type="radio" name="store-${type}-profile" value="${escapeHtml(profile)}"${profile === defaultProfile ? " checked" : ""}>
             <span>${escapeHtml(profile)}</span>
-            <i class="material-symbols-sharp" aria-hidden="true">check</i>
+            <i class="material-symbols-sharp picker__check" aria-hidden="true">check</i>
           </label>`;
         })
         .join("");
@@ -678,53 +677,51 @@ const store = () => {
     }
 
     const comment = optionalComment
-      ? `<span class="store-card__comment col-span-full">${optionalComment}</span>`
+      ? `<span class="store__note col-span-full">${optionalComment}</span>`
       : "";
 
     return `
       <button
-        class="button store-card items-start w-full"
+        class="button store__item store__card items-start w-full"
         data-store-add
         data-store-item-id="${itemId}"
         data-store-price="${price}"
         type="button"
       >
         <strong data-store-item-name>${name}</strong>
-        <span class="price flex items-center">${getPriceMarkup(price)}</span>
+        <span class="store__price flex items-center">${getPriceMarkup(price)}</span>
         ${comment}
-        <span class="store-count-badge" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
+        <span class="store__count" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
       </button>`;
   };
 
   /** @param {StoreCatalogItem} item */
   const renderProfileItem = (item) => {
     if (item.type === "subheader") {
-      return `<p class="store-profile-items__subheader col-span-full">${item.label}</p>`;
+      return `<p class="catalog__subtitle col-span-full">${item.label}</p>`;
     }
 
     const itemId = String(nextItemId++);
     const assetMarkup = renderProfileAsset(item);
-    let addButtonClass =
-      "button store-profile__add flex items-center justify-center";
     let itemName = "Иконка из магазина";
     if (item.type === "plashka") {
-      addButtonClass += " store-profile__add--plashka";
       itemName = "Плашка из магазина";
     }
 
     return `
       <button
-        class="${addButtonClass}"
+        class="button store__item store__asset flex items-center justify-center"
         data-store-add
         data-store-item-id="${itemId}"
         data-store-item-type="${item.type}"
         data-store-price="${item.price}"
         data-store-item-url="${item.url}"
         type="button"
+        aria-pressed="false"
       >
         ${assetMarkup}
         <span class="sr-only" data-store-item-name>${itemName}</span>
-        <span class="store-count-badge" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
+        <span class="store__count" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
       </button>`;
   };
 
@@ -738,43 +735,47 @@ const store = () => {
 
     const renderedItems = category.items.map(itemRenderer).join("");
     const categoryComment = category.comment
-      ? `<small class="store-category__comment">${category.comment}</small>`
+      ? `<small class="catalog__note">${category.comment}</small>`
       : "";
 
-    let categoryClass = "store-category relative";
-    if (category.layout !== "profile") {
+    let categoryClass = "catalog relative";
+    if (category.layout === "profile") {
+      categoryClass += " catalog--assets";
+    } else {
       categoryClass += " wrapper";
     }
     if (category.wide) {
       categoryClass += " col-span-full";
     }
 
-    let itemsMarkup = `<div>${renderedItems}</div>`;
+    let itemsMarkup = `<div class="flex flex-col gap-sm">${renderedItems}</div>`;
     if (category.wide && category.layout !== "profile") {
       itemsMarkup = `<div class="grid-col-2">${renderedItems}</div>`;
     }
 
     if (category.layout === "profile") {
-      const layoutClass =
-        category.profileType === "plashka"
-          ? " store-profile-items--plashkas"
-          : "";
+      let itemsClass = "catalog__items scrollable";
+      if (category.profileType === "plashka") {
+        itemsClass += " catalog__items--plashkas";
+      } else {
+        itemsClass += " gap-sm";
+      }
       itemsMarkup = `
-        <div class="wrapper relative store-profile-items-wrapper">
-          <div class="store-profile-items${layoutClass} scrollable">
+        <div class="wrapper relative catalog__frame">
+          <div class="${itemsClass}">
             ${renderedItems}
           </div>
         </div>`;
     }
 
-    const categoryTitle =
-      category.layout === "profile"
-        ? `${category.title} — ${getPriceMarkup(category.profileUnitPrice)} за шт.`
-        : category.title;
+    let categoryTitle = category.title;
+    if (category.layout === "profile") {
+      categoryTitle = `${category.title} — ${getPriceMarkup(category.profileUnitPrice)} за шт.`;
+    }
 
     return `
       <article class="${categoryClass}">
-        <h5 class="store-category__title relative flex items-center">${categoryTitle}</h5>
+        <h5 class="catalog__title relative flex items-center">${categoryTitle}</h5>
         ${categoryComment}
 
         ${itemsMarkup}
@@ -786,7 +787,7 @@ const store = () => {
     <section>
       <h4 class="subtitle">${group.title}</h4>
       
-      <div class="store-group">
+      <div class="store__group">
       ${group.categories.map(renderCategory).join("")}
       </div>
     </section>`;
@@ -816,16 +817,20 @@ const store = () => {
       const count = itemCounts.get(addButton.dataset.storeItemId) ?? 0;
       itemCountValue.textContent = String(count);
       itemCount.hidden = count === 0;
-      addButton.toggleAttribute("data-store-added", count > 0);
+      addButton.classList.toggle("store__item--added", count > 0);
+      const itemType = addButton.dataset.storeItemType;
+      if (itemType === "icon" || itemType === "plashka") {
+        addButton.setAttribute("aria-pressed", String(count > 0));
+      }
     });
   };
 
-  const replaceCartTextareaPlaceholders = () => {
-    const placeholders = /** @type {NodeListOf<HTMLElement>} */ (
+  const populateCartFields = () => {
+    const textareas = /** @type {NodeListOf<HTMLTextAreaElement>} */ (
       cartList.querySelectorAll("[data-store-cart-field]")
     );
-    placeholders.forEach((placeholder) => {
-      const cartItemId = placeholder.dataset.storeCartItemId;
+    textareas.forEach((textarea) => {
+      const cartItemId = textarea.dataset.storeCartItemId;
       const item = cartItems.find(
         (cartItem) => cartItem.cartItemId === cartItemId
       );
@@ -833,16 +838,7 @@ const store = () => {
         return;
       }
 
-      const textarea = document.createElement("textarea");
-      textarea.className = "store-cart__field-input";
-      textarea.id = `hehe-store-cart-field-${cartItemId}`;
-      textarea.dataset.storeCartField = "";
-      if (!cartItemId) {
-        return;
-      }
-      textarea.dataset.storeCartItemId = cartItemId;
       textarea.value = item.fieldValue ?? "";
-      placeholder.replaceWith(textarea);
     });
   };
 
@@ -883,7 +879,7 @@ const store = () => {
 
     cartTotal.hidden = totalLines.length === 0;
     cartTotal.innerHTML = totalLines.length
-      ? `<span>Итого:</span><span class="store-cart__total-values flex items-center gap-xs">${totalLines
+      ? `<span>Итого:</span><span class="flex items-center gap-xs">${totalLines
           .map((line) => `<span class="flex items-center">${line}</span>`)
           .join(
             '<span class="flex items-center" aria-hidden="true">+</span>'
@@ -892,13 +888,12 @@ const store = () => {
     cartList.innerHTML = cartItems
       .map((item, index) => {
         let preview = "";
-        let productClass = "store-cart__product flex items-center";
-        let productMarkup = `<span class="store-cart__name">${item.name}</span>`;
+        let productClass = "cart__product flex items-center gap-sm";
+        let productMarkup = `<strong class="cart__name">${item.name}</strong>`;
         if (item.url && item.type) {
           preview = renderProfileAsset(item);
           if (item.type === "plashka") {
-            productClass =
-              "store-cart__product store-cart__product--plashka flex flex-col gap-xs";
+            productClass = "cart__product flex flex-col gap-xs";
             productMarkup += preview;
           } else {
             productMarkup = `${preview}${productMarkup}`;
@@ -906,32 +901,37 @@ const store = () => {
         }
 
         const field = item.field
-          ? `<div class="store-cart__field col-span-full gap-xs">
-                <label class="store-cart__field-label" for="hehe-store-cart-field-${item.cartItemId}">${escapeHtml(item.field.comment)}</label>
-                <div data-store-cart-field data-store-cart-item-id="${item.cartItemId}"></div>
+          ? `<div class="cart__field flex flex-col col-span-full gap-xs">
+                <label class="cart__label" for="hehe-store-cart-field-${item.cartItemId}">${escapeHtml(item.field.comment)}</label>
+                <textarea
+                  class="cart__input"
+                  id="hehe-store-cart-field-${item.cartItemId}"
+                  data-store-cart-field
+                  data-store-cart-item-id="${item.cartItemId}"
+                ></textarea>
               </div>`
           : "";
-        const priceHidden =
-          item.payment === "coupon"
-            ? ' data-store-price-hidden aria-hidden="true"'
-            : "";
+        let priceClass = "store__price flex items-center";
+        if (item.payment === "coupon") {
+          priceClass += " store__price--coupon";
+        }
 
         return `
-          <li class="store-cart__row items-start">
+          <li class="cart__row items-center gap-sm">
             <div class="${productClass}">
               ${productMarkup}
             </div>
-            <span class="price flex items-center"${priceHidden}>${getPriceMarkup(item.price)}</span>
+            <span class="${priceClass}">${getPriceMarkup(item.price)}</span>
             <button
-              class="button store-cart__remove items-center justify-center"
+              class="button-icon shrink-0"
               data-store-cart-remove
               data-store-cart-index="${index}"
               type="button"
             >
-              <i class="material-symbols-sharp" aria-hidden="true">delete</i>
+              <i class="material-symbols-sharp icon-16" aria-hidden="true">delete</i>
               <span class="sr-only">Удалить позицию</span>
             </button>
-            <label class="store-cart__coupon flex items-center gap-xs col-span-full">
+            <label class="cart__coupon flex items-center gap-xs col-span-full">
               <input
                 data-store-cart-coupon
                 data-store-cart-index="${index}"
@@ -944,13 +944,13 @@ const store = () => {
           </li>`;
       })
       .join("");
-    replaceCartTextareaPlaceholders();
+    populateCartFields();
     renderItemCounts();
   };
 
   const hideCartConfirmations = () => {
     const popovers = /** @type {NodeListOf<HTMLElement>} */ (
-      store.querySelectorAll(".store-cart__confirmation")
+      store.querySelectorAll("[data-store-confirmation]")
     );
     popovers.forEach((popover) => {
       if (popover.matches(":popover-open")) {
@@ -1016,19 +1016,10 @@ const store = () => {
     if (!open && cart.open) {
       cart.close();
     }
-
-    cart.dataset.open = String(open);
-    store.querySelectorAll("[data-store-cart-toggle]").forEach((toggle) => {
-      toggle.setAttribute("aria-expanded", String(open));
-    });
   };
 
   cart.addEventListener("close", () => {
     hideCartConfirmations();
-    cart.dataset.open = "false";
-    store.querySelectorAll("[data-store-cart-toggle]").forEach((toggle) => {
-      toggle.setAttribute("aria-expanded", "false");
-    });
   });
 
   store.addEventListener("click", (event) => {
@@ -1089,12 +1080,25 @@ const store = () => {
     if (!itemId) {
       return;
     }
+
+    const itemType = addButton.dataset.storeItemType;
+    if (itemType === "icon" || itemType === "plashka") {
+      const selectedIndex = cartItems.findIndex(
+        (cartItem) => cartItem.itemId === itemId
+      );
+      if (selectedIndex !== -1) {
+        cartItems.splice(selectedIndex, 1);
+        renderCart();
+        return;
+      }
+    }
+
     const field = catalogItemFields.get(itemId);
     /** @type {StoreCartItem} */
     const item = {
       cartItemId: String(nextCartItemId++),
       itemId,
-      type: addButton.dataset.storeItemType,
+      type: itemType,
       name: itemName,
       price: itemPrice,
       payment: "coins"
