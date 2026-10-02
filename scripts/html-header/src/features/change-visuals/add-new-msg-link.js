@@ -9,8 +9,8 @@ const NEW_MSG_MODULE_NAME = "html-header/addNewMsgLink";
 
 /** @returns {string} */
 export const newMsgLinkControlMarkup = () => `
-  <section class="theme">
-    <label class="theme__system-control" for="${CONTROL_ID}">
+  <section class="theme flex flex-col flex-nowrap gap-xs">
+    <label class="theme__label flex items-center gap-xs" for="${CONTROL_ID}">
       <input type="checkbox" id="${CONTROL_ID}" disabled>
       <span>«Новые сообщения»</span>
     </label>
