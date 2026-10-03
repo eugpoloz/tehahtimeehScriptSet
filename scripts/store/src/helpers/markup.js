@@ -51,7 +51,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
               <i class="material-symbols-sharp icon-16 shrink-0" aria-hidden="true">keyboard_arrow_down</i>
             </button>
             <div
-              class="picker__menu popover-custom"
+              class="picker__menu popover-custom popover-panel popover-panel--rounded"
               id="store-recipient-popover"
               popover="auto"
               role="dialog"
@@ -78,7 +78,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
               <i class="material-symbols-sharp icon-16 shrink-0" aria-hidden="true">keyboard_arrow_down</i>
             </button>
             <div
-              class="picker__menu popover-custom"
+              class="picker__menu popover-custom popover-panel popover-panel--rounded"
               id="store-payer-popover"
               popover="auto"
               role="dialog"
