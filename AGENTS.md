@@ -1,102 +1,68 @@
 # Repository instructions
 
-These instructions apply to the entire repository.
+These instructions apply throughout `tehahtimeehScriptSet`.
 
-## Scope and change discipline
+## Scope
 
-- Implement only the behavior requested for the current task. Treat future
-  features and examples as context, not authorization to implement them.
-- Read only files relevant to the current task and avoid broad repository
-  scans.
-- Requests to “outline,” “scaffold,” or “prepare for” a feature authorize only
-  that preparatory work, not the feature itself.
-- Keep changes focused. Do not include unrelated cleanup.
-- If the requested boundary or file structure is unclear, present the proposed
-  structure and wait for approval before editing.
-- Before adding any dependency, explain why it is necessary and wait for
-  explicit approval.
-- For a larger feature or refactor, agree on implementation milestones before
-  starting. Complete and validate each agreed milestone, then wait for review;
-  treat a small task as one milestone.
-- This repository overrides the global compatibility default: breaking changes
-  are allowed when necessary for the requested behavior. Preserve unrelated
+- Implement only the current request; read only relevant files and avoid
+  unrelated cleanup or broad scans. Future features and examples are context.
+  “Outline,” “scaffold,” and “prepare for” authorize preparation only.
+- If scope or file structure is unclear, propose it and wait for approval.
+- Explain any new dependency and obtain approval before adding it.
+- Agree on milestones before larger features or refactors; validate each and
+  wait for review. Treat small tasks as one step.
+- Breaking changes are allowed when required by the request; preserve unrelated
   behavior and APIs.
 
 ## Workspace boundaries
 
-- Before working in the sibling `hehedges-backups` repository, read its
-  `AGENTS.md` as well. Apply each repository's instructions only to files
-  within that repository.
-- Work in one repository does not authorize synchronizing, copying, or
-  modifying files in the other repository.
+- Editing either or both repositories is allowed within the current task;
+  crossing repository boundaries needs no separate approval.
+- Read `hehedges-backups/AGENTS.md` before working there. Apply each repository's
+  instructions only to its own files.
+- Before editing scripts in `tehahtimeehScriptSet` to accommodate style changes
+  in `hehedges-backups`, describe the proposed script changes and ask for
+  approval. Wait for approval before making those edits.
 
 ## Repository architecture
 
-- This is a Yarn 4 workspace monorepo of browser scripts for mybb/rusff forums.
-- Keep buildable scripts in `scripts/<kebab-case-name>`.
-- Keep shared browser utilities in `lib/utils`.
-- Organize script code into small feature modules under `src/features` and
-  reusable helpers under `src/helpers`.
-- Each script must build as an IIFE into the root `dist/` directory and expose
-  its public API through `window.teh`.
-- Load `@teh/core` before any package that extends the shared `window.teh`
-  namespace.
+- Yarn 4 workspace monorepo of browser scripts for mybb/rusff forums.
+- Buildable scripts: `scripts/<kebab-case-name>`; shared utilities: `lib/utils`.
+  Use small modules in `src/features` and reusable helpers in `src/helpers`.
+- Build each script as an IIFE into root `dist/`; expose public APIs through
+  `window.teh`. Load `@teh/core` before packages extending that namespace.
 
 ## JavaScript and markup standards
 
-- Keep application source in JavaScript unless the task explicitly requires
-  TypeScript. Use ESM imports and exports.
-- Use JSDoc with strict `checkJs` for type safety. Document public functions and
-  non-obvious data structures.
-- Follow the repository Prettier configuration: 2-space indentation and no
-  trailing commas.
-- Optimize for human readability:
-  - Prefer explicit conditionals to multiline or nested ternary expressions.
-  - Use early returns for unsupported pages, missing DOM elements, and failed
-    access checks.
-  - Always use braces for control-flow blocks, including single-statement
-    branches.
-  - Put `return` on its own line. After a block that returns, leave a blank line
-    before the next statement.
-- Generate markup with HTML template strings. Do not construct generated markup
-  element by element with `document.createElement` or equivalent APIs.
-- Use classes as CSS hooks. Reserve data attributes and IDs for JavaScript hooks
-  or required DOM relationships; do not use them as CSS selectors.
-- Preserve Russian user-facing text unless the task explicitly changes the
-  copy.
+- Use JavaScript and ESM unless TypeScript is explicitly requested. Use JSDoc
+  with strict `checkJs`; document public functions and non-obvious structures.
+- Follow Prettier: 2-space indentation, no trailing commas.
+- Prefer explicit conditionals over multiline or nested ternaries. Use early
+  returns for unsupported pages, missing elements, and failed access checks.
+- Always brace control flow. Put `return` on its own line and leave a blank line
+  after a returning block.
+- Generate markup with HTML template strings, not element-by-element DOM APIs.
+- Use classes for CSS hooks. Reserve IDs and data attributes for JavaScript
+  hooks or required DOM relationships, never CSS selectors.
+- Preserve Russian user-facing text unless copy changes are requested.
 
 ## Editing, building, and validation
 
-- Treat small tasks as one implementation step.
-- For every implementation step that changes code, run `make typecheck` and
-  the appropriate build. Documentation-only changes do not require these
-  checks. Do not run any other checks unless the user explicitly requests
-  them.
-- Do not rerun a check unless files affecting it changed since the last
-  successful run.
-- Do not run `git diff --check`; it is not needed for this repository.
+- For each code-changing step, run `make typecheck` and the appropriate build:
+  `make <script-name>`, or `make build` for multiple packages or build-system
+  changes. Documentation-only changes need neither.
+- Run no other checks unless requested, and rerun successful checks only when
+  relevant files change. Never run `git diff --check`.
 - Scaffold a new script package with `make new-script NAME=<kebab-name>`.
-- Edit source files, never generated files in `dist/`. Regenerate `dist/`
-  artifacts through the build.
-- Build a changed script with `make <script-name>`.
-- Run `make build` instead when a change affects multiple packages or the build
-  system.
-- Run `make format` as the final step immediately before handing files off for
-  review. Documentation-only changes require only this final format step. If
-  files change afterward, run `make format` again before handoff.
-- Before handing off, report the applicable validation commands run, and any
-  required checks that could not be run.
+- Edit source, never generated `dist/` files; regenerate artifacts by building.
+- Run `make format` last before review, including documentation-only changes.
+  If files change afterward, format again.
+- Report validation commands run and any required checks that could not run.
 
-## Communication efficiency
+## Communication and documentation
 
 - Keep progress updates and final responses concise.
-- Summarize successful command output; include detailed output only when a
-  command fails or the details are necessary.
-- Do not restate repository instructions or explain obvious edits.
-
-## Documentation and commits
-
-- Update `README.md` when commands, packages, architecture, or public APIs
-  change.
-- When creating a commit, follow the repository's Conventional Commit style,
-  for example `feat(scope): description` or `fix(scope): description`.
+- Summarize successful output; show details only for failures or when needed.
+  Do not restate instructions or explain obvious edits.
+- Update `README.md` for command, package, architecture, or public API changes.
+- Use Conventional Commits, e.g. `feat(scope): description`.
