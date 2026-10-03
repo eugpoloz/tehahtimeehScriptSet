@@ -10,7 +10,7 @@ const VISUAL_CONTROLS_HTML = `
         <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6.044 6.05 2.122 2.122M10.994 11l9.192 9.192M15.944 6.05l-2.122 2.122m-5.656 5.656L6.044 15.95M17.994 11h-3m-8 0h-3m7 7v-3m0-8V4" />
       </svg>
     </button>
-    <div class="theme__menu popover-custom" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
+    <div class="theme__menu popover-custom popover-panel popover-panel--rounded" id="theme-settings-popover" popover="auto" role="dialog" aria-labelledby="theme-settings-title">
       ${fontSizeControlsMarkup()}
       ${themeControlsMarkup()}
       ${newMsgLinkControlMarkup()}
