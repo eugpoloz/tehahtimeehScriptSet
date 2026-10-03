@@ -125,7 +125,7 @@ const addEpisodeTemplates = ({
 
     tags.insertAdjacentHTML(
       "beforeend",
-      `<div id="${MENU_ID}" class="teh-ep-templates-menu popover-custom" popover="auto" role="menu" style="position-anchor: ${ANCHOR_NAME}">
+      `<div id="${MENU_ID}" class="teh-ep-templates-menu popover-custom popover-panel" popover="auto" role="menu" style="position-anchor: ${ANCHOR_NAME}">
   <p class="teh-ep-templates-menu__heading">${menuHeading}</p>
   ${itemsHtml}
 </div>`

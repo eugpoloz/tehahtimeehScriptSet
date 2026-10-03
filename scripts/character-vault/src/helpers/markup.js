@@ -14,7 +14,7 @@ const characterSelectorMarkup =
     <span class="char-select__value flex items-center gap-xs" data-vault="selected-char"></span>
     <i class="material-symbols-sharp ms-auto" aria-hidden="true">keyboard_arrow_down</i>
   </button>
-  <div class="char-select__menu popover-custom" id="character-filter-popover" popover="auto">
+  <div class="char-select__menu popover-custom popover-panel" id="character-filter-popover" popover="auto">
     <div class="flex flex-col flex-nowrap" data-vault="all-chars"></div>
   </div>
 </div>`;
