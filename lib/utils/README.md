@@ -4,11 +4,12 @@ Shared browser utilities for the forum script workspace.
 
 ## Character config
 
-`loadCharacters()` loads the asset at `window.teh.charactersConfigUrl` and returns the same
+`loadCharacters()` loads the JSON asset at `window.teh.charactersConfigUrl` and returns the same
 object as `window.characters`. Pass the URL once when starting the load in the
 forum header; later calls need no arguments. It reuses loaded data,
-shares pending requests and permits retry after failure. JavaScript and JSON
-assets use Windows-1251. Core exposes the loader through `teh`. The header stores
+shares pending requests and permits retry after failure. Only `.json` files are
+supported; their bytes are decoded as Windows-1251. Core exposes the loader
+through `teh`. The header stores
 the returned promise as `teh.charactersPromise`; the loader records the supplied
 URL as `teh.charactersConfigUrl`.
 
