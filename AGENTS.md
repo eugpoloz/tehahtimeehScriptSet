@@ -16,6 +16,7 @@ These instructions apply throughout `tehahtimeehScriptSet`.
 
 ## Workspace boundaries
 
+- Keep plans for both repositories in `hehedges-backups/plans/`.
 - Editing either or both repositories is allowed within the current task;
   crossing repository boundaries needs no separate approval.
 - Read `hehedges-backups/AGENTS.md` before working there. Apply each repository's
