@@ -2,19 +2,13 @@
  * Loads the character config and stylesheet.
  *
  * @param {object} options
- * @param {string} options.configUrl
  * @param {string} options.stylesUrl
- * @param {() => void} [options.onload]
- * @returns {HTMLScriptElement | null}
+ * @returns {Promise<void>}
  */
-const loadAssets = ({ configUrl, stylesUrl, onload }) => {
-  if (
-    typeof configUrl !== "string" ||
-    !configUrl ||
-    typeof stylesUrl !== "string" ||
-    !stylesUrl
-  ) {
-    return null;
+const loadAssets = async ({ stylesUrl }) => {
+  const loadFromCore = window.teh?.loadCharacters;
+  if (typeof loadFromCore !== "function") {
+    throw new Error("Load @teh/core before admin-actions.");
   }
 
   const stylesheet = document.createElement("link");
@@ -22,15 +16,7 @@ const loadAssets = ({ configUrl, stylesUrl, onload }) => {
   stylesheet.href = stylesUrl;
   document.head.append(stylesheet);
 
-  const script = document.createElement("script");
-  script.charset = "windows-1251";
-  script.src = configUrl;
-  if (onload) {
-    script.addEventListener("load", onload, { once: true });
-  }
-  document.head.append(script);
-
-  return script;
+  await loadFromCore();
 };
 
 export default loadAssets;

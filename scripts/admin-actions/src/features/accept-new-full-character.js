@@ -7,7 +7,6 @@ const DIALOG_ID = "accept-new-full-character-dialog";
 
 /**
  * @typedef {object} AcceptNewFullCharacterConfig
- * @property {string} configUrl
  * @property {string} stylesUrl
  * @property {number} forumId
  */
@@ -47,8 +46,6 @@ const showCharacterDialog = () => {
 const acceptNewFullCharacter = (config) => {
   if (
     !config ||
-    typeof config.configUrl !== "string" ||
-    !config.configUrl ||
     typeof config.stylesUrl !== "string" ||
     !config.stylesUrl ||
     typeof config.forumId !== "number"
@@ -56,7 +53,7 @@ const acceptNewFullCharacter = (config) => {
     return;
   }
 
-  const { configUrl, stylesUrl, forumId } = config;
+  const { stylesUrl, forumId } = config;
 
   if (!isUserAdminByGroup()) {
     return;
@@ -74,10 +71,8 @@ const acceptNewFullCharacter = (config) => {
     return;
   }
 
-  loadAssets({
-    configUrl,
-    stylesUrl,
-    onload: () => {
+  loadAssets({ stylesUrl })
+    .then(() => {
       if (topicModmenu.querySelector("#accept-new-full-character")) {
         return;
       }
@@ -90,8 +85,10 @@ const acceptNewFullCharacter = (config) => {
       topicModmenu
         .querySelector("#accept-new-full-character")
         ?.addEventListener("click", showCharacterDialog);
-    }
-  });
+    })
+    .catch((error) => {
+      console.error("Could not load admin-action assets.", error);
+    });
 };
 
 export default acceptNewFullCharacter;

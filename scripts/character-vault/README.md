@@ -12,8 +12,11 @@ explicit: direct pages and modal loaders call it after loading the script.
 ## API
 
 - `teh.characterVault(root)`: initialize the vault
-- `teh.loadCharacters()`: load and return `window.characters`
+- `teh.loadCharacters()`: supplied by core; load and return `window.characters`
 - `teh.describeCharacter(character)`: format a species/status label
+
+Load core and configure character loading in the forum header before vault.
+Vault uses core's loader and does not replace it or load a separate data script.
 
 On hehedges, load the `hehedges-specials` bundle before character-vault. It
 registers the `profile-icon`, `profile-plashka`, and `coupon-card` elements

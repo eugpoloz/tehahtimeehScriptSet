@@ -2,9 +2,8 @@
 
 import characterVault from "./features/character-vault.js";
 import describeCharacter from "./features/describe-character.js";
-import loadCharacters from "./features/load-characters.js";
 
-export { characterVault, describeCharacter, loadCharacters };
+export { characterVault, describeCharacter };
 
 // Usage:
 // teh.characterVault(document.querySelector(".main.pages"));
