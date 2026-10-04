@@ -1,4 +1,4 @@
-const ADMIN_INDEX_URL = "https://hehedges.rusff.me/admin_index.php";
+const ADMIN_INDEX_URL = "/admin_index.php";
 
 /**
  * Checks whether the current session can load the admin index.
