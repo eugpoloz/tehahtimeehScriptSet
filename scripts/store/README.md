@@ -6,6 +6,9 @@ Auto-initializing catalog and cart controls for the store markup in
 Loading the bundle initializes the first matching store automatically and
 exposes the initializer as `teh.store()` for explicit reuse.
 
+Load core and initialize character loading in the forum header before store.
+Profile choices use `teh.loadCharacters()`; store does not load its own data script.
+
 Each catalog icon or plashka can appear in the cart once. Clicking its button
 again removes it; other products can be added repeatedly.
 

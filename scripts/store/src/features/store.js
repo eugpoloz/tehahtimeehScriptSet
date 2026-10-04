@@ -103,12 +103,6 @@ const store = () => {
 
   source.dataset.storeInitialized = "true";
 
-  const CHARACTERS_SCRIPT_URL = "//forumstatic.ru/files/001c/ab/7e/10010.js";
-  const forumWindow =
-    /** @type {Window & { characters?: Record<string, StoreProfile> }} */ (
-      window
-    );
-
   /** @type {StoreCartItem[]} */
   const cartItems = [];
 
@@ -124,36 +118,12 @@ const store = () => {
     !(typeof character.main === "string" && character.main !== "");
 
   const loadCharacters = async () => {
-    if (forumWindow.characters) {
-      return forumWindow.characters;
+    const loadFromCore = window.teh?.loadCharacters;
+    if (typeof loadFromCore !== "function") {
+      throw new Error("Load @teh/core before store.");
     }
 
-    const existing = document.querySelector(
-      "script[data-store-character-data], script[data-character-vault-data]"
-    );
-    await new Promise((resolve, reject) => {
-      if (existing) {
-        existing.addEventListener("load", resolve, { once: true });
-        existing.addEventListener("error", reject, { once: true });
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.charset = "windows-1251";
-      script.src = `${CHARACTERS_SCRIPT_URL}?v=${Date.now()}`;
-      script.dataset.storeCharacterData = "";
-      script.addEventListener("load", resolve, { once: true });
-      script.addEventListener("error", reject, { once: true });
-      document.body.append(script);
-    });
-
-    if (!forumWindow.characters) {
-      throw new Error(
-        "Character data is unavailable after loading its script."
-      );
-    }
-
-    return forumWindow.characters;
+    return /** @type {Record<string, StoreProfile>} */ (await loadFromCore());
   };
 
   /** @param {string} message */
