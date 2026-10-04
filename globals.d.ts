@@ -59,10 +59,16 @@ interface Window {
   UserLogin?: string;
   GroupID?: string | number;
   teh?: TehNamespace;
+  characters?: CharactersConfig;
 }
+
+type CharactersConfig = Record<string, Record<string, unknown>>;
 
 /** Runtime namespace populated by @teh/core (and extended by other IIFEs). */
 interface TehNamespace {
+  loadCharacters?: (url?: string) => Promise<CharactersConfig>;
+  charactersConfigUrl?: string;
+  charactersPromise?: Promise<CharactersConfig>;
   [key: string]: unknown;
 }
 
