@@ -14,13 +14,11 @@ styles, so do not use a Shadow DOM.
 <profile-icon>https://example.com/icon.gif</profile-icon>
 
 <profile-plashka class="justify-end" src="https://example.com/plashka.png">
-  <strong>Текст плашки</strong><br>
+  <strong>Текст плашки</strong><br />
   <a href="/viewtopic.php?id=1">Подробнее</a>
 </profile-plashka>
 
-<coupon-card>
-  Бесплатная плашка | 3 | reusable
-</coupon-card>
+<coupon-card> Бесплатная плашка | 3 | reusable </coupon-card>
 ```
 
 `profile-icon` accepts a URL through `src` or text content. `profile-plashka`

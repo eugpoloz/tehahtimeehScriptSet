@@ -98,5 +98,7 @@ Use it with `outputMode: "single"` and `fldId: "5"`. The default
 stored value for `laurent_ambrose` is:
 
 ```html
-<button type="button" class="vault" data-href="laurent_ambrose">Коллекция</button>
+<button type="button" class="vault" data-href="laurent_ambrose">
+  Коллекция
+</button>
 ```
