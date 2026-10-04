@@ -75,4 +75,6 @@ Unknown properties are preserved.
 JavaScript scripts use `charset="windows-1251"`. JSON bytes are decoded with
 `TextDecoder("windows-1251")` before parsing. Asset URLs have no timestamps.
 
-Existing consumers keep their own loaders until their migration is complete.
+Character-vault, store, admin-actions and the character editor use core's loader.
+The editor derives its administrative file from `teh.charactersConfigUrl` and
+saves/exports JSON or JavaScript according to that file's extension.
