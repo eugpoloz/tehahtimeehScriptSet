@@ -12,6 +12,7 @@ import init from "./features/init";
 import gnu from "./features/gnu-terry-pratchett";
 import loadWhen from "./features/load-when";
 import { popoverHintPolyfill } from "./polyfills/popover-hint";
+import { loadCharacters } from "@teh/utils";
 
 import "interestfor";
 
@@ -19,4 +20,4 @@ gnu();
 popoverHintPolyfill();
 init();
 
-export { init, loadWhen, version };
+export { init, loadCharacters, loadWhen, version };

@@ -48,3 +48,31 @@ TypeScript configuration discover packages automatically.
 
 [`teh.proxyImages()`](scripts/html-footer/README.md#image-proxy-fallback) in
 `html-footer` retries failed images through a proxy.
+
+## Character config
+
+Core provides `teh.loadCharacters()`. Start loading in the forum HTML header
+after core loads, and keep the returned promise:
+
+```js
+teh.charactersPromise = teh.loadCharacters(
+  "//forumstatic.ru/files/001c/ab/7e/21393.json?v=2"
+);
+```
+
+Later consumers need no URL:
+
+```js
+const characters = await teh.loadCharacters();
+```
+
+The loader stores the supplied URL in `teh.charactersConfigUrl` for subsequent
+calls and administrative links. It sets `window.characters` and returns that
+same object. It reuses loaded data, shares concurrent requests and allows retry
+after failure. Character values must be objects; NPCs may omit `id` and DOB.
+Unknown properties are preserved.
+
+JavaScript scripts use `charset="windows-1251"`. JSON bytes are decoded with
+`TextDecoder("windows-1251")` before parsing. Asset URLs have no timestamps.
+
+Existing consumers keep their own loaders until their migration is complete.
