@@ -16,3 +16,9 @@ declare module "lodash-es/debounce" {
     wait?: number
   ): DebouncedFunction<T>;
 }
+
+/** Inline styles bundled with shared UI markup. */
+declare module "*.css?inline" {
+  const css: string;
+  export default css;
+}
