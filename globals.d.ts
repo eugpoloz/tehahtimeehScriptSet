@@ -54,6 +54,8 @@ declare function bbcode(open: string, close?: string): void;
 declare function insert(text: string): void;
 
 interface Window {
+  FORUM?: Forum;
+  GAME_LATEST_DATE?: Date;
   ForumAPITicket?: string;
   UserID?: string | number;
   UserLogin?: string;
@@ -66,6 +68,15 @@ type CharactersConfig = Record<string, Record<string, unknown>>;
 
 /** Runtime namespace populated by @teh/core (and extended by other IIFEs). */
 interface TehNamespace {
+  acceptNewFullCharacter?: (
+    config: import("./scripts/admin-actions/src/features/accept-new-full-character.js").AcceptNewFullCharacterConfig
+  ) => Promise<void>;
+  getCharacterFormMarkup?: () => string;
+  initCharacterForm?: (
+    form: HTMLFormElement,
+    options?: import("./scripts/admin-actions/src/features/character-form.js").CharacterFormOptions
+  ) => import("./scripts/admin-actions/src/features/character-form.js").CharacterFormController;
+  adminActionsScriptUrl?: string;
   loadCharacters?: (url?: string) => Promise<CharactersConfig>;
   charactersConfigUrl?: string;
   charactersPromise?: Promise<CharactersConfig>;

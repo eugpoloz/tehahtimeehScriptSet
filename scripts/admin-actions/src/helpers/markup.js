@@ -1,203 +1,351 @@
-/** Returns the config form markup. @returns {string} */
-export const getConfigFormMarkup = () => `
-<dialog
-  class="anfc-dialog"
-  id="accept-new-full-character-dialog"
-  closedby="any"
-  aria-labelledby="anfc-dialog-title"
->
-  <div class="content">
-  <article class="toolbar sticky">
-    <h2 id="anfc-dialog-title">Новый персонаж</h2>
-    <div class="actions">
-      <button commandfor="accept-new-full-character-dialog" command="close" class="vault-modal__close">
-        <span class="sr-only">Закрыть</span>
-        <i class="material-symbols-sharp" aria-hidden="true">close</i>
-      </button>
-    </div>
-  </article>
-  <form class="ce-form anfc-form" id="ce-form" autocomplete="off" novalidate>
-    <div class="ce-top-flags">
-      <label class="ce-switch">
+/** Common character fields; callers supply the form and workflow controls. @returns {string} */
+export const getCharacterFormMarkup = () =>
+  /* HTML */ `<fieldset class="char-form__fields" id="char-form-fields">
+    <div class="char-form__flags flex items-center gap-sm col-span-full">
+      <label class="char-form__toggle flex items-center gap-sm">
         <input
           type="checkbox"
-          id="ce-npc"
-          name="npc"
-          aria-controls="ce-id-field ce-main-optional"
+          id="char-form-npc"
+          aria-controls="char-form-id-field char-form-main-optional"
         />
-        <span class="ce-switch-track" aria-hidden="true"></span>
         <span>NPC</span>
       </label>
-      <label class="ce-field-label ms-auto">
-        <input type="checkbox" id="ce-gender-f" name="genderFemale" /> Женщина
+      <label class="char-form__label flex items-center gap-sm ms-auto">
+        <input type="checkbox" id="char-form-gender-f" />
+        <strong>Женщина</strong>
       </label>
     </div>
-    <div class="ce-field" data-config-field>
-      <label class="ce-field-control">
-        <span class="ce-field-label">
-          Name
-          <small>Латиницей (имя профиля)</small>
-        </span>
-        <input type="text" id="ce-name" name="name" required autofocus placeholder="Name Surname" />
-      </label>
-    </div>
-    <div class="ce-field" data-config-field>
-      <label class="ce-field-control">
-        <span class="ce-field-label">
-          Имя
-          <small>Кириллицей</small>
+    <div class="char-form__field flex flex-col gap-xs">
+      <label class="char-form__control flex flex-col gap-xs">
+        <span class="char-form__label flex items-center gap-sm">
+          <strong>Name</strong>
+          <small class="char-form__hint">Латиницей (имя профиля)</small>
         </span>
         <input
           type="text"
-          id="ce-ru"
-          name="ru"
+          class="char-form__input w-full"
+          id="char-form-name"
+          required
+          placeholder="Name Surname"
+        />
+      </label>
+    </div>
+    <div class="char-form__field flex flex-col gap-xs">
+      <label class="char-form__control flex flex-col gap-xs">
+        <span class="char-form__label flex items-center gap-sm">
+          <strong>Имя</strong>
+          <small class="char-form__hint">Кириллицей</small>
+        </span>
+        <input
+          type="text"
+          class="char-form__input w-full"
+          id="char-form-ru"
           required
           placeholder="Имярек Имярекович"
         />
       </label>
     </div>
-    <div class="ce-field" data-config-field>
-      <label class="ce-field-control">
-        <span class="ce-field-label">
-          Дата рождения
-          <small>ДД.ММ.ГГГГ</small>
+    <div class="char-form__field flex flex-col gap-xs">
+      <label class="char-form__control flex flex-col gap-xs">
+        <span class="char-form__label flex items-center gap-sm">
+          <strong>Дата рождения</strong>
+          <small class="char-form__hint">ДД.ММ.ГГГГ</small>
         </span>
-        <input type="text" id="ce-dob" name="dob" placeholder="13.12.1989" />
-      </label>
-    </div>
-    <div class="ce-field" data-config-field>
-      <label class="ce-field-control">
-        <span class="ce-field-label">
-          FC
-          <small>Внешность латиницей</small>
-        </span>
-        <input type="text" id="ce-fc" name="fc" required placeholder="Name Surname" />
-      </label>
-    </div>
-    <div class="ce-field" id="ce-id-field" data-config-field>
-      <div class="ce-field-control">
-        <label class="ce-field-label" for="ce-id">
-          ID профиля
-          <small>Только цифры</small>
-        </label>
-        <div class="ce-id-row">
-          <input type="text" id="ce-id" name="id" inputmode="numeric" required placeholder="00" />
-          <a
-            class="ce-id-link"
-            id="ce-id-link"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Проверить профиль"
-            aria-label="Проверить профиль"
-            hidden
-          >&nearr;</a>
-        </div>
-      </div>
-    </div>
-    <div class="ce-field" id="ce-anketa-field" data-config-field>
-      <div class="ce-field-control">
-        <label class="ce-field-label" for="ce-anketa">
-          Анкета
-          <small id="ce-anketa-hint">ID темы</small>
-        </label>
-        <div class="ce-id-row">
-          <input type="text" id="ce-anketa" name="anketa" inputmode="numeric" required placeholder="00" />
-          <a
-            class="ce-id-link"
-            id="ce-anketa-link"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Проверить анкету"
-            aria-label="Проверить анкету"
-            hidden
-          >&nearr;</a>
-        </div>
-      </div>
-    </div>
-    <div class="ce-field" id="ce-main-optional" data-config-field>
-      <div class="ce-optional-head">
-        <label class="ce-switch compact">
-          <input
-            type="checkbox"
-            id="ce-main-is-main"
-            name="isMain"
-            checked
-            aria-controls="ce-main-body"
-            aria-expanded="false"
-            aria-label="Основной профиль"
-          />
-          <span class="ce-switch-track" aria-hidden="true"></span>
-        </label>
-        <label for="ce-main-is-main">
-          <span class="ce-field-label">Основной профиль</span>
-        </label>
-      </div>
-      <div class="ce-optional-body" id="ce-main-body" hidden>
         <input
           type="text"
-          id="ce-main"
-          name="main"
-          disabled
-          list="ce-main-list"
+          class="char-form__input w-full"
+          id="char-form-dob"
+          placeholder="13.12.1989"
+        />
+      </label>
+    </div>
+    <div class="char-form__field flex flex-col gap-xs">
+      <label class="char-form__control flex flex-col gap-xs">
+        <span class="char-form__label flex items-center gap-sm">
+          <strong>FC</strong>
+          <small class="char-form__hint">Внешность латиницей</small>
+        </span>
+        <input
+          type="text"
+          class="char-form__input w-full"
+          id="char-form-fc"
+          required
+          placeholder="Name Surname"
+        />
+      </label>
+    </div>
+    <div
+      class="char-form__field char-form__field--profile flex flex-col gap-xs"
+      id="char-form-id-field"
+    >
+      <div
+        class="char-form__control flex flex-col gap-xs flex-1 justify-between"
+      >
+        <label
+          class="char-form__label flex items-center gap-sm"
+          for="char-form-id"
+        >
+          <strong>ID профиля</strong>
+          <small class="char-form__hint">Только цифры</small>
+        </label>
+        <div class="char-form__reference flex items-center gap-sm">
+          <input
+            type="text"
+            class="char-form__input w-full"
+            id="char-form-id"
+            required
+            placeholder="00"
+          />
+          <a
+            class="char-form__link shrink-0"
+            id="char-form-id-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Проверить профиль"
+            hidden
+            >↗</a
+          >
+        </div>
+      </div>
+    </div>
+    <div
+      class="char-form__field char-form__field--application grid-col-4"
+      id="char-form-anketa-field"
+    >
+      <div class="char-form__control flex flex-col gap-xs justify-between">
+        <label
+          class="char-form__label flex items-center gap-sm"
+          for="char-form-anketa"
+        >
+          <strong>Анкета</strong>
+          <small class="char-form__hint" id="char-form-anketa-hint"
+            >ID темы</small
+          >
+        </label>
+        <div class="char-form__reference flex items-center gap-sm">
+          <input
+            type="text"
+            class="char-form__input w-full"
+            id="char-form-anketa"
+            required
+            placeholder="00"
+          />
+          <a
+            class="char-form__link shrink-0"
+            id="char-form-anketa-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Проверить анкету"
+            hidden
+            >↗</a
+          >
+        </div>
+      </div>
+    </div>
+    <div
+      class="char-form__field char-form__field--main flex flex-col gap-xs"
+      id="char-form-main-optional"
+    >
+      <div class="char-form__checks flex items-center gap-sm">
+        <label class="char-form__toggle flex items-center">
+          <input
+            type="checkbox"
+            id="char-form-main-is-main"
+            checked
+            aria-controls="char-form-main-body"
+          />
+        </label>
+        <label for="char-form-main-is-main">
+          <strong class="char-form__label flex items-center gap-sm"
+            >Основной профиль</strong
+          >
+        </label>
+      </div>
+      <div class="char-form__main-profile" id="char-form-main-body">
+        <input
+          type="text"
+          class="char-form__input w-full"
+          id="char-form-main"
+          list="char-form-main-list"
           placeholder="Laurent Ambrose"
           aria-label="Имя основного профиля"
         />
-        <datalist id="ce-main-list"></datalist>
+        <datalist id="char-form-main-list"></datalist>
       </div>
     </div>
-    <div class="ce-field" data-config-field>
-      <span class="ce-field-label">Кто</span>
-      <div class="ce-who-groups">
+    <div class="char-form__field flex flex-col gap-xs">
+      <strong class="char-form__label flex items-center gap-sm">Кто</strong>
+      <div class="flex flex-col gap-xs">
         <div
-          class="ce-checkboxes"
-          id="ce-who-nature"
+          class="char-form__options flex gap-sm"
+          id="char-form-who-nature"
           role="radiogroup"
           aria-label="Тип"
         >
-          <label><input type="radio" name="who-nature" value="human" checked /> человек</label>
-          <label><input type="radio" name="who-nature" value="hybrid" /> полукровка</label>
-          <label><input type="radio" name="who-nature" value="creature" /> существо</label>
-          <label><input type="radio" name="who-nature" value="other" /> ???</label>
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="human" checked />
+            человек</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="hybrid" />
+            полукровка</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="creature" />
+            существо</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="other" /> ???</label
+          >
         </div>
         <div
-          class="ce-checkboxes"
-          id="ce-who-magic"
+          class="char-form__options flex gap-sm"
+          id="char-form-who-magic"
           role="group"
           aria-label="Магия"
         >
-          <label><input type="checkbox" name="who-magic" value="magician" /> <span id="ce-magician-label">волшебник</span></label>
-          <label><input type="checkbox" name="who-magic" value="hedgewitch" /> хедж-ведьма</label>
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="checkbox" name="who-magic" value="magician" />
+            <span id="char-form-magician-label">волшебник</span></label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="checkbox" name="who-magic" value="hedgewitch" />
+            хедж-ведьма</label
+          >
         </div>
       </div>
     </div>
-    <div class="ce-field" data-config-field>
-      <span class="ce-field-label">Принадлежность</span>
-      <div class="ce-checkboxes" id="ce-aff">
-        <label><input type="checkbox" name="affiliations" value="lawenforcement" /> полиция</label>
-        <label><input type="checkbox" name="affiliations" value="mafia" /> синдикат</label>
+    <div class="char-form__field flex flex-col gap-xs">
+      <strong class="char-form__label flex items-center gap-sm"
+        >Принадлежность</strong
+      >
+      <div class="char-form__options flex gap-sm" id="char-form-aff">
+        <label class="char-form__option flex items-center gap-xs"
+          ><input type="checkbox" name="affiliations" value="lawenforcement" />
+          полиция</label
+        >
+        <label class="char-form__option flex items-center gap-xs"
+          ><input type="checkbox" name="affiliations" value="mafia" />
+          синдикат</label
+        >
       </div>
     </div>
-    <div class="ce-field full" data-config-field>
-      <label class="ce-switch danger">
-        <input type="checkbox" id="ce-cursed" name="cursed" />
-        <span class="ce-switch-track" aria-hidden="true"></span>
-        <span id="ce-cursed-label">Проклят</span>
+    <div class="char-form__field flex flex-col gap-xs col-span-full">
+      <label class="char-form__toggle flex items-center gap-sm">
+        <input type="checkbox" id="char-form-cursed" />
+        <span id="char-form-cursed-label">Проклят</span>
       </label>
     </div>
-    <div class="ce-field full" data-config-field>
-      <label class="ce-field-control">
-        <span class="ce-field-label">Описание</span>
-        <textarea id="ce-desc" name="desc" placeholder="Чем занимается?"></textarea>
+    <div class="char-form__field flex flex-col gap-xs col-span-full">
+      <label class="char-form__control flex flex-col gap-xs">
+        <strong class="char-form__label flex items-center gap-sm"
+          >Описание</strong
+        >
+        <textarea
+          class="char-form__input char-form__description"
+          id="char-form-desc"
+          placeholder="Чем занимается?"
+        ></textarea>
       </label>
     </div>
-    <p class="ce-form-status" id="ce-form-status" role="status" aria-live="polite" aria-atomic="true"></p>
-    <div class="ce-form-actions">
-      <button type="submit" class="button button--primary">Проверить</button>
-      <button type="reset" class="button" id="ce-reset" disabled>Сбросить изменения</button>
+  </fieldset>`;
+
+/** Acceptance dialog around the shared fields. @returns {string} */
+export const getConfigFormMarkup = () =>
+  /* HTML */ `<dialog
+    class="char-accept"
+    id="accept-new-full-character-dialog"
+    closedby="any"
+    aria-labelledby="anfc-dialog-title"
+  >
+    <div class="content">
+      <article class="toolbar sticky">
+        <h2 id="anfc-dialog-title">Новый персонаж</h2>
+        <div class="actions">
+          <button type="button" data-close-acceptance class="button-icon">
+            <span class="sr-only">Закрыть</span>
+            <i class="material-symbols-sharp icon-20" aria-hidden="true"
+              >close</i
+            >
+          </button>
+        </div>
+      </article>
+      <p class="char-accept__notes" id="anfc-notes"></p>
+      <ol
+        class="char-accept__progress"
+        id="anfc-progress"
+        aria-live="polite"
+      ></ol>
+      <form
+        class="char-form grid-col-4 relative"
+        id="char-form"
+        autocomplete="off"
+        novalidate
+      >
+        ${getCharacterFormMarkup()}
+        <div
+          class="char-form__field flex flex-col gap-xs col-span-full"
+          id="anfc-collection"
+        >
+          <label
+            class="char-form__control flex flex-col gap-xs"
+            for="anfc-address"
+          >
+            <strong class="char-form__label">Адрес личной страницы</strong>
+            <input
+              type="text"
+              class="char-form__input w-full"
+              id="anfc-address"
+              maxlength="48"
+              aria-describedby="anfc-address-hint"
+            />
+            <small class="char-form__hint" id="anfc-address-hint"
+              >После /pages/: латиница, цифры, дефис и подчёркивание, до 48
+              символов.</small
+            >
+          </label>
+        </div>
+        <footer class="char-form__footer flex flex-col gap-sm col-span-full">
+          <p
+            class="char-form__status char-accept__status"
+            id="char-form-status"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          ></p>
+          <label
+            class="flex items-center gap-sm"
+            id="anfc-letter-review"
+            hidden
+          >
+            <input type="checkbox" id="anfc-letter-resend" />
+            <span
+              >Проверил
+              <a id="anfc-letter-link" target="_blank" rel="noopener">тему</a>:
+              письмо не опубликовано. Разрешаю повторную отправку.</span
+            >
+          </label>
+          <div class="char-form__actions flex justify-end gap-xs">
+            <button type="reset" class="button" id="char-form-reset" disabled>
+              Сбросить изменения
+            </button>
+            <button type="button" class="button" id="anfc-retry" hidden>
+              Проверить сохранение
+            </button>
+            <button type="submit" class="button button--primary">
+              Добавить в конфиг
+            </button>
+          </div>
+        </footer>
+        <div
+          class="char-form__loader busy loading items-center absolute"
+          id="anfc-save-overlay"
+          aria-hidden="true"
+          hidden
+        ></div>
+      </form>
     </div>
-  </form>
-  </div>
-</dialog>`;
+  </dialog>`;
 
 /** @param {string[]} names @returns {string} */
 export const getMainProfileOptionsMarkup = (names) =>

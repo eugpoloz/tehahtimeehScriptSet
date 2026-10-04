@@ -77,4 +77,7 @@ Character config must be a `.json` file. Its bytes are decoded with
 
 Character-vault, store, admin-actions and the character editor use core's loader.
 The editor derives its administrative file from `teh.charactersConfigUrl` and
-saves/exports plain JSON.
+saves/exports plain JSON. Admin-actions shares that form and adds application
+prefill and verified config-only saves for regular characters and NPCs; see
+[scripts/admin-actions/README.md](scripts/admin-actions/README.md) for initialization
+and recovery.
