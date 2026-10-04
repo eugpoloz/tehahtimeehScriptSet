@@ -72,9 +72,9 @@ same object. It reuses loaded data, shares concurrent requests and allows retry
 after failure. Character values must be objects; NPCs may omit `id` and DOB.
 Unknown properties are preserved.
 
-JavaScript scripts use `charset="windows-1251"`. JSON bytes are decoded with
+Character config must be a `.json` file. Its bytes are decoded with
 `TextDecoder("windows-1251")` before parsing. Asset URLs have no timestamps.
 
 Character-vault, store, admin-actions and the character editor use core's loader.
 The editor derives its administrative file from `teh.charactersConfigUrl` and
-saves/exports JSON or JavaScript according to that file's extension.
+saves/exports plain JSON.
