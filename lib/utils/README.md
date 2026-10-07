@@ -4,24 +4,17 @@ Shared browser utilities for the forum script workspace.
 
 ## Character config
 
-`loadCharacters()` loads the JSON asset at `window.teh.charactersConfigUrl` and returns the same
-object as `window.characters`. Pass the URL once when starting the load in the
-forum header; later calls need no arguments. It reuses loaded data,
-shares pending requests and permits retry after failure. Only `.json` files are
-supported; their bytes are decoded as Windows-1251. Core exposes the loader
-through `teh`. The header stores
-the returned promise as `teh.charactersPromise`; the loader records the supplied
-URL as `teh.charactersConfigUrl`.
+`loadCharacters(url?)` returns `window.characters`, shares concurrent loads and
+allows retry after failure. Core exposes it as `teh.loadCharacters()`; see
+[forum setup](../../README.md#forum-setup) for the URL and encoding requirements.
 
 ## Image URLs
 
-`getImageUrl(value)` returns a trimmed absolute or protocol-relative HTTP(S) URL,
-or `""`. Escape it before inserting into HTML.
+| Helper                                             | Result                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------- |
+| `getImageUrl(value)`                               | Trimmed absolute or protocol-relative HTTP(S) URL, or `""` |
+| `getProxiedImageUrl(value, proxy = IMAGE_PROXY)`   | Validated proxy URL; skips already proxied URLs            |
+| `getUnproxiedImageUrl(value, proxy = IMAGE_PROXY)` | Original URL from encoded or legacy proxy URLs             |
 
-`getProxiedImageUrl(value, proxy = IMAGE_PROXY)` validates and proxies a URL,
-skipping URLs already using that prefix.
-
-`getUnproxiedImageUrl(value, proxy = IMAGE_PROXY)` extracts the original URL from
-encoded or legacy proxy URLs.
-
-`IMAGE_PROXY` is the DuckDuckGo image proxy prefix.
+`IMAGE_PROXY` is the DuckDuckGo image proxy prefix. Escape URLs before inserting
+them into HTML.
