@@ -6,22 +6,12 @@ Renders character collections from `[data-collection]` elements.
 teh.characterVault(document.querySelector(".main.pages"));
 ```
 
-The root is optional and defaults to the first `.main.pages`. Initialization is
-explicit: direct pages and modal loaders call it after loading the script.
+The root defaults to the first `.main.pages`. Load core and configure
+[character loading](../../README.md#forum-setup) first.
+`teh.describeCharacter(character)` formats a species/status label.
 
-## API
-
-- `teh.characterVault(root)`: initialize the vault
-- `teh.loadCharacters()`: supplied by core; load and return `window.characters`
-- `teh.describeCharacter(character)`: format a species/status label
-
-Load core and configure character loading in the forum header before vault.
-Vault uses core's loader and does not replace it or load a separate data script.
-
-On hehedges, load the `hehedges-specials` bundle before character-vault. It
-registers the `profile-icon`, `profile-plashka`, and `coupon-card` elements
-that character-vault renders for these collections. Then load vault assets
-through `hehedges-specials`:
+On hehedges, load `hehedges-specials` first for its profile and coupon components,
+then use its asset loader:
 
 ```js
 teh.loadCharacterVault({
@@ -30,12 +20,10 @@ teh.loadCharacterVault({
 });
 ```
 
-Mark direct vault pages with `[data-character-vault-page]`. Page markup should
-not load the vault assets or call the initializer itself.
+Mark direct vault pages with `[data-character-vault-page]`; the loader handles
+assets and initialization.
 
-Coupons are defined as one nonempty line in a `[data-collection="coupon"]`
-element. Existing single-field coupon lines remain valid. Optional trailing
-metadata supports quantity and reusable status:
+Coupons use one nonempty line per item, with optional quantity and reusable status:
 
 ```text
 <div data-collection="coupon">
@@ -46,6 +34,5 @@ metadata supports quantity and reusable status:
 </div>
 ```
 
-Quantity defaults to `1` and must be a positive integer. The `reusable` flag
-marks a coupon as reusable; unrecognized trailing content remains part of the
-coupon text.
+Quantity defaults to `1` and must be a positive integer. Unrecognized trailing
+content remains part of the coupon text.
