@@ -3,19 +3,24 @@ import { getMultiaccItemHTML, MULTIACC_LIST_VIP_HTML } from "./markup";
 import { getMultiaccEncryptedData, saveMultiaccEncryptedData } from "./storage";
 import { getVIPMultiAccList } from "./vip-accounts";
 
-/** @param {HTMLElement | null} parent */
-const updateEmptyMessage = (parent) => {
-  const empty = parent?.querySelector("[data-multiacc-empty]");
-  const listEmpty = parent?.querySelector("ul:empty");
+/** @param {HTMLElement} list */
+const updateEmptyMessage = (list) => {
+  const parent = list.parentElement;
+  if (!parent) {
+    return;
+  }
 
-  if (!listEmpty && empty) {
+  const empty = parent.querySelector("[data-multiacc-empty]");
+  const isEmpty = list.children.length === 0;
+
+  if (!isEmpty && empty) {
     empty.remove();
   }
 
-  if (listEmpty && !empty) {
-    listEmpty.insertAdjacentHTML(
+  if (isEmpty && !empty) {
+    list.insertAdjacentHTML(
       "afterend",
-      "<small class='list-empty' data-multiacc-empty><em>Нет сохраненных профилей</em></small>"
+      `<small class="teh-quicklogin__empty" data-multiacc-empty><em>Нет сохраненных профилей</em></small>`
     );
   }
 };
@@ -68,7 +73,7 @@ export const renderMultiaccList = async () => {
       }
 
       multiListVip.classList.remove("loading");
-      updateEmptyMessage(multiListVip.parentElement);
+      updateEmptyMessage(multiListVip);
     }
   }
 
@@ -106,7 +111,7 @@ export const renderMultiaccList = async () => {
           decryptedData = await getMultiaccEncryptedData();
 
           itemElement.remove();
-          updateEmptyMessage(multiListLocal.parentElement);
+          updateEmptyMessage(multiListLocal);
         });
 
         if (loginItem) {
@@ -125,6 +130,6 @@ export const renderMultiaccList = async () => {
     }
 
     multiListLocal.classList.remove("loading");
-    updateEmptyMessage(multiListLocal.parentElement);
+    updateEmptyMessage(multiListLocal);
   }
 };
