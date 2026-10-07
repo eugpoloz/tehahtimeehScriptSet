@@ -43,13 +43,13 @@ const multiaccQuickLogin = () => {
   const lang = getLang();
   const link = { en: "Re-login", ru: "Перезайти" }[lang] ?? "Перезайти";
 
-  const html = `<div id="teh-multiacc-quick-login" class="teh-quick-login">
+  const html = `<div id="teh-multiacc-quick-login" class="teh-quicklogin" data-multiacc-open="false">
     <div class="container">
-      <div class="panel" data-multiacc-wrapper>
-          <h3 class="quick-login-title">Быстрый вход</h3>
-          <section id="multiacc-form" class="layout">
+      <div class="teh-quicklogin__panel" data-multiacc-wrapper>
+          <h3 class="teh-quicklogin__title">Быстрый вход</h3>
+          <section id="multiacc-form" class="teh-quicklogin__layout">
             ${getQuickLoginFormHTML()}
-            <article class="relative lists">
+            <article class="relative teh-quicklogin__accounts">
               <div id="multiacc-list" class="scrollable">${MULTIACC_LIST_LOCAL_HTML}</div>
             </article>
           </section>
@@ -85,7 +85,9 @@ const multiaccQuickLogin = () => {
 
     const quickForm = document.getElementById("teh-multiacc-quick-login");
     if (quickForm) {
-      quickForm.classList.toggle("visible");
+      const isOpen = quickForm.dataset.multiaccOpen !== "true";
+      quickForm.dataset.multiaccOpen = String(isOpen);
+      quickForm.classList.toggle("visible", isOpen);
 
       /** @param {MouseEvent} eClickOutside */
       const handleClickOutside = (eClickOutside) => {
@@ -95,12 +97,13 @@ const multiaccQuickLogin = () => {
           !clickTarget.closest("[data-multiacc-wrapper]") &&
           clickTarget !== e.target
         ) {
+          quickForm.dataset.multiaccOpen = "false";
           quickForm.classList.remove("visible");
           document.removeEventListener("click", handleClickOutside, false);
         }
       };
 
-      if (quickForm.classList.contains("visible")) {
+      if (isOpen) {
         await renderMultiaccList();
 
         document.addEventListener("click", handleClickOutside, false);

@@ -33,14 +33,14 @@ export const getQuickLoginFormHTML = () => {
 
 export const MULTIACC_LIST_LOCAL_HTML = `
 <div>
-  <h4 class="quick-login-section-title">Локальные профили:</h4>
+  <h4 class="teh-quicklogin__subtitle">Локальные профили:</h4>
   <ul id="multiacc-list-local" class="list loading"></ul>
 </div>
 `;
 
 export const MULTIACC_LIST_VIP_HTML = `
 <div>
-  <h4 class="quick-login-section-title">Мультиаккаунт:</h4>
+  <h4 class="teh-quicklogin__subtitle">Мультиаккаунт:</h4>
   <ul id="multiacc-list-vip" class="list loading"></ul>
 </div>
 `;
