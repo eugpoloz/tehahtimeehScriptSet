@@ -140,7 +140,7 @@ const generateCustomFields = async ({
 
   fsBox.insertAdjacentHTML(
     "afterbegin",
-    `<article class="teh-customFld" id="${containerId}" hidden></article>`
+    `<article class="teh-flds flex flex-col w-full" id="${containerId}" hidden></article>`
   );
 
   const customFldsContainer = document.getElementById(containerId);
@@ -166,15 +166,19 @@ const generateCustomFields = async ({
       let fldContents = "";
       let fldClassNames = "";
 
-      const sectionEl = customFldsContainer.querySelector(
-        `#${getSectionId(section.name)}`
+      const sectionFields = customFldsContainer.querySelector(
+        `#${getSectionId(section.name)}_flds`
       );
-      if (!sectionEl) {
+      if (!sectionFields) {
         return;
       }
 
       const sectionInputsArr = /** @type {HTMLInputElement[]} */ (
-        Array.from(sectionEl.querySelectorAll(`input[type="text"]`))
+        Array.from(
+          sectionFields.querySelectorAll(
+            `:scope > [data-flds-role="field"] > [data-flds-role="input"]`
+          )
+        )
       );
       const componentValues = new Map();
 
@@ -245,11 +249,16 @@ const generateCustomFields = async ({
     const sectionFldsId = sectionId + "_flds";
     const sectionPreviewId = sectionId + "_preview";
 
+    let dividerMarkup = "";
+    if (customFldsContainer.childElementCount) {
+      dividerMarkup = `<hr class="hr--dashed w-full">`;
+    }
+
     customFldsContainer.insertAdjacentHTML(
       "beforeend",
-      `<section class="teh-customFld__section" id="${sectionId}">
-        <div id="${sectionFldsId}" class="teh-customFld__fields"></div>
-        <div class="teh-customFld__preview">
+      `${dividerMarkup}<section class="teh-flds__section" id="${sectionId}">
+        <div id="${sectionFldsId}" class="flex flex-col gap-sm"></div>
+        <div class="teh-flds__preview flex items-center justify-center">
           <div id="${sectionPreviewId}" data-custom-fld="${section.name}"></div>
         </div>
       </section>`
@@ -331,9 +340,9 @@ const generateCustomFields = async ({
             optionLabelHTML = input.mask(optionLabel);
           }
 
-          optionsHTML += `<label>
-            <span${dataAttr}>${optionLabelHTML}</span>
-            <input type="radio" name="${radioName}" value="${optionValue}"/>
+          optionsHTML += `<label class="teh-flds__choice flex gap-xs">
+            <span class="teh-flds__content"${dataAttr}>${optionLabelHTML}</span>
+            <input type="radio" class="teh-flds__radio" data-flds-role="option" name="${radioName}" value="${optionValue}"/>
           </label>`;
         });
       }
@@ -342,12 +351,22 @@ const generateCustomFields = async ({
       const isHiddenInput =
         resolvedOptions.length && (!isAMS() || input.strict) ? "hidden" : "";
 
+      let optionsMarkup = "";
+      if (optionsHTML.length) {
+        let optionsClass = "teh-flds__options scrollable";
+        if (["icon", "plashka", "justify"].includes(input.name)) {
+          optionsClass += ` teh-flds__options--${input.name}`;
+        }
+
+        optionsMarkup = `<div class="relative"><div class="${optionsClass}">${optionsHTML}</div></div>`;
+      }
+
       fieldContainer.insertAdjacentHTML(
         "beforeend",
-        `<div id="${inputId}_fldContainer">
+        `<div id="${inputId}_fldContainer" data-flds-role="field" class="flex flex-col gap-sm">
           <strong>${input.label}</strong>
-          ${optionsHTML.length ? `<div class="relative"><div class="scrollable">${optionsHTML}</div></div>` : ""}
-          <input type="text" id="${inputId}" ${getMaxLength(input.maxlength)} ${isHiddenInput}/>
+          ${optionsMarkup}
+          <input type="text" id="${inputId}" data-flds-role="input" class="w-full" ${getMaxLength(input.maxlength)} ${isHiddenInput}/>
         </div>`
       );
 
@@ -379,19 +398,17 @@ const generateCustomFields = async ({
         }
       }
 
-      const inputContainer = fieldContainer.querySelector(
-        `div:has(> #${inputId})`
-      );
       const inputNode = /** @type {HTMLInputElement | null} */ (
         fieldContainer.querySelector(`#${inputId}`)
       );
+      const inputContainer = inputNode?.closest(`[data-flds-role="field"]`);
 
       if (!inputContainer || !inputNode) {
         return;
       }
 
       const optionNodesArr = /** @type {HTMLInputElement[]} */ (
-        Array.from(inputContainer.querySelectorAll(`input[type="radio"]`))
+        Array.from(inputContainer.querySelectorAll(`[data-flds-role="option"]`))
       );
 
       /** @param {string} value */
