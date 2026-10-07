@@ -11,10 +11,7 @@ The bundle disables unused `RusffCore` features when loaded after
 const content = await teh.loadSiteContent("/path/to/content.json");
 ```
 
-The URL must be a non-empty string. The JSON request is made with high
-priority and resolves only for a non-null object (arrays are rejected). Requests
-and successful results are memoized by URL, so repeated calls share the same
-Promise. Rejected requests are removed from the cache and can be retried.
+Returns a JSON object. Loads are cached by URL; failed requests can be retried.
 
 ## Editor
 
@@ -24,8 +21,7 @@ Call after `FORUM.editor` is available:
 teh.configureEditor();
 ```
 
-This installs the configured fonts and custom tags. Pass `{ fonts, tags }` to
-replace either default for a call.
+Installs fonts and custom tags. Pass `{ fonts, tags }` to override the defaults.
 
 ## Visuals
 
@@ -33,25 +29,8 @@ replace either default for a call.
 teh.changeVisuals();
 ```
 
-This inserts a settings button into `#pun-navlinks ul` and restores saved
-settings. The button toggles a light-dismiss popover with font-size controls
-and an animated light/dark toggle with a separate system-theme checkbox. The
-preference is stored in `userTheme`. While the system preference is selected,
-the light/dark toggle displays the resolved theme and is disabled. The
-document root receives
-`data-theme-preference` with that preference and `data-theme` with the resolved
-`light` or `dark` theme. Changes to the system theme are followed while the
-system preference is selected.
+Adds font-size and theme controls to `#pun-navlinks ul` and restores saved
+settings. Font sizing requires `#pun`. Theme choices are light, dark, or system;
+the document root's `data-theme` exposes the resolved `light` or `dark` theme.
 
-When the document is still loading, the saved theme and font-size CSS variable
-are restored immediately while control insertion and event setup wait for
-`DOMContentLoaded`.
-
-Font sizing requires `#pun`.
-
-The settings, decrease, and increase icons use inline SVGs from
-[MingCute](https://github.com/mingcute-design/mingcute-icons/tree/main/packages/svg/core-regular):
-`magic-2`, `minimize`, and `add`. They inherit `currentColor` and require no icon
-font or runtime request. The custom animated sun/moon SVG is unchanged.
-MingCute attribution and license links are listed in the
-[repository LICENSE](../../LICENSE).
+Icon attribution: [LICENSE](../../LICENSE).

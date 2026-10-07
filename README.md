@@ -2,57 +2,28 @@
 
 Browser scripts for mybb/rusff, built as IIFEs in `dist/`.
 
-## Layout
-
-```text
-lib/
-  utils/                     # shared browser helpers
-scripts/
-  <script-name>/             # Script package; builds to dist/teh.<script-name>.iife.js
-tooling/                     # Repository build and scaffolding tools
-```
-
-## Conventions
-
-- Packages live in `scripts/<kebab-case-name>` and contain `package.json`,
-  `vite.config.js`, and `src/index.js`.
-- Entry points define the public API, initialization, and exports.
-- Source modules and feature directories use lowercase kebab-case.
-- Put feature code in `src/features`, local helpers in `src/helpers`,
-  configuration code in `src/config`, shared JSDoc types in `src/types.js`, and
-  shared browser helpers in `lib/utils`.
-- A multi-file feature may use a directory with its own `index.js`.
-- Create optional directories only when needed.
-- Document configuration and usage in the package README.
-- Keep source in JavaScript; JSDoc and `checkJs` provide type safety.
-- Public APIs use camelCase; bundle filenames remain kebab-case.
+Scripts live in `scripts/<script-name>`, shared helpers in `lib/utils`, and
+build tools in `tooling`. Development conventions are in [AGENTS.md](AGENTS.md).
 
 ## Commands
 
 ```bash
 make install                 # install dependencies
 make build                   # build every script
-make build WINDOWS_1251=1    # also emit Windows-1251 copies
+make build WINDOWS_1251=1     # also emit Windows-1251 copies
 make <script>                # build one script, e.g. make html-footer
 make typecheck               # check JavaScript and JSDoc types
 make format                  # format all supported files, respecting .gitignore
 make clean                   # remove dist/
-make new-script NAME=my-tool # scaffold scripts/my-tool
+make new-script NAME=my-tool  # scaffold scripts/my-tool and install dependencies
 ```
 
-`make new-script` creates the package, installs workspace dependencies, and
-exposes its API under the camel-cased `teh` property. The Makefile and
-TypeScript configuration discover packages automatically.
+## Forum setup
 
-## Image fallback
+Load `dist/teh.core.iife.js` before other bundles. Public APIs are exposed through
+`window.teh`; see each package's README for initialization and options.
 
-[`teh.proxyImages()`](scripts/html-footer/README.md#image-proxy-fallback) in
-`html-footer` retries failed images through a proxy.
-
-## Character config
-
-Core provides `teh.loadCharacters()`. Start loading in the forum HTML header
-after core loads, and keep the returned promise:
+Configure character loading in the forum header after core:
 
 ```js
 teh.charactersPromise = teh.loadCharacters(
@@ -60,24 +31,12 @@ teh.charactersPromise = teh.loadCharacters(
 );
 ```
 
-Later consumers need no URL:
+Consumers then call:
 
 ```js
 const characters = await teh.loadCharacters();
 ```
 
-The loader stores the supplied URL in `teh.charactersConfigUrl` for subsequent
-calls and administrative links. It sets `window.characters` and returns that
-same object. It reuses loaded data, shares concurrent requests and allows retry
-after failure. Character values must be objects; NPCs may omit `id` and DOB.
-Unknown properties are preserved.
-
-Character config must be a `.json` file. Its bytes are decoded with
-`TextDecoder("windows-1251")` before parsing. Asset URLs have no timestamps.
-
-Character-vault, store, admin-actions and the character editor use core's loader.
-The editor derives its administrative file from `teh.charactersConfigUrl` and
-saves/exports plain JSON. Admin-actions shares that form and adds application
-prefill and verified config-only saves for regular characters and NPCs; see
-[scripts/admin-actions/README.md](scripts/admin-actions/README.md) for initialization
-and recovery.
+The config must be Windows-1251 JSON. The loader remembers the URL in
+`teh.charactersConfigUrl` and returns `window.characters`. Character values are
+objects; NPCs may omit `id` and DOB.
