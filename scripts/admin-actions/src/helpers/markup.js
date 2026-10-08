@@ -352,7 +352,7 @@ export const getConfigFormMarkup = () =>
           aria-live="polite"
         ></ol>
         <div
-          class="char-accept__controls sticky-bottom shrink-0 flex flex-col gap-sm"
+          class="char-accept__controls sticky--bottom shrink-0 flex flex-col gap-sm"
         >
           <p
             class="char-accept__status"
