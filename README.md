@@ -4,6 +4,8 @@ Browser scripts for mybb/rusff, built as IIFEs in `dist/`.
 
 Scripts live in `scripts/<script-name>`, shared helpers in `lib/utils`, and
 build tools in `tooling`. Development conventions are in [AGENTS.md](AGENTS.md).
+The store and character forms share profile-picker markup through
+[`@teh/utils`](lib/utils/README.md#profile-pickers).
 
 ## Commands
 

@@ -1,6 +1,7 @@
 "use strict";
 
 import { storeMarkup } from "../helpers/markup";
+import { getProfilePickerOptionsMarkup } from "@teh/utils";
 
 /**
  * @typedef {object} StoreProfile
@@ -86,7 +87,7 @@ const store = () => {
   const clearButton = store.querySelector("[data-store-clear]");
   const cartStatus = store.querySelector("[data-store-cart-status]");
   const profileSelectors = /** @type {NodeListOf<HTMLFieldSetElement>} */ (
-    store.querySelectorAll("[data-store-profile-selector]")
+    store.querySelectorAll("[data-profile-picker]")
   );
 
   if (
@@ -129,8 +130,8 @@ const store = () => {
   /** @param {string} message */
   const setProfileSelectorStatus = (message) => {
     profileSelectors?.forEach((selector) => {
-      const status = selector.querySelector("[data-store-profile-status]");
-      const value = selector.querySelector("[data-store-profile-value]");
+      const status = selector.querySelector("[data-profile-picker-status]");
+      const value = selector.querySelector("[data-profile-picker-value]");
       if (status) {
         status.textContent = message;
       }
@@ -159,12 +160,12 @@ const store = () => {
    * @param {string} profile
    */
   const updateProfileSelector = (selector, profile) => {
-    const value = selector.querySelector("[data-store-profile-value]");
+    const value = selector.querySelector("[data-profile-picker-value]");
     if (value) {
       value.textContent = profile;
     }
 
-    if (selector.dataset.storeProfileSelector === "recipient") {
+    if (selector.dataset.profilePicker === "recipient") {
       updateRecipientProfile(profile);
       return;
     }
@@ -193,23 +194,19 @@ const store = () => {
     currentMainProfile = defaultProfile;
 
     profileSelectors?.forEach((selector) => {
-      const type = selector.dataset.storeProfileSelector;
-      const options = selector.querySelector("[data-store-profile-options]");
-      const status = selector.querySelector("[data-store-profile-status]");
-      const value = selector.querySelector("[data-store-profile-value]");
+      const type = selector.dataset.profilePicker;
+      const options = selector.querySelector("[data-profile-picker-options]");
+      const status = selector.querySelector("[data-profile-picker-status]");
+      const value = selector.querySelector("[data-profile-picker-value]");
       if (!type || !options) {
         return;
       }
 
-      options.innerHTML = profiles
-        .map((profile) => {
-          return `<label class="picker__option flex items-center justify-between gap-sm">
-            <input class="picker__radio sr-only" data-store-profile-option type="radio" name="store-${type}-profile" value="${escapeHtml(profile)}"${profile === defaultProfile ? " checked" : ""}>
-            <span>${escapeHtml(profile)}</span>
-            <i class="material-symbols-sharp picker__check" aria-hidden="true">check</i>
-          </label>`;
-        })
-        .join("");
+      options.innerHTML = getProfilePickerOptionsMarkup(
+        profiles,
+        `store-${type}-profile`,
+        defaultProfile
+      );
       status?.remove();
       selector.disabled = false;
       if (defaultProfile) {
@@ -935,9 +932,9 @@ const store = () => {
     recipientProfile = defaultProfile ? `@${defaultProfile}` : "";
     payerProfile = defaultProfile ? `@${defaultProfile}` : "";
     profileSelectors?.forEach((selector) => {
-      const value = selector.querySelector("[data-store-profile-value]");
+      const value = selector.querySelector("[data-profile-picker-value]");
       const options = /** @type {NodeListOf<HTMLInputElement>} */ (
-        selector.querySelectorAll("[data-store-profile-option]")
+        selector.querySelectorAll("[data-profile-picker-option]")
       );
       options.forEach((option) => {
         option.checked = option.value === defaultProfile;
@@ -1125,11 +1122,11 @@ const store = () => {
       return;
     }
 
-    if (!input.matches("[data-store-profile-option]")) {
+    if (!input.matches("[data-profile-picker-option]")) {
       return;
     }
 
-    const selector = input.closest("[data-store-profile-selector]");
+    const selector = input.closest("[data-profile-picker]");
     if (!(selector instanceof HTMLFieldSetElement)) {
       return;
     }

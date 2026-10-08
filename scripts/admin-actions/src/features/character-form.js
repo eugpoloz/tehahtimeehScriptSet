@@ -1,4 +1,4 @@
-import { getMainProfileOptionsMarkup } from "../helpers/markup";
+import { getProfilePickerOptionsMarkup } from "@teh/utils";
 import { parsePositiveId } from "../helpers/character-data";
 
 /** @typedef {Record<string, unknown>} Character */
@@ -83,7 +83,22 @@ export const initCharacterForm = (form, options = {}) => {
   const affiliations = element("char-form-aff");
   const mainOptional = element("char-form-main-optional");
   const mainBody = element("char-form-main-body");
-  const mainList = element("char-form-main-list");
+  const mainPicker = /** @type {HTMLFieldSetElement} */ (
+    mainBody.querySelector("[data-profile-picker]")
+  );
+  const mainTrigger = /** @type {HTMLButtonElement} */ (
+    mainPicker.querySelector("[data-profile-picker-trigger]")
+  );
+  const mainValue = /** @type {HTMLElement} */ (
+    mainPicker.querySelector("[data-profile-picker-value]")
+  );
+  const mainOptions = /** @type {HTMLElement} */ (
+    mainPicker.querySelector("[data-profile-picker-options]")
+  );
+  const mainStatus = /** @type {HTMLElement} */ (
+    mainPicker.querySelector("[data-profile-picker-status]")
+  );
+  const mainMenu = element("char-form-main-picker-popover");
   const idField = element("char-form-id-field");
   const anketaHint = element("char-form-anketa-hint");
   const magicianLabel = element("char-form-magician-label");
@@ -150,6 +165,7 @@ export const initCharacterForm = (form, options = {}) => {
       field.removeAttribute("aria-invalid");
       field.closest(".char-form__field")?.classList.remove("invalid");
     }
+    mainTrigger.removeAttribute("aria-invalid");
 
     showStatus("");
   };
@@ -157,7 +173,12 @@ export const initCharacterForm = (form, options = {}) => {
   const fieldError = (field, message) => {
     field.setAttribute("aria-invalid", "true");
     field.closest(".char-form__field")?.classList.add("invalid");
-    field.focus();
+    if (field === fields.main) {
+      mainTrigger.setAttribute("aria-invalid", "true");
+      mainTrigger.focus();
+    } else {
+      field.focus();
+    }
     showStatus(message);
     throw new Error(message);
   };
@@ -173,7 +194,14 @@ export const initCharacterForm = (form, options = {}) => {
       )
       .map(([name]) => name)
       .sort((a, b) => a.localeCompare(b));
-    mainList.innerHTML = getMainProfileOptionsMarkup(names);
+    mainOptions.innerHTML = getProfilePickerOptionsMarkup(
+      names,
+      "char-form-main-profile",
+      fields.main.value
+    );
+    mainValue.textContent = fields.main.value || "Выберите профиль";
+    mainStatus.textContent = "Главные профили не найдены";
+    mainStatus.hidden = names.length > 0;
   };
   const updateMain = () => {
     const expanded = !npc.checked && !isMain.checked;
@@ -181,8 +209,12 @@ export const initCharacterForm = (form, options = {}) => {
     mainBody.hidden = !expanded;
     isMain.setAttribute("aria-expanded", String(expanded));
     fields.main.disabled = !expanded;
+    mainPicker.disabled = !expanded;
     if (!expanded) {
       fields.main.value = "";
+      if (mainMenu.matches(":popover-open")) {
+        mainMenu.hidePopover();
+      }
     }
   };
   const updateLinks = () => {
@@ -393,12 +425,22 @@ export const initCharacterForm = (form, options = {}) => {
     updateMain();
     if (!fields.main.disabled) {
       refreshMainProfiles();
-      fields.main.focus();
+      mainTrigger.focus();
     }
   });
   npc.addEventListener("change", updateNpc);
   genderFemale.addEventListener("change", updateGender);
-  fields.main.addEventListener("focus", refreshMainProfiles);
+  mainTrigger.addEventListener("click", refreshMainProfiles);
+  mainOptions.addEventListener("change", (event) => {
+    const choice = event.target;
+    if (!(choice instanceof HTMLInputElement) || !choice.checked) {
+      return;
+    }
+
+    fields.main.value = choice.value;
+    mainValue.textContent = choice.value;
+    mainMenu.hidePopover();
+  });
   fields.name.addEventListener("input", refreshMainProfiles);
   magic.addEventListener("change", (event) => {
     const target = event.target;
@@ -431,7 +473,7 @@ export const initCharacterForm = (form, options = {}) => {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (submitting || form.querySelector("fieldset:disabled")) {
+    if (submitting || fieldset.matches(":disabled")) {
       return;
     }
 

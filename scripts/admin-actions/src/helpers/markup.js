@@ -1,3 +1,5 @@
+import { getProfilePickerMarkup } from "@teh/utils";
+
 /** @param {string} [collectionMarkup] @returns {string} */
 const getCharacterFieldsMarkup = (collectionMarkup = "") =>
   /* HTML */ `<fieldset class="char-form__fields" id="char-form-fields">
@@ -161,16 +163,14 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
           >
         </label>
       </div>
-      <div class="char-form__main-profile" id="char-form-main-body">
-        <input
-          type="text"
-          class="char-form__input w-full"
-          id="char-form-main"
-          list="char-form-main-list"
-          placeholder="Laurent Ambrose"
-          aria-label="Имя основного профиля"
-        />
-        <datalist id="char-form-main-list"></datalist>
+      <div class="pickers gap-sm" id="char-form-main-body">
+        <input type="hidden" id="char-form-main" />
+        ${getProfilePickerMarkup({
+          id: "char-form-main-picker",
+          label: "Имя основного профиля",
+          hideLabel: true,
+          disabled: true
+        })}
       </div>
     </div>
     ${collectionMarkup}
@@ -384,16 +384,3 @@ export const getConfigFormMarkup = () =>
         </div>
       </div>
     </dialog>`;
-
-/** @param {string[]} names @returns {string} */
-export const getMainProfileOptionsMarkup = (names) =>
-  names
-    .map((name) => {
-      const value = name
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-      return `<option value="${value}"></option>`;
-    })
-    .join("");

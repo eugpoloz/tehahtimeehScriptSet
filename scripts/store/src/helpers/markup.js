@@ -1,3 +1,5 @@
+import { getProfilePickerMarkup } from "@teh/utils";
+
 /**
  * Returns the store shell with separate CSS classes and JavaScript hooks.
  *
@@ -37,61 +39,23 @@ export const storeMarkup = () => `<section class="store relative" data-store>
             <span class="sr-only">Закрыть корзину</span>
           </button>
         </div>
-        <div class="cart__profiles gap-sm">
-          <fieldset class="picker" data-store-profile-selector="recipient" disabled>
-            <legend class="picker__label" id="store-recipient-label">Покупаю для</legend>
-            <button
-              class="button picker__trigger flex items-center justify-between gap-xs w-full"
-              data-store-profile-trigger
-              type="button"
-              popovertarget="store-recipient-popover"
-              aria-haspopup="dialog"
-            >
-              <span class="picker__value" data-store-profile-value>Загрузка...</span>
-              <i class="material-symbols-sharp icon-16 shrink-0" aria-hidden="true">keyboard_arrow_down</i>
-            </button>
-            <div
-              class="picker__menu popover-custom popover-panel popover-panel--rounded"
-              id="store-recipient-popover"
-              popover="auto"
-              role="dialog"
-              aria-labelledby="store-recipient-label"
-            >
-              <div class="picker__body relative w-full">
-                <div class="picker__scroll scrollable w-full">
-                  <p class="picker__status" data-store-profile-status>Загрузка профилей...</p>
-                  <div class="picker__options flex flex-col" data-store-profile-options></div>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="picker" data-store-profile-selector="payer" disabled>
-            <legend class="picker__label" id="store-payer-label">Платит</legend>
-            <button
-              class="button picker__trigger flex items-center justify-between gap-xs w-full"
-              data-store-profile-trigger
-              type="button"
-              popovertarget="store-payer-popover"
-              aria-haspopup="dialog"
-            >
-              <span class="picker__value" data-store-profile-value>Загрузка...</span>
-              <i class="material-symbols-sharp icon-16 shrink-0" aria-hidden="true">keyboard_arrow_down</i>
-            </button>
-            <div
-              class="picker__menu popover-custom popover-panel popover-panel--rounded"
-              id="store-payer-popover"
-              popover="auto"
-              role="dialog"
-              aria-labelledby="store-payer-label"
-            >
-              <div class="picker__body relative w-full">
-                <div class="picker__scroll scrollable w-full">
-                  <p class="picker__status" data-store-profile-status>Загрузка профилей...</p>
-                  <div class="picker__options flex flex-col" data-store-profile-options></div>
-                </div>
-              </div>
-            </div>
-          </fieldset>
+        <div class="pickers gap-sm">
+          ${getProfilePickerMarkup({
+            id: "store-recipient",
+            key: "recipient",
+            label: "Покупаю для",
+            value: "Загрузка...",
+            status: "Загрузка профилей...",
+            disabled: true
+          })}
+          ${getProfilePickerMarkup({
+            id: "store-payer",
+            key: "payer",
+            label: "Платит",
+            value: "Загрузка...",
+            status: "Загрузка профилей...",
+            disabled: true
+          })}
         </div>
       </div>
       <div class="cart__scroll relative flex flex-col flex-1 w-full">
