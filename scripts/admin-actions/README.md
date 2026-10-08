@@ -19,8 +19,9 @@ styles live in `hehedges-backups/styles/style_cs.css`.
 ## Acceptance
 
 Group-1 administrators with verified admin access get «Принять» in the application
-forum and «Добавить NPC» on NPC posts except the opening post. Review the
-prefilled fields before saving; drafts survive closing the dialog.
+forum's moderation menu container and «Добавить NPC» on NPC posts except the
+opening post. Review the prefilled form, then press «Принять» to open the progress
+overlay. Parsing errors appear in red; drafts survive closing the dialog.
 
 Regular acceptance saves the config, prepares the collection, assigns the group,
 updates the profile, posts the acceptance letter, and moves the topic without a
@@ -30,9 +31,11 @@ Regular characters require a profile ID, DOB, and the source topic ID; in-game a
 uses `GAME_LATEST_DATE`. NPCs need no profile ID or DOB. Their application link is
 optional, but must match the selected post when supplied.
 
-Review the collection address for main profiles: 1–48 letters, digits, hyphens,
-or underscores. Occupied pages are never overwritten with starter content.
-Twins use the main profile's collection and receive one icon and one plaque coupon.
+The collection address appears below the profile and application links and is
+hidden only when NPC is checked. Review it for main profiles: 1–48 letters,
+digits, hyphens, or underscores. Occupied pages are never overwritten with starter
+content. Twins use the main profile's collection and receive one icon and one
+plaque coupon.
 
 ## Recovery
 
