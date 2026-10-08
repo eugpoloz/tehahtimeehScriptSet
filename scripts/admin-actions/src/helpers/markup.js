@@ -306,26 +306,34 @@ export const getConfigFormMarkup = () =>
               </label>
             </div>`
           )}
-          <footer
-            class="char-form__footer sticky--bottom shrink-0 flex flex-col gap-sm col-span-full"
-          >
-            <p
-              class="char-form__status char-accept__status char-accept__status--error"
-              id="char-form-status"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            ></p>
-            <div class="char-form__actions flex justify-end gap-xs">
-              <button type="reset" class="button" id="char-form-reset" disabled>
-                Сбросить изменения
-              </button>
-              <button type="submit" class="button button--primary">
-                Добавить в конфиг
-              </button>
-            </div>
-          </footer>
+          <p
+            class="char-form__status char-accept__status char-accept__status--error col-span-full"
+            id="char-form-status"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          ></p>
         </form>
+        <footer class="char-form__footer sticky--bottom shrink-0">
+          <div class="char-form__actions flex justify-end gap-xs">
+            <button
+              type="reset"
+              form="char-form"
+              class="button"
+              id="char-form-reset"
+              disabled
+            >
+              Сбросить изменения
+            </button>
+            <button
+              type="submit"
+              form="char-form"
+              class="button button--primary"
+            >
+              Добавить в конфиг
+            </button>
+          </div>
+        </footer>
       </div>
     </dialog>
     <dialog
