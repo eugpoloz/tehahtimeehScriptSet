@@ -62,6 +62,9 @@ const characterForm = teh.initCharacterForm(form, {
 characterForm.fill(name, existingCharacter);
 ```
 
+Unchecking «Основной профиль» reveals the same profile popover used by the store.
+Its choices exclude the edited character and include only regular main profiles.
+
 Supply a `<form autocomplete="off" novalidate>` and action buttons. An optional
 `#char-form-reset` button resets values; `[role="status"]` displays errors.
 Use one character form per page because field IDs are fixed.
