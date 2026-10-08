@@ -66,7 +66,7 @@ const createCharacterAcceptance = async (config) => {
     dialog.querySelector("#anfc-errors")
   );
   const save = /** @type {HTMLButtonElement} */ (
-    form.querySelector('button[type="submit"]')
+    dialog.querySelector('button[type="submit"]')
   );
   const letterReview = /** @type {HTMLElement} */ (
     progressDialog.querySelector("#anfc-letter-review")
@@ -81,7 +81,7 @@ const createCharacterAcceptance = async (config) => {
     form.querySelector("fieldset")
   );
   const reset = /** @type {HTMLButtonElement} */ (
-    form.querySelector("#char-form-reset")
+    form.elements.namedItem("char-form-reset")
   );
   const collectionField = /** @type {HTMLElement} */ (
     form.querySelector("#anfc-collection")

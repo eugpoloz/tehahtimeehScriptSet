@@ -113,7 +113,7 @@ export const initCharacterForm = (form, options = {}) => {
   }
 
   const status = form.querySelector('[role="status"]');
-  const resetButton = form.querySelector("#char-form-reset");
+  const resetButton = form.elements.namedItem("char-form-reset");
   let originalName = "";
   /** @type {Character} */
   let originalCharacter = {};

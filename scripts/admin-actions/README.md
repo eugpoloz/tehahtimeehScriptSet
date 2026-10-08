@@ -67,6 +67,8 @@ Its choices exclude the edited character and include only regular main profiles.
 
 Supply a `<form autocomplete="off" novalidate>` and action buttons. An optional
 `#char-form-reset` button resets values; `[role="status"]` displays errors.
+Action buttons can sit outside the form using a matching `form` attribute;
+acceptance and the character editor place their sticky footer beside the form.
 Use one character form per page because field IDs are fixed.
 
 | Method                               | Purpose                                                                                                                 |
