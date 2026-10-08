@@ -100,7 +100,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
           <ol class="cart__list" data-store-cart-list hidden></ol>
         </div>
       </div>
-      <div class="cart__footer items-center gap-sm shrink-0">
+      <div class="cart__footer sticky--bottom items-center gap-sm shrink-0">
         <p class="cart__total flex items-center gap-xs" data-store-cart-total hidden></p>
         <div class="cart__actions cart__actions--footer flex justify-center gap-sm">
           <div>
