@@ -24,6 +24,7 @@ import { escapeHtml } from "@teh/utils";
  * @property {AcceptanceSource} source
  * @property {CharacterFormValues} initialValues
  * @property {string[]} notes
+ * @property {string[]} errors
  * @property {AcceptanceStep[]} steps
  * @property {AcceptanceJournal | null} journal
  * @property {CharacterFormDraft} [draft]
@@ -45,6 +46,9 @@ const createCharacterAcceptance = async (config) => {
   const dialog = /** @type {HTMLDialogElement} */ (
     container.querySelector("#accept-new-full-character-dialog")
   );
+  const progressDialog = /** @type {HTMLDialogElement} */ (
+    container.querySelector("#anfc-progress-dialog")
+  );
   const form = /** @type {HTMLFormElement} */ (dialog.querySelector("form"));
   const heading = /** @type {HTMLElement} */ (
     dialog.querySelector("#anfc-dialog-title")
@@ -53,25 +57,25 @@ const createCharacterAcceptance = async (config) => {
     dialog.querySelector("#anfc-notes")
   );
   const progress = /** @type {HTMLOListElement} */ (
-    dialog.querySelector("#anfc-progress")
+    progressDialog.querySelector("#anfc-progress")
   );
   const status = /** @type {HTMLElement} */ (
-    form.querySelector("#char-form-status")
+    progressDialog.querySelector("#anfc-progress-status")
   );
-  const overlay = /** @type {HTMLElement} */ (
-    form.querySelector("#anfc-save-overlay")
+  const errors = /** @type {HTMLElement} */ (
+    dialog.querySelector("#anfc-errors")
   );
   const save = /** @type {HTMLButtonElement} */ (
     form.querySelector('button[type="submit"]')
   );
   const letterReview = /** @type {HTMLElement} */ (
-    dialog.querySelector("#anfc-letter-review")
+    progressDialog.querySelector("#anfc-letter-review")
   );
   const letterResend = /** @type {HTMLInputElement} */ (
-    dialog.querySelector("#anfc-letter-resend")
+    progressDialog.querySelector("#anfc-letter-resend")
   );
   const retry = /** @type {HTMLButtonElement} */ (
-    dialog.querySelector("#anfc-retry")
+    progressDialog.querySelector("#anfc-retry")
   );
   const fields = /** @type {HTMLFieldSetElement} */ (
     form.querySelector("fieldset")
@@ -79,16 +83,16 @@ const createCharacterAcceptance = async (config) => {
   const reset = /** @type {HTMLButtonElement} */ (
     form.querySelector("#char-form-reset")
   );
-  const closeButton = /** @type {HTMLButtonElement} */ (
-    dialog.querySelector("[data-close-acceptance]")
-  );
   const collectionField = /** @type {HTMLElement} */ (
     form.querySelector("#anfc-collection")
   );
   const addressInput = /** @type {HTMLInputElement} */ (
     form.querySelector("#anfc-address")
   );
-  const buttons = [...dialog.querySelectorAll("button")];
+  const buttons = [
+    ...dialog.querySelectorAll("button"),
+    ...progressDialog.querySelectorAll("button")
+  ];
 
   const iframe = createIframe();
   /** @type {Map<string, ApplicationState>} */
@@ -105,7 +109,7 @@ const createCharacterAcceptance = async (config) => {
       active?.journal?.configState === "complete";
     fields.disabled = frozen;
     form.setAttribute("aria-busy", String(busy));
-    overlay.hidden = !busy;
+    progressDialog.setAttribute("aria-busy", String(busy));
     for (const button of buttons) {
       button.disabled = busy;
     }
@@ -128,7 +132,7 @@ const createCharacterAcceptance = async (config) => {
     }
 
     const draft = characterForm.getDraft();
-    collectionField.hidden = active.source.mode === "npc" || !draft.isMain;
+    collectionField.hidden = draft.npc;
     if (active.addressDraft === undefined) {
       addressInput.value =
         active.journal?.input.collectionAddress ??
@@ -190,7 +194,12 @@ const createCharacterAcceptance = async (config) => {
     }
 
     const application = active;
+    renderProgress();
+    if (!progressDialog.open) {
+      progressDialog.showModal();
+    }
     busy = true;
+    status.classList.remove("char-accept__status--error");
     status.textContent = "Добавление персонажа в конфиг…";
     updateControls();
     try {
@@ -229,6 +238,7 @@ const createCharacterAcceptance = async (config) => {
           ? "NPC внесён в конфиг. Сохранение подтверждено."
           : "Персонаж принят. Конфиг, личная страница, профиль и письмо проверены; анкета перенесена в принятые.";
     } catch (error) {
+      status.classList.add("char-accept__status--error");
       status.textContent =
         error instanceof Error
           ? error.message
@@ -264,6 +274,7 @@ const createCharacterAcceptance = async (config) => {
         }
         void execute(reviewAddress(active.journal.input));
       } catch (error) {
+        status.classList.add("char-accept__status--error");
         status.textContent =
           error instanceof Error
             ? error.message
@@ -286,26 +297,33 @@ const createCharacterAcceptance = async (config) => {
   });
   const close = () => {
     if (!busy) {
+      progressDialog.close();
       dialog.close();
     }
   };
-  closeButton.addEventListener("click", close);
-  dialog.addEventListener("cancel", (event) => {
-    event.preventDefault();
-    close();
-  });
-  dialog.addEventListener("click", (event) => {
-    const bounds = dialog.getBoundingClientRect();
-    if (
-      event.target === dialog &&
-      (event.clientX < bounds.left ||
-        event.clientX > bounds.right ||
-        event.clientY < bounds.top ||
-        event.clientY > bounds.bottom)
-    ) {
-      close();
+  for (const button of buttons) {
+    if (button.hasAttribute("data-close-acceptance")) {
+      button.addEventListener("click", close);
     }
-  });
+  }
+  for (const modal of [dialog, progressDialog]) {
+    modal.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      close();
+    });
+    modal.addEventListener("click", (event) => {
+      const bounds = modal.getBoundingClientRect();
+      if (
+        event.target === modal &&
+        (event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom)
+      ) {
+        close();
+      }
+    });
+  }
 
   /** @param {Element} post @param {AcceptanceSource} source @param {AcceptanceStep[]} steps @param {() => void} [onVerified] */
   const open = (post, source, steps, onVerified) => {
@@ -322,6 +340,7 @@ const createCharacterAcceptance = async (config) => {
         source,
         initialValues: extracted.values,
         notes: extracted.notes,
+        errors: extracted.errors,
         steps,
         onVerified,
         journal,
@@ -337,7 +356,7 @@ const createCharacterAcceptance = async (config) => {
     }
     active = application;
     letterResend.checked = false;
-    dialog
+    progressDialog
       .querySelector("#anfc-letter-link")
       ?.setAttribute("href", `/viewtopic.php?id=${source.topicId}`);
     const draft = application.draft;
@@ -360,10 +379,20 @@ const createCharacterAcceptance = async (config) => {
       retry.textContent = "Проверить сохранение";
     } else {
       heading.textContent = "Принятие персонажа";
-      save.textContent = "Начать принятие";
+      save.textContent = "Принять";
       retry.textContent = "Продолжить принятие";
     }
+    const progressHeading = progressDialog.querySelector(
+      "#anfc-progress-title"
+    );
+    if (progressHeading) {
+      progressHeading.textContent = heading.textContent;
+    }
+    errors.textContent = application.errors.join(" ");
+    errors.hidden = application.errors.length === 0;
     notes.textContent = application.notes.join(" ");
+    status.textContent = "";
+    status.classList.remove("char-accept__status--error");
     if (source.mode === "regular") {
       notes.textContent +=
         " Конфиг, личная страница, профиль, письмо и перенос анкеты выполняются по порядку.";
@@ -379,6 +408,12 @@ const createCharacterAcceptance = async (config) => {
     dialog.showModal();
     updateControls();
     characterForm.focus();
+    if (
+      application.journal?.configState === "pending" ||
+      application.journal?.configState === "complete"
+    ) {
+      progressDialog.showModal();
+    }
   };
   /** @param {number} topicId */
   const openingPost = async (topicId) => {

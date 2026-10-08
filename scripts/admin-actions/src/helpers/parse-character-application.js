@@ -24,7 +24,7 @@ const linesFrom = (element) => {
     .filter(Boolean);
 };
 
-/** Extract only the card heading, intro and FC, never narrative biography. @param {Element} post @param {AcceptanceSource} source @returns {{values: CharacterFormValues, notes: string[]}} */
+/** Extract only the card heading, intro and FC, never narrative biography. @param {Element} post @param {AcceptanceSource} source @returns {{values: CharacterFormValues, notes: string[], errors: string[]}} */
 export const parseCharacterApplication = (post, source) => {
   const npc = source.mode === "npc";
   /** @type {import('../features/character-form').Character} */
@@ -35,9 +35,10 @@ export const parseCharacterApplication = (post, source) => {
   };
   const notes = [
     npc
-      ? "Проверьте пол, принадлежность и проклятие."
-      : "Проверьте основной профиль, пол, принадлежность и проклятие."
+      ? "Проверьте гендер, принадлежность и проклятие."
+      : "Проверьте основной профиль, гендер, принадлежность и проклятие."
   ];
+  const errors = [];
   let name = "";
   if (!npc) {
     name =
@@ -58,10 +59,10 @@ export const parseCharacterApplication = (post, source) => {
 
   const cards = post.querySelectorAll(".post-content .hehe-charcard");
   if (cards.length !== 1) {
-    notes.push(
+    errors.push(
       "Не удалось выбрать карточку персонажа. Заполните поля вручную."
     );
-    return { values: { name, character }, notes };
+    return { values: { name, character }, notes, errors };
   }
 
   const card = cards[0];
@@ -109,12 +110,12 @@ export const parseCharacterApplication = (post, source) => {
     if (natures.length <= 1) {
       who.push(...natures.map((term) => term.value));
     } else {
-      notes.push("Указано несколько типов персонажа. Выберите тип вручную.");
+      errors.push("Указано несколько типов персонажа. Выберите тип вручную.");
     }
     if (magic.length <= 1) {
       who.push(...magic.map((term) => term.value));
     } else {
-      notes.push("Указано несколько видов магии. Выберите вид вручную.");
+      errors.push("Указано несколько видов магии. Выберите вид вручную.");
     }
     character.who = who;
     character.desc = lines.slice(statusIndex + 1).join(" ");
@@ -149,8 +150,8 @@ export const parseCharacterApplication = (post, source) => {
     missing.push("кто");
   }
   if (missing.length) {
-    notes.push(`Не удалось распознать: ${missing.join(", ")}.`);
+    errors.push(`Не удалось распознать: ${missing.join(", ")}.`);
   }
 
-  return { values: { name, character }, notes };
+  return { values: { name, character }, notes, errors };
 };
