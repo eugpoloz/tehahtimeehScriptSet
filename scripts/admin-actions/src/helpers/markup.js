@@ -1,5 +1,5 @@
-/** Common character fields; callers supply the form and workflow controls. @returns {string} */
-export const getCharacterFormMarkup = () =>
+/** @param {string} [collectionMarkup] @returns {string} */
+const getCharacterFieldsMarkup = (collectionMarkup = "") =>
   /* HTML */ `<fieldset class="char-form__fields" id="char-form-fields">
     <div class="char-form__flags flex items-center gap-sm col-span-full">
       <label class="char-form__toggle flex items-center gap-sm">
@@ -173,6 +173,7 @@ export const getCharacterFormMarkup = () =>
         <datalist id="char-form-main-list"></datalist>
       </div>
     </div>
+    ${collectionMarkup}
     <div class="char-form__field flex flex-col gap-xs">
       <strong class="char-form__label flex items-center gap-sm">Кто</strong>
       <div class="flex flex-col gap-xs">
@@ -250,65 +251,112 @@ export const getCharacterFormMarkup = () =>
     </div>
   </fieldset>`;
 
+/** Common character fields; callers supply the form and workflow controls. @returns {string} */
+export const getCharacterFormMarkup = () => getCharacterFieldsMarkup();
+
 /** Acceptance dialog around the shared fields. @returns {string} */
 export const getConfigFormMarkup = () =>
   /* HTML */ `<dialog
-    class="char-accept"
-    id="accept-new-full-character-dialog"
-    closedby="any"
-    aria-labelledby="anfc-dialog-title"
-  >
-    <div class="content">
-      <article class="toolbar sticky">
-        <h2 id="anfc-dialog-title">Новый персонаж</h2>
-        <div class="actions">
-          <button type="button" data-close-acceptance class="button-icon">
-            <span class="sr-only">Закрыть</span>
-            <i class="material-symbols-sharp icon-20" aria-hidden="true"
-              >close</i
-            >
-          </button>
-        </div>
-      </article>
-      <p class="char-accept__notes" id="anfc-notes"></p>
-      <ol
-        class="char-accept__progress"
-        id="anfc-progress"
-        aria-live="polite"
-      ></ol>
-      <form
-        class="char-form grid-col-4 relative"
-        id="char-form"
-        autocomplete="off"
-        novalidate
-      >
-        ${getCharacterFormMarkup()}
-        <div
-          class="char-form__field flex flex-col gap-xs col-span-full"
-          id="anfc-collection"
+      class="char-accept"
+      id="accept-new-full-character-dialog"
+      closedby="any"
+      aria-labelledby="anfc-dialog-title"
+    >
+      <div class="content">
+        <article class="toolbar sticky">
+          <h2 id="anfc-dialog-title">Новый персонаж</h2>
+          <div class="actions">
+            <button type="button" data-close-acceptance class="button-icon">
+              <span class="sr-only">Закрыть</span>
+              <i class="material-symbols-sharp icon-20" aria-hidden="true"
+                >close</i
+              >
+            </button>
+          </div>
+        </article>
+        <p class="char-accept__notes" id="anfc-notes"></p>
+        <p class="char-accept__errors" id="anfc-errors" role="alert" hidden></p>
+        <form
+          class="char-form grid-col-4 relative"
+          id="char-form"
+          autocomplete="off"
+          novalidate
         >
-          <label
-            class="char-form__control flex flex-col gap-xs"
-            for="anfc-address"
-          >
-            <strong class="char-form__label">Адрес личной страницы</strong>
-            <input
-              type="text"
-              class="char-form__input w-full"
-              id="anfc-address"
-              maxlength="48"
-              aria-describedby="anfc-address-hint"
-            />
-            <small class="char-form__hint" id="anfc-address-hint"
-              >После /pages/: латиница, цифры, дефис и подчёркивание, до 48
-              символов.</small
+          ${getCharacterFieldsMarkup(
+            /* HTML */ `<div
+              class="char-form__field flex flex-col gap-xs col-span-full"
+              id="anfc-collection"
             >
-          </label>
-        </div>
-        <footer class="char-form__footer flex flex-col gap-sm col-span-full">
+              <label
+                class="char-form__control flex flex-col gap-xs"
+                for="anfc-address"
+              >
+                <strong class="char-form__label">Адрес личной страницы</strong>
+                <input
+                  type="text"
+                  class="char-form__input w-full"
+                  id="anfc-address"
+                  maxlength="48"
+                  aria-describedby="anfc-address-hint"
+                />
+                <small class="char-form__hint" id="anfc-address-hint"
+                  >После /pages/: латиница, цифры, дефис и подчёркивание, до 48
+                  символов.</small
+                >
+              </label>
+            </div>`
+          )}
+          <footer
+            class="char-form__footer sticky--bottom shrink-0 flex flex-col gap-sm col-span-full"
+          >
+            <p
+              class="char-form__status char-accept__status char-accept__status--error"
+              id="char-form-status"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            ></p>
+            <div class="char-form__actions flex justify-end gap-xs">
+              <button type="reset" class="button" id="char-form-reset" disabled>
+                Сбросить изменения
+              </button>
+              <button type="submit" class="button button--primary">
+                Добавить в конфиг
+              </button>
+            </div>
+          </footer>
+        </form>
+      </div>
+    </dialog>
+    <dialog
+      class="char-accept char-accept--progress"
+      id="anfc-progress-dialog"
+      closedby="any"
+      aria-labelledby="anfc-progress-title"
+    >
+      <div class="content">
+        <article class="toolbar sticky">
+          <h2 id="anfc-progress-title">Принятие персонажа</h2>
+          <div class="actions">
+            <button type="button" data-close-acceptance class="button-icon">
+              <span class="sr-only">Закрыть</span>
+              <i class="material-symbols-sharp icon-20" aria-hidden="true"
+                >close</i
+              >
+            </button>
+          </div>
+        </article>
+        <ol
+          class="char-accept__progress"
+          id="anfc-progress"
+          aria-live="polite"
+        ></ol>
+        <div
+          class="char-accept__controls sticky-bottom shrink-0 flex flex-col gap-sm"
+        >
           <p
-            class="char-form__status char-accept__status"
-            id="char-form-status"
+            class="char-accept__status"
+            id="anfc-progress-status"
             role="status"
             aria-live="polite"
             aria-atomic="true"
@@ -326,26 +374,16 @@ export const getConfigFormMarkup = () =>
             >
           </label>
           <div class="char-form__actions flex justify-end gap-xs">
-            <button type="reset" class="button" id="char-form-reset" disabled>
-              Сбросить изменения
-            </button>
             <button type="button" class="button" id="anfc-retry" hidden>
               Проверить сохранение
             </button>
-            <button type="submit" class="button button--primary">
-              Добавить в конфиг
+            <button type="button" class="button" data-close-acceptance>
+              Закрыть
             </button>
           </div>
-        </footer>
-        <div
-          class="char-form__loader busy loading items-center absolute"
-          id="anfc-save-overlay"
-          aria-hidden="true"
-          hidden
-        ></div>
-      </form>
-    </div>
-  </dialog>`;
+        </div>
+      </div>
+    </dialog>`;
 
 /** @param {string[]} names @returns {string} */
 export const getMainProfileOptionsMarkup = (names) =>

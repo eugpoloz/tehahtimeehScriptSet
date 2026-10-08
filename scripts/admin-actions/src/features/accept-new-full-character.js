@@ -101,15 +101,18 @@ const acceptNewFullCharacter = async (config) => {
       return;
     }
 
-    const menu = document.querySelector("#topic-modmenu");
+    const menu = document.querySelector("#topic-modmenu .container");
     if (!menu || menu.querySelector("#accept-new-full-character")) {
       return;
     }
 
-    menu.insertAdjacentHTML(
-      "beforeend",
-      `<button type="button" id="accept-new-full-character" class="button button--primary button--wide">${isApplication ? "Принять" : "Проверить принятие"}</button>`
-    );
+    const markup = `<button type="button" id="accept-new-full-character" class="button button--primary button--wide">${isApplication ? "Принять" : "Проверить принятие"}</button>`;
+    const firstElement = menu.firstElementChild;
+    if (firstElement) {
+      firstElement.insertAdjacentHTML("afterend", markup);
+    } else {
+      menu.insertAdjacentHTML("beforeend", markup);
+    }
     const button = /** @type {HTMLButtonElement} */ (
       menu.querySelector("#accept-new-full-character")
     );
@@ -145,7 +148,7 @@ const acceptNewFullCharacter = async (config) => {
           },
           {
             id: "letter",
-            title: "Публикация письма о принятии",
+            title: "Публикация сообщения о принятии",
             run: postAcceptanceLetter
           },
           {
@@ -167,7 +170,7 @@ const acceptNewFullCharacter = async (config) => {
         ? error.message
         : "Не удалось загрузить данные для принятия персонажа.";
     document
-      .querySelector("#topic-modmenu")
+      .querySelector("#topic-modmenu .container")
       ?.insertAdjacentHTML(
         "beforeend",
         `<p role="alert">${escapeHtml(message)}</p>`
