@@ -11,3 +11,6 @@ Each catalog icon or plashka can appear in the cart once. Clicking its button
 again removes it; other products can be added repeatedly.
 
 Styles: `hehedges-backups/styles/style_cs.css`.
+
+Profile selectors use the shared picker markup in `@teh/utils`, also used by the
+character form.
