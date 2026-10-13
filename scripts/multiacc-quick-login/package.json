@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "@teh/utils": "workspace:*",
-    "idb": "^8.0.3"
+    "idb": "^8.0.4"
   }
 }
