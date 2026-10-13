@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "@teh/utils": "workspace:*",
-    "interestfor": "^1.0.8"
+    "interestfor": "^1.0.10"
   }
 }

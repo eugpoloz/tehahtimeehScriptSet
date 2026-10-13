@@ -9,6 +9,10 @@ The store and character forms share profile-picker markup through
 
 ## Commands
 
+Use Node.js 22.x starting at 22.22.2, 24.x starting at 24.15.0, or 26+ for
+the current build dependencies. Enable Corepack to use the Yarn version pinned
+in `package.json`.
+
 ```bash
 make install                 # install dependencies
 make build                   # build every script
