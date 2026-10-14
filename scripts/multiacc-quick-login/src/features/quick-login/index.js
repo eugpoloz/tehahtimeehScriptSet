@@ -43,18 +43,14 @@ const multiaccQuickLogin = () => {
   const lang = getLang();
   const link = { en: "Re-login", ru: "Перезайти" }[lang] ?? "Перезайти";
 
-  const html = `<div id="teh-multiacc-quick-login" class="teh-quicklogin" data-multiacc-open="false">
-    <div class="container">
-      <div class="teh-quicklogin__panel" data-multiacc-wrapper>
-          <h3 class="teh-quicklogin__title">Быстрый вход</h3>
-          <section id="multiacc-form" class="teh-quicklogin__layout">
-            ${getQuickLoginFormHTML()}
-            <article class="relative teh-quicklogin__accounts">
-              <div id="multiacc-list" class="scrollable">${MULTIACC_LIST_LOCAL_HTML}</div>
-            </article>
-          </section>
-      </div>
-    </div>
+  const html = `<div id="teh-multiacc-quick-login" class="teh-quicklogin popover-custom popover-panel popover-panel--rounded" popover="auto" role="dialog" aria-labelledby="teh-quicklogin-title">
+    <h3 id="teh-quicklogin-title" class="teh-quicklogin__title">Быстрый вход</h3>
+    <section id="multiacc-form" class="teh-quicklogin__layout relative">
+      ${getQuickLoginFormHTML()}
+      <article class="relative teh-quicklogin__accounts flex flex-col flex-nowrap">
+        <div id="multiacc-list" class="scrollable flex flex-col flex-nowrap">${MULTIACC_LIST_LOCAL_HTML}</div>
+      </article>
+    </section>
   </div>`;
 
   const loginNavlink = document.querySelector("#navlogin a");
@@ -65,51 +61,31 @@ const multiaccQuickLogin = () => {
     return;
   }
 
-  navlinks.insertAdjacentHTML("beforeend", html);
-
   if (loginNavlink) {
-    loginNavlink.setAttribute("href", "javascript:void(0)");
-    loginNavlink.setAttribute("data-multiacc-relogin", "");
+    loginNavlink.insertAdjacentHTML(
+      "beforebegin",
+      `<button class="link teh-quicklogin__trigger" type="button" popovertarget="teh-multiacc-quick-login" aria-haspopup="dialog">${loginNavlink.innerHTML}</button>`
+    );
+    loginNavlink.remove();
   } else if (logoutNavlink) {
-    const quickLoginNavlink = `<li id="navrelogin"><a href="javascript:void(0)" data-multiacc-relogin>${link}</a></li>`;
+    const quickLoginNavlink = `<li id="navrelogin"><button class="link teh-quicklogin__trigger" type="button" popovertarget="teh-multiacc-quick-login" aria-haspopup="dialog">${link}</button></li>`;
     logoutNavlink.insertAdjacentHTML("beforebegin", quickLoginNavlink);
   }
 
-  const reloginLink = document.querySelector("[data-multiacc-relogin]");
-  if (!reloginLink) {
+  const positioningBar = document.getElementById("pun-ulinks") ?? navlinks;
+  positioningBar.classList.add("teh-quicklogin__bar");
+
+  const forumRoot = navlinks.closest(".punbb") ?? document.body;
+  forumRoot.insertAdjacentHTML("beforeend", html);
+
+  const quickForm = document.getElementById("teh-multiacc-quick-login");
+  if (!quickForm) {
     return;
   }
 
-  reloginLink.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const quickForm = document.getElementById("teh-multiacc-quick-login");
-    if (quickForm) {
-      const isOpen = quickForm.dataset.multiaccOpen !== "true";
-      quickForm.dataset.multiaccOpen = String(isOpen);
-      quickForm.classList.toggle("visible", isOpen);
-
-      /** @param {MouseEvent} eClickOutside */
-      const handleClickOutside = (eClickOutside) => {
-        const clickTarget = eClickOutside.target;
-        if (
-          clickTarget instanceof Element &&
-          !clickTarget.closest("[data-multiacc-wrapper]") &&
-          clickTarget !== e.target
-        ) {
-          quickForm.dataset.multiaccOpen = "false";
-          quickForm.classList.remove("visible");
-          document.removeEventListener("click", handleClickOutside, false);
-        }
-      };
-
-      if (isOpen) {
-        await renderMultiaccList();
-
-        document.addEventListener("click", handleClickOutside, false);
-      } else {
-        document.removeEventListener("click", handleClickOutside, false);
-      }
+  quickForm.addEventListener("toggle", async () => {
+    if (quickForm.matches(":popover-open")) {
+      await renderMultiaccList();
     }
   });
 
