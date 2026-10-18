@@ -1,116 +1,111 @@
-import { openDB } from "idb";
-import { handleError } from "@teh/utils";
+import errorMessages from "./error-messages.json";
+
+/** A safe, user-facing error; never include credential data. */
+export class QuickLoginError extends Error {}
+
+/** @returns {boolean} */
+export const isQuickLoginCryptoAvailable = () =>
+  window.location.protocol === "https:" &&
+  !!window.crypto?.subtle &&
+  typeof window.crypto?.getRandomValues === "function";
+
+/** @returns {Promise<CryptoKey>} */
+export const createEncryptionKey = () =>
+  crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 256
+    },
+    false,
+    ["encrypt", "decrypt"]
+  );
 
 /**
- * @param {Uint8Array | ArrayBuffer} buffer
- * @returns {string}
+ * @param {CryptoKey} key
+ * @param {import("./validation").StoredLogin} account
+ * @returns {Promise<import("./validation").EncryptedLogin>}
  */
-const bufferToBase64 = (buffer) =>
-  btoa(String.fromCharCode(...new Uint8Array(buffer)));
+export const encryptLogin = async (key, { login, password }) => {
+  const encoder = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv,
+      additionalData: encoder.encode(JSON.stringify(login)),
+      tagLength: 128
+    },
+    key,
+    encoder.encode(JSON.stringify(password))
+  );
+
+  return {
+    login,
+    iv,
+    ciphertext
+  };
+};
 
 /**
- * @param {string} base64
- * @returns {Uint8Array<ArrayBuffer>}
+ * @param {CryptoKey} key
+ * @param {import("./validation").EncryptedLogin} account
+ * @returns {Promise<string>}
  */
-const base64ToBuffer = (base64) =>
-  Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
-
-const DB_NAME = "tehahtimeehScriptSetDB";
-const STORE_NAME = "keys";
-
-/**
- * @param {string} keyName
- * @returns {Promise<CryptoKey | undefined>}
- */
-export async function getOrCreateKey(keyName) {
-  try {
-    const db = await openDB(DB_NAME, 1, {
-      upgrade(db) {
-        db.createObjectStore(STORE_NAME);
-      }
-    });
-
-    let key = await db.get(STORE_NAME, keyName);
-
-    if (!key) {
-      key = await window.crypto.subtle.generateKey(
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["encrypt", "decrypt"]
-      );
-
-      await db.put(STORE_NAME, key, keyName);
-    }
-
-    return key;
-  } catch (error) {
-    handleError("multiacc-quick-login/crypto/getOrCreateKey", error);
+export const decryptLogin = async (key, { login, iv, ciphertext }) => {
+  const plaintext = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+      additionalData: new TextEncoder().encode(JSON.stringify(login)),
+      tagLength: 128
+    },
+    key,
+    ciphertext
+  );
+  const password = JSON.parse(
+    new TextDecoder("utf-8", {
+      fatal: true
+    }).decode(plaintext)
+  );
+  if (typeof password !== "string") {
+    throw new QuickLoginError(errorMessages.accountsReadFailed);
   }
-}
+
+  return password;
+};
 
 /**
- * @typedef {object} EncryptAndSaveOptions
- * @property {string} encryptionKey
- * @property {string} localStorageKey
- * @property {string} data
+ * Decodes the old bundle without creating or modifying its key or storage.
+ * @param {CryptoKey} key
+ * @param {string} raw
+ * @returns {Promise<unknown>}
  */
-
-/**
- * @param {EncryptAndSaveOptions} options
- * @returns {Promise<void>}
- */
-export async function encryptAndSave({ encryptionKey, localStorageKey, data }) {
-  try {
-    const key = /** @type {CryptoKey} */ (await getOrCreateKey(encryptionKey));
-    const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    const encoded = new TextEncoder().encode(data);
-
-    const ciphertext = await window.crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      key,
-      encoded
-    );
-
-    const bundle = {
-      iv: bufferToBase64(iv),
-      data: bufferToBase64(ciphertext)
-    };
-    localStorage.setItem(localStorageKey, JSON.stringify(bundle));
-  } catch (error) {
-    handleError("multiacc-quick-login/crypto/encryptAndSave", error);
+export const decryptLegacyLogins = async (key, raw) => {
+  const bundle = JSON.parse(raw);
+  if (typeof bundle?.iv !== "string" || typeof bundle?.data !== "string") {
+    throw new QuickLoginError(errorMessages.accountsReadFailed);
   }
-}
 
-/**
- * @typedef {object} DecryptAndLoadOptions
- * @property {string} encryptionKey
- * @property {string} localStorageKey
- */
-
-/**
- * @param {DecryptAndLoadOptions} options
- * @returns {Promise<string | null | undefined>}
- */
-export async function decryptAndLoad({ encryptionKey, localStorageKey }) {
-  try {
-    const bundle = JSON.parse(
-      /** @type {string} */ (localStorage.getItem(localStorageKey))
-    );
-
-    if (!bundle) return null;
-
-    const iv = base64ToBuffer(bundle.iv);
-    const data = base64ToBuffer(bundle.data);
-
-    const key = /** @type {CryptoKey} */ (await getOrCreateKey(encryptionKey));
-    const decrypted = await window.crypto.subtle.decrypt(
-      { name: "AES-GCM", iv },
-      key,
-      data
-    );
-
-    return new TextDecoder().decode(decrypted);
-  } catch (error) {
-    handleError("multiacc-quick-login/crypto/decryptAndLoad", error);
+  const iv = Uint8Array.from(atob(bundle.iv), (char) => char.charCodeAt(0));
+  const ciphertext = Uint8Array.from(atob(bundle.data), (char) =>
+    char.charCodeAt(0)
+  );
+  if (iv.byteLength !== 12 || ciphertext.byteLength < 16) {
+    throw new QuickLoginError(errorMessages.accountsReadFailed);
   }
-}
+
+  const plaintext = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv
+    },
+    key,
+    ciphertext
+  );
+
+  return JSON.parse(
+    new TextDecoder("utf-8", {
+      fatal: true
+    }).decode(plaintext)
+  );
+};

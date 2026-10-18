@@ -1,7 +1,10 @@
-import { handleError } from "@teh/utils";
+import { handleLogs } from "@teh/utils";
 
-/** @returns {Promise<NodeListOf<Element> | undefined>} */
-export const getVIPMultiAccList = async () => {
+/**
+ * @param {boolean} [debug=false]
+ * @returns {Promise<NodeListOf<Element> | undefined>}
+ */
+export const getVIPMultiAccList = async (debug = false) => {
   try {
     const url = `/profile.php?section=multi&id=${window.UserID}`;
 
@@ -10,17 +13,18 @@ export const getVIPMultiAccList = async () => {
       credentials: "include"
     });
 
-    const responseHTML = await profileResponse.arrayBuffer().then((buffer) => {
-      const decoder = new TextDecoder("windows-1251"); // Or 'koi8-r'
-      const text = decoder.decode(buffer);
-      return text;
-    });
+    const buffer = await profileResponse.arrayBuffer();
+    const responseHTML = new TextDecoder("windows-1251").decode(buffer);
 
     const parser = new DOMParser();
     const profile9 = parser.parseFromString(responseHTML, "text/html");
 
     return profile9.querySelectorAll("#profile9 .list li");
-  } catch (e) {
-    handleError("footer/handleQuickLogin", e);
+  } catch {
+    handleLogs({
+      debug,
+      module: "multiacc-quick-login/vipAccounts",
+      message: "Failed to load VIP accounts"
+    });
   }
 };
