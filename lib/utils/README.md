@@ -2,6 +2,14 @@
 
 Shared browser utilities for the forum script workspace.
 
+## Login
+
+`handleLogin({ login, password }, { reload?, debug? })` returns `Promise<boolean>`:
+`true` means this attempt was confirmed for the submitted username; rejected,
+uncertain, and failed attempts return `false`. Successful calls reload the page
+by default. Pass `{ reload: false }` to await other work before reloading.
+Console logging is off by default. Pass `{ debug: true }` to enable it.
+
 ## Profile pickers
 
 `getProfilePickerMarkup({ id, label, key?, value?, status?, disabled?, hideLabel? })`

@@ -1,3 +1,9 @@
+import { escapeHtml } from "@teh/utils";
+
+/** @param {string} labelHTML */
+export const getQuickLoginButtonHTML = (labelHTML) =>
+  `<button class="link teh-quicklogin__trigger" type="button" popovertarget="teh-multiacc-quick-login" aria-haspopup="dialog">${labelHTML}</button>`;
+
 export const getQuickLoginFormHTML = () => {
   const FULL_LOGIN_LINK =
     GroupID === 3 ? `<a href="/login.php">На страницу логина</a>` : "";
@@ -45,15 +51,28 @@ export const MULTIACC_LIST_VIP_HTML = `
 </div>
 `;
 
+export const getQuickLoginPanelHTML = () =>
+  `<div id="teh-multiacc-quick-login" class="teh-quicklogin popover-custom popover-panel popover-panel--rounded" popover="auto" role="dialog" aria-labelledby="teh-quicklogin-title">
+    <h3 id="teh-quicklogin-title" class="teh-quicklogin__title">Быстрый вход</h3>
+    <p class="teh-quicklogin__error" role="alert" data-quicklogin-error hidden></p>
+    <section id="multiacc-form" class="teh-quicklogin__layout relative">
+      ${getQuickLoginFormHTML()}
+      <article class="relative teh-quicklogin__accounts flex flex-col flex-nowrap">
+        <div id="multiacc-list" class="scrollable flex flex-col flex-nowrap">${MULTIACC_LIST_LOCAL_HTML}</div>
+      </article>
+    </section>
+  </div>`;
+
 /** @param {string} login */
 export const getMultiaccItemHTML = (login) => {
+  const escapedLogin = escapeHtml(login);
   let loginHTML = "";
 
   if (login !== window.UserLogin) {
     loginHTML = `<a href="javascript:void(0)" data-multiacc-login>Зайти</a>, `;
   }
 
-  return `<li data-login="${login}">
-    <span>${login}</span> (${loginHTML}<a href="javascript:void(0)" data-multiacc-remove>Удалить</a>)
+  return `<li data-login="${escapedLogin}">
+    <span>${escapedLogin}</span> (${loginHTML}<a href="javascript:void(0)" data-multiacc-remove>Удалить</a>)
   </li>`;
 };
