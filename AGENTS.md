@@ -14,17 +14,6 @@ These instructions apply throughout `tehahtimeehScriptSet`.
 - Breaking changes are allowed when required by the request; preserve unrelated
   behavior and APIs.
 
-## Workspace boundaries
-
-- Keep plans for both repositories in `hehedges-backups/plans/`.
-- Editing either or both repositories is allowed within the current task;
-  crossing repository boundaries needs no separate approval.
-- Read `hehedges-backups/AGENTS.md` before working there. Apply each repository's
-  instructions only to its own files.
-- Before editing scripts in `tehahtimeehScriptSet` to accommodate style changes
-  in `hehedges-backups`, describe the proposed script changes and ask for
-  approval. Wait for approval before making those edits.
-
 ## Repository architecture
 
 - Yarn 4 workspace monorepo of browser scripts for mybb/rusff forums.
@@ -40,8 +29,8 @@ These instructions apply throughout `tehahtimeehScriptSet`.
 - Follow Prettier: 2-space indentation, no trailing commas.
 - Prefer explicit conditionals over multiline or nested ternaries. Use early
   returns for unsupported pages, missing elements, and failed access checks.
-- Always brace control flow. Put `return` on its own line and leave a blank line
-  after a returning block.
+- Always brace control flow. Put each return statement on its own line and
+  leave a blank line after a block that returns.
 - Generate markup with HTML template strings, not element-by-element DOM APIs.
 - Use classes for CSS hooks. Reserve IDs and data attributes for JavaScript
   hooks or required DOM relationships, never CSS selectors.
@@ -52,7 +41,7 @@ These instructions apply throughout `tehahtimeehScriptSet`.
 - For each code-changing step, run `make typecheck` and the appropriate build:
   `make <script-name>`, or `make build` for multiple packages or build-system
   changes. Documentation-only changes need neither.
-- Run no other checks unless requested, and rerun successful checks only when
+- Run no other checks unless requested. Rerun successful checks only when
   relevant files change. Never run `git diff --check`.
 - Scaffold a new script package with `make new-script NAME=<kebab-name>`.
 - Edit source, never generated `dist/` files; regenerate artifacts by building.
