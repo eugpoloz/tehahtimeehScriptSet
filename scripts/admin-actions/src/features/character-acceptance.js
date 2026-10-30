@@ -124,7 +124,10 @@ const createCharacterAcceptance = async (config) => {
     letterReview.hidden = busy || !active?.journal?.letter?.reviewRequired;
     letterResend.disabled = busy;
     retry.hidden =
-      busy || !active?.journal || active.journal.configState === "waiting";
+      busy ||
+      !active?.journal ||
+      active.journal.configState === "waiting" ||
+      active.steps.every((step) => active?.progress[step.id] === "complete");
   };
   const updateCollectionAddress = () => {
     if (!characterForm || !active) {
@@ -355,6 +358,14 @@ const createCharacterAcceptance = async (config) => {
       applications.set(key, application);
     }
     active = application;
+    if (
+      source.mode === "npc" &&
+      application.journal?.configState === "complete"
+    ) {
+      for (const step of application.steps) {
+        application.progress[step.id] = "complete";
+      }
+    }
     letterResend.checked = false;
     progressDialog
       .querySelector("#anfc-letter-link")
@@ -400,6 +411,18 @@ const createCharacterAcceptance = async (config) => {
     if (application.journal?.configState === "pending") {
       status.textContent =
         "Предыдущее сохранение не подтверждено. Проверьте его перед повторной отправкой.";
+    } else if (
+      source.mode === "npc" &&
+      application.journal?.configState === "complete"
+    ) {
+      status.textContent = "NPC внесён в конфиг. Сохранение подтверждено.";
+    } else if (
+      application.steps.every(
+        (step) => application.progress[step.id] === "complete"
+      )
+    ) {
+      status.textContent =
+        "Принятие персонажа завершено. Все шаги подтверждены.";
     } else if (application.journal?.configState === "complete") {
       status.textContent =
         "Конфиг ранее сохранён. Кнопка ниже проверит выполненные шаги и продолжит оставшиеся.";
