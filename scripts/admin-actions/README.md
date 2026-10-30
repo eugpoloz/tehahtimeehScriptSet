@@ -41,7 +41,9 @@ plaque coupon.
 
 Reload in the same browser and choose «Продолжить принятие» to resume an interrupted
 acceptance. Saved steps are verified before retrying; conflicting changes require
-manual review. NPCs use «Проверить сохранение» for config recovery.
+manual review. NPCs use «Проверить сохранение» for config recovery. Recovery
+controls disappear once all steps are confirmed; reopening a confirmed NPC save
+shows its completed status without another verification button.
 
 If the letter is unconfirmed, open the linked topic and check it. Only when it is
 absent, select «Проверил тему: письмо не опубликовано…» and continue to permit
