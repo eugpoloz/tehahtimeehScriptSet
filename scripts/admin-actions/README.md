@@ -86,7 +86,9 @@ Use one character form per page because field IDs are fixed.
 `onSubmit` runs after validation and may be async; the caller handles saving and
 busy state. `onChange` runs after edits, fill, or reset. Unknown character
 properties are preserved. The shared form allows missing DOB; acceptance requires
-it for regular characters.
+it for regular characters. Both birth dates use native date inputs and are saved
+in `DD.MM.YYYY` format. The optional `dobAlt` does not affect age calculations
+and is omitted when empty.
 
 ## Deployment
 

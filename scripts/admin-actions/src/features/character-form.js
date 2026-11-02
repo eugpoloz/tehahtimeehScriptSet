@@ -15,6 +15,7 @@ import { parsePositiveId } from "../helpers/character-data";
  * @property {boolean} npc
  * @property {boolean} isMain
  * @property {boolean} genderFemale
+ * @property {boolean} dobAltEnabled
  * @property {boolean} cursed
  * @property {string[]} who
  * @property {string[]} affiliations
@@ -33,6 +34,22 @@ import { parsePositiveId } from "../helpers/character-data";
 
 /** @param {unknown} value @returns {unknown[]} */
 const arrayValues = (value) => (Array.isArray(value) ? value : []);
+
+/** @param {unknown} value @returns {string} */
+const toDateInput = (value) => {
+  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(value ?? ""));
+  if (!match) {
+    return "";
+  }
+
+  return `${match[3]}-${match[2]}-${match[1]}`;
+};
+
+/** @param {string} value @returns {string} */
+const fromDateInput = (value) => {
+  const [year, month, day] = value.split("-");
+  return `${day}.${month}.${year}`;
+};
 
 /**
  * Initialize a form containing getCharacterFormMarkup(). Does not save config.
@@ -65,6 +82,7 @@ export const initCharacterForm = (form, options = {}) => {
     ru: input("char-form-ru"),
     fc: input("char-form-fc"),
     dob: input("char-form-dob"),
+    dobAlt: input("char-form-dob-alt"),
     id: input("char-form-id"),
     anketa: input("char-form-anketa"),
     main: input("char-form-main")
@@ -77,6 +95,8 @@ export const initCharacterForm = (form, options = {}) => {
   const npc = input("char-form-npc");
   const isMain = input("char-form-main-is-main");
   const genderFemale = input("char-form-gender-f");
+  const dobAltEnabled = input("char-form-dob-alt-enabled");
+  const dobAltBody = element("char-form-dob-alt-body");
   const cursed = input("char-form-cursed");
   const nature = element("char-form-who-nature");
   const magic = element("char-form-who-magic");
@@ -141,6 +161,7 @@ export const initCharacterForm = (form, options = {}) => {
     npc: npc.checked,
     isMain: isMain.checked,
     genderFemale: genderFemale.checked,
+    dobAltEnabled: dobAltEnabled.checked,
     cursed: cursed.checked,
     who: [...checkedValues(nature), ...checkedValues(magic)],
     affiliations: checkedValues(affiliations)
@@ -219,15 +240,13 @@ export const initCharacterForm = (form, options = {}) => {
   };
   const updateLinks = () => {
     const profileId = parsePositiveId(fields.id.value);
-    idLink.hidden = npc.checked || profileId === null;
     idLink.removeAttribute("href");
-    if (!idLink.hidden && profileId !== null) {
+    if (!npc.checked && profileId !== null) {
       idLink.href = `/profile.php?id=${profileId}`;
     }
 
     const anketaId = parsePositiveId(fields.anketa.value);
     anketaHint.textContent = npc.checked ? "ID поста" : "ID темы";
-    anketaLink.hidden = anketaId === null;
     anketaLink.removeAttribute("href");
     if (anketaId !== null) {
       if (npc.checked) {
@@ -262,15 +281,22 @@ export const initCharacterForm = (form, options = {}) => {
       cursedLabel.textContent = "Проклят";
     }
   };
+  const updateDobAlt = () => {
+    dobAltBody.hidden = !dobAltEnabled.checked;
+    fields.dobAlt.disabled = !dobAltEnabled.checked;
+    dobAltEnabled.setAttribute("aria-expanded", String(dobAltEnabled.checked));
+  };
 
   const restoreBaseline = () => {
     const character = originalCharacter;
     fields.name.value = originalName;
-    for (const key of ["ru", "fc", "dob", "id", "anketa", "main"]) {
+    for (const key of ["ru", "fc", "id", "anketa", "main"]) {
       fields[/** @type {keyof typeof fields} */ (key)].value = String(
         character[key] ?? ""
       );
     }
+    fields.dob.value = toDateInput(character.dob);
+    fields.dobAlt.value = toDateInput(character.dobAlt);
     if (typeof character.main !== "string") {
       fields.main.value = "";
     }
@@ -279,6 +305,7 @@ export const initCharacterForm = (form, options = {}) => {
     npc.checked = character.id == null;
     isMain.checked = !fields.main.value || npc.checked;
     genderFemale.checked = character.gender === "f";
+    dobAltEnabled.checked = Boolean(fields.dobAlt.value.trim());
     cursed.checked = Boolean(character.cursed);
     const who = arrayValues(character.who);
     const natureValue =
@@ -292,6 +319,7 @@ export const initCharacterForm = (form, options = {}) => {
     setCheckedValues(affiliations, arrayValues(character.affiliations));
     updateNpc();
     updateGender();
+    updateDobAlt();
     refreshMainProfiles();
     clearErrors();
     initialFormState = getFormState();
@@ -316,12 +344,14 @@ export const initCharacterForm = (form, options = {}) => {
     npc.checked = draft.npc;
     isMain.checked = draft.isMain;
     genderFemale.checked = draft.genderFemale;
+    dobAltEnabled.checked = draft.dobAltEnabled;
     cursed.checked = draft.cursed;
     setCheckedValues(nature, draft.who);
     setCheckedValues(magic, draft.who);
     setCheckedValues(affiliations, draft.affiliations);
     updateNpc();
     updateGender();
+    updateDobAlt();
     refreshMainProfiles();
     clearErrors();
     notifyChange();
@@ -396,10 +426,37 @@ export const initCharacterForm = (form, options = {}) => {
       character.id = profileId;
     }
 
-    if (fields.dob.value.trim()) {
-      character.dob = fields.dob.value.trim();
+    if (
+      fields.dob.validity.badInput ||
+      fields.dob.validity.rangeOverflow ||
+      fields.dob.validity.rangeUnderflow
+    ) {
+      fieldError(fields.dob, "Укажите существующую дату рождения.");
+    }
+
+    if (fields.dob.value) {
+      character.dob = fromDateInput(fields.dob.value);
     } else {
       delete character.dob;
+    }
+
+    if (
+      dobAltEnabled.checked &&
+      (fields.dobAlt.validity.badInput ||
+        fields.dobAlt.validity.rangeOverflow ||
+        fields.dobAlt.validity.rangeUnderflow)
+    ) {
+      fieldError(
+        fields.dobAlt,
+        "Укажите существующую дополнительную дату рождения."
+      );
+    }
+
+    const dobAlt = dobAltEnabled.checked ? fields.dobAlt.value : "";
+    if (dobAlt) {
+      character.dobAlt = fromDateInput(dobAlt);
+    } else {
+      delete character.dobAlt;
     }
 
     if (!npc.checked && !isMain.checked) {
@@ -430,6 +487,7 @@ export const initCharacterForm = (form, options = {}) => {
   });
   npc.addEventListener("change", updateNpc);
   genderFemale.addEventListener("change", updateGender);
+  dobAltEnabled.addEventListener("change", updateDobAlt);
   mainTrigger.addEventListener("click", refreshMainProfiles);
   mainOptions.addEventListener("change", (event) => {
     const choice = event.target;
