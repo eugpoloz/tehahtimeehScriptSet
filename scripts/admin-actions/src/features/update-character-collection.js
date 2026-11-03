@@ -21,12 +21,29 @@ import { addTwinCollection } from "../helpers/collection-coupons";
 const readPageTitle = (value) =>
   value.replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)));
 
+/** Read Tagify's JSON value as a list of tag names. @param {string} value */
+const readTags = (value) => {
+  try {
+    const tags = JSON.parse(value);
+    if (
+      Array.isArray(tags) &&
+      tags.every((tag) => typeof tag?.value === "string")
+    ) {
+      return tags.map((tag) => tag.value).join(",");
+    }
+  } catch {
+    // The forum may also expose tags as a plain string before widget initialization.
+  }
+
+  return value;
+};
+
 /** @param {HTMLFormElement} form @returns {CollectionPage} */
 const readPage = (form) => ({
   name: getField(form, "name").value,
   title: readPageTitle(getField(form, "title").value),
   content: getField(form, "content").value,
-  tags: getField(form, "tags").value,
+  tags: readTags(getField(form, "tags").value),
   announcement: /** @type {HTMLInputElement} */ (
     form.querySelector('[name="announcement"]:checked')
   ).value,
@@ -300,12 +317,12 @@ export const updateCharacterCollection = async (context) => {
     Object.assign(values, {
       title: expected.title,
       name: expected.name,
-      tags: expected.tags,
+      tags: JSON.stringify([{ value: expected.tags }]),
       announcement: expected.announcement
     });
     getField(form, "title").value = expected.title;
     getField(form, "name").value = expected.name;
-    getField(form, "tags").value = expected.tags;
+    getField(form, "tags").value = JSON.stringify([{ value: expected.tags }]);
     /** @type {HTMLInputElement} */ (
       form.querySelector('[name="announcement"][value="0"]')
     ).checked = true;
@@ -316,8 +333,21 @@ export const updateCharacterCollection = async (context) => {
     getSubmitter(form, current ? "save" : "add_page"),
     values
   );
-  const responseMessage =
-    response.querySelector(".info .container")?.textContent?.trim() || "";
+  const navigation = /** @type {PerformanceNavigationTiming | undefined} */ (
+    response.defaultView?.performance.getEntriesByType("navigation")[0]
+  );
+  const responseStatus = navigation?.responseStatus || 0;
+  const responseDetails = [];
+  if (responseStatus >= 400) {
+    responseDetails.push(`HTTP ${responseStatus}`);
+  }
+  const forumMessage = response
+    .querySelector(".info .container")
+    ?.textContent?.trim();
+  if (forumMessage) {
+    responseDetails.push(forumMessage);
+  }
+  const responseMessage = responseDetails.join(". ");
   const verified = await loadPage(
     iframe,
     address,
