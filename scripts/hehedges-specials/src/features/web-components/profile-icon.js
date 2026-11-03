@@ -1,4 +1,4 @@
-import { escapeHtml, getImageUrl } from "@teh/utils";
+import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
 
 /** Displays a profile icon from its `src` attribute or text content. */
 class ProfileIcon extends HTMLElement {
@@ -27,7 +27,7 @@ class ProfileIcon extends HTMLElement {
   /** @returns {void} */
   _render() {
     const source = this.getAttribute("src") ?? this.textContent.trim();
-    const imageUrl = getImageUrl(source);
+    const imageUrl = getProxiedImageUrl(source);
 
     this.dataset.customFld = "icon";
     this.hidden = !imageUrl;

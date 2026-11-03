@@ -1,4 +1,4 @@
-import { escapeHtml, getImageUrl } from "@teh/utils";
+import { escapeHtml, getProxiedImageUrl } from "@teh/utils";
 
 const IMAGE_SELECTOR = ":scope > img";
 const CONTENT_SELECTOR = ":scope > [data-profile-plashka-content]";
@@ -52,7 +52,7 @@ class ProfilePlashka extends HTMLElement {
 
   /** @returns {void} */
   _render() {
-    const imageUrl = getImageUrl(this.getAttribute("src"));
+    const imageUrl = getProxiedImageUrl(this.getAttribute("src"));
     const image = /** @type {HTMLImageElement | null} */ (
       this.querySelector(IMAGE_SELECTOR)
     );

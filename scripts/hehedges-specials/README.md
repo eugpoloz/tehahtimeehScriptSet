@@ -20,6 +20,7 @@ The bundle registers profile and coupon elements using the forum's styles:
 `profile-icon` accepts a URL through `src` or text content. `profile-plashka`
 uses `src` and preserves child markup. Both accept absolute or protocol-relative
 HTTP(S) URLs. Plashka text is centered; use `justify-start` or `justify-end` to align it.
+Both load images through the DuckDuckGo image proxy.
 
 `coupon-card` preserves rich markup and accepts trailing `| N`, `| reusable`, or
 `| N | reusable`. It displays a coupon without changing the character's collection.
