@@ -110,7 +110,7 @@ const resolveMainPage = async ({ input, iframe }) => {
   const matches = findCollectionRows(doc, mainName);
   if (matches.length !== 1) {
     throw new Error(
-      "Не найдена единственная личная страница основного профиля. Проверьте поле «Личная страница»."
+      "Не удалось определить личную страницу основного профиля. Проверьте поле «Личная страница»."
     );
   }
 
@@ -123,7 +123,7 @@ const resolveMainPage = async ({ input, iframe }) => {
 const checkMainPage = (page, mainName) => {
   if (page.title !== mainName || !hasVaultTag(page.tags)) {
     throw new Error(
-      "Личная страница не соответствует основному персонажу или не имеет тега vault."
+      "Название личной страницы не совпадает с именем основного персонажа или у страницы нет тега vault."
     );
   }
 };
@@ -145,7 +145,7 @@ const verifyCompletedPage = ({ input, journal }, page) => {
   }
   if (!doc.querySelector("[data-character-vault-page]") || !gift) {
     throw new Error(
-      "Ранее сохранённая коллекция изменена. Проверьте личную страницу."
+      "Коллекция изменилась после сохранения. Проверьте личную страницу."
     );
   }
 };
@@ -325,7 +325,7 @@ export const updateCharacterCollection = async (context) => {
   );
   if (snapshot(verified.page) !== snapshot(expected)) {
     throw new Error(
-      "Личная страница не подтвердила сохранение. Нажмите «Продолжить принятие»."
+      "Не удалось проверить, сохранилась ли личная страница. Нажмите «Продолжить принятие»."
     );
   }
 

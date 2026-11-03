@@ -9,7 +9,7 @@
  * @property {1} version
  * @property {AcceptanceInput} input
  * @property {'waiting' | 'pending' | 'complete'} configState
- * @property {string} [configFile] Administrative target recorded before submitting.
+ * @property {string} [configAcceptedSnapshot] Config entry explicitly accepted by the administrator.
  * @property {string} [beforeSnapshot] Last fresh config while its write is pending.
  * @property {string} [expectedSnapshot] Intended whole-file result while its write is pending.
  * @property {CollectionJournal} [collection]
@@ -33,7 +33,7 @@ export const readJournal = (source) => {
     journal = JSON.parse(stored);
   } catch {
     throw new Error(
-      "Не удалось прочитать сохранённую операцию для этой анкеты."
+      "Не удалось загрузить данные о предыдущей попытке принять эту анкету."
     );
   }
   if (
@@ -54,7 +54,7 @@ export const readJournal = (source) => {
         typeof journal.expectedSnapshot !== "string"))
   ) {
     throw new Error(
-      "Не удалось прочитать сохранённую операцию для этой анкеты."
+      "Не удалось загрузить данные о предыдущей попытке принять эту анкету."
     );
   }
 
@@ -80,7 +80,7 @@ export const saveJournal = (journal) => {
     localStorage.setItem(key(journal.input.source), JSON.stringify(journal));
   } catch {
     throw new Error(
-      "Не удалось сохранить состояние операции в браузере. Сохранение остановлено."
+      "Не удалось сохранить данные о принятии в браузере. Действие остановлено."
     );
   }
 };

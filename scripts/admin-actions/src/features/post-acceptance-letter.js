@@ -154,7 +154,7 @@ export const postAcceptanceLetter = async ({ input, journal, iframe }) => {
       previous.reviewRequired = true;
       saveJournal(journal);
       throw new Error(
-        "Публикация сообщения не подтверждена. Проверьте тему. Повторная отправка доступна только после подтверждения ниже."
+        "Не удалось проверить, опубликовано ли сообщение. Проверьте тему и подтвердите ниже, если сообщения в ней нет."
       );
     }
   }

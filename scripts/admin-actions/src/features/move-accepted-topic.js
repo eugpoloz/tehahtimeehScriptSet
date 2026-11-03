@@ -20,7 +20,7 @@ export const moveAcceptedTopic = async (
 
   if (journal.move?.state === "complete") {
     throw new Error(
-      "После принятия тема перенесена в другой форум. Проверьте её вручную."
+      "После принятия тему перенесли в другой раздел. Проверьте её вручную."
     );
   }
 
@@ -59,7 +59,7 @@ export const moveAcceptedTopic = async (
   const result = await iframe.load(`/viewtopic.php?id=${topicId}`);
   if (Number(result.defaultView?.FORUM?.topic?.forum_id) !== forumId) {
     throw new Error(
-      "Перенос темы не подтверждён. Продолжение проверит её форум перед повторной попыткой."
+      "Не удалось проверить, перенесена ли тема. При продолжении скрипт сначала проверит её раздел."
     );
   }
 

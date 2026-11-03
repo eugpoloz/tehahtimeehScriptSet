@@ -11,6 +11,28 @@ import { saveJournal } from "../helpers/acceptance-journal";
 /** @typedef {import('../helpers/acceptance-journal').AcceptanceJournal} AcceptanceJournal */
 /** @typedef {{input: AcceptanceInput, journal: AcceptanceJournal, iframe: import('../helpers/iframe').AcceptanceIframe}} AcceptanceContext */
 
+export class ConfigMismatchError extends Error {
+  /** @param {AcceptanceInput} input @param {CharactersConfig} data */
+  constructor(input, data) {
+    super("Запись в конфиге отличается от данных формы. Сравните их ниже.");
+    this.name = "ConfigMismatchError";
+    this.expected = JSON.stringify({ [input.name]: input.character }, null, 2);
+    this.actual = Object.prototype.hasOwnProperty.call(data, input.name)
+      ? JSON.stringify({ [input.name]: data[input.name] }, null, 2)
+      : "Персонаж не найден в конфиге.";
+    this.actualCharacter = Object.prototype.hasOwnProperty.call(
+      data,
+      input.name
+    )
+      ? data[input.name]
+      : undefined;
+    this.acceptedSnapshot = snapshot([
+      Object.prototype.hasOwnProperty.call(data, input.name),
+      data[input.name]
+    ]);
+  }
+}
+
 const getConfigFile = () => {
   const configured = window.teh?.charactersConfigUrl;
   if (typeof configured !== "string" || !configured.trim()) {
@@ -27,7 +49,7 @@ const getConfigFile = () => {
     `/admin_files.php?edit&file=${encodeURIComponent(filename)}`,
     location.origin
   );
-  return { url, filename };
+  return url;
 };
 
 /** @param {import('../helpers/iframe').AcceptanceIframe} iframe @param {URL} url */
@@ -90,34 +112,40 @@ const checkNewCharacter = (data, input) => {
       (typeof data[main].main === "string" && data[main].main))
   ) {
     throw new Error(
-      "Выберите существующий основной профиль, а не твин или самого персонажа."
+      "Выберите основной профиль. Нельзя выбрать твинка или самого персонажа."
     );
   }
 };
 
 /** Add one reviewed character to the fresh JSON and verify the whole-file result. @param {AcceptanceContext} context */
 export const saveCharacterConfig = async ({ input, journal, iframe }) => {
-  const { url, filename } = getConfigFile();
-  if (journal.configFile && journal.configFile !== filename) {
-    throw new Error(
-      "Адрес конфига изменился после начала операции. Проверьте сохранение в исходном файле."
-    );
-  }
-
+  const url = getConfigFile();
   const current = await loadConfigForm(iframe, url);
   const currentSnapshot = snapshot(current.data);
+  const entrySnapshot = snapshot([
+    Object.prototype.hasOwnProperty.call(current.data, input.name),
+    current.data[input.name]
+  ]);
   let verifiedData = current.data;
-  if (journal.configState === "complete") {
+  if (
+    journal.configAcceptedSnapshot !== undefined &&
+    journal.configAcceptedSnapshot === entrySnapshot
+  ) {
+    // The administrator explicitly accepted this exact current entry.
+  } else if (journal.configState === "complete") {
     if (!hasSavedCharacter(current.data, input)) {
-      throw new Error(
-        "Ранее сохранённый персонаж изменён или удалён. Проверьте конфиг."
-      );
+      throw new ConfigMismatchError(input, current.data);
     }
   } else if (
     journal.configState === "waiting" &&
     hasSavedCharacter(current.data, input)
   ) {
     // Recover an exact match even when this browser has no previous journal.
+  } else if (
+    journal.configState === "waiting" &&
+    Object.prototype.hasOwnProperty.call(current.data, input.name)
+  ) {
+    throw new ConfigMismatchError(input, current.data);
   } else if (
     journal.configState === "pending" &&
     currentSnapshot === journal.expectedSnapshot
@@ -129,14 +157,13 @@ export const saveCharacterConfig = async ({ input, journal, iframe }) => {
       currentSnapshot !== journal.beforeSnapshot
     ) {
       throw new Error(
-        "Результат предыдущего сохранения не подтверждён, а конфиг изменился. Проверьте файл вручную; повторная отправка остановлена."
+        "Не удалось проверить предыдущее сохранение, а конфиг с тех пор изменился. Проверьте файл вручную перед повторной попыткой."
       );
     }
 
     checkNewCharacter(current.data, input);
     const next = { ...current.data, [input.name]: input.character };
     journal.configState = "pending";
-    journal.configFile = filename;
     journal.beforeSnapshot = currentSnapshot;
     journal.expectedSnapshot = snapshot(next);
     saveJournal(journal);
@@ -145,7 +172,7 @@ export const saveCharacterConfig = async ({ input, journal, iframe }) => {
     const verification = await loadConfigForm(iframe, url);
     if (snapshot(verification.data) !== journal.expectedSnapshot) {
       throw new Error(
-        "Админка не подтвердила сохранение конфига. Нажмите «Проверить сохранение»."
+        "Не удалось проверить, сохранился ли конфиг. Нажмите «Проверить сохранение»."
       );
     }
 

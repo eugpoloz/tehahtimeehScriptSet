@@ -8,7 +8,9 @@ export const isAcceptanceWorker = () => window.name === WORKER_NAME;
 export const getForm = (doc, selector) => {
   const form = doc.querySelector(selector);
   if (!form) {
-    throw new Error(`Не найдена форма ${selector}. Проверьте вход в админку.`);
+    throw new Error(
+      `Не удалось найти форму ${selector}. Проверьте доступ к странице.`
+    );
   }
 
   return /** @type {HTMLFormElement} */ (form);
@@ -55,9 +57,7 @@ export const createIframe = () => {
       // Cross-origin redirects cannot be inspected from this page.
     }
 
-    throw new Error(
-      "Нет доступа к странице в iframe. Проверьте вход в админку."
-    );
+    throw new Error("Не удалось открыть страницу. Проверьте доступ к админке.");
   };
   /** @param {() => void} action @returns {Promise<Document>} */
   const waitForLoad = (action) =>
@@ -89,7 +89,7 @@ export const createIframe = () => {
         cleanup();
         reject(
           new Error(
-            "Таймаут. Результат сохранения нужно проверить перед повторной отправкой."
+            "Страница слишком долго не отвечала. Проверьте, сохранились ли изменения, прежде чем повторить попытку."
           )
         );
       }, TIMEOUT_MS);

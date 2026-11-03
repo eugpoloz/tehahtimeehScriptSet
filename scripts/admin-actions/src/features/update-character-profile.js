@@ -57,7 +57,7 @@ export const updateCharacterGroup = async (
   const verified = getForm(await iframe.load(url), "form#profile11");
   if (getField(verified, "group_id").value !== expected) {
     throw new Error(
-      "Перенос профиля в группу не подтверждён. Нажмите «Продолжить принятие»."
+      "Не удалось проверить, перенесён ли профиль в группу. Нажмите «Продолжить принятие»."
     );
   }
 
@@ -114,7 +114,7 @@ export const updateCharacterProfile = async ({ input, journal, iframe }) => {
     snapshot({ ...current, ...desired })
   ) {
     throw new Error(
-      "Сохранение полей профиля не подтверждено. Нажмите «Продолжить принятие»."
+      "Не удалось проверить, сохранились ли поля профиля. Нажмите «Продолжить принятие»."
     );
   }
 

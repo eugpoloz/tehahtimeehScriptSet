@@ -18,7 +18,7 @@ export const suggestCollectionAddress = (name) =>
 export const validateCollectionAddress = (address) => {
   if (!/^[a-z0-9_-]{1,48}$/.test(address)) {
     throw new Error(
-      "Адрес личной страницы: до 48 символов, латиница в нижнем регистре, цифры, дефис и подчёркивание."
+      "В адресе личной страницы можно использовать до 48 символов: строчные латинские буквы, цифры, дефис и подчёркивание."
     );
   }
 };
@@ -148,7 +148,7 @@ export const getAcceptanceInput = (values, source) => {
     birth.getUTCMonth() !== month - 1 ||
     birth.getUTCDate() !== day
   ) {
-    throw new Error("Укажите существующую дату рождения.");
+    throw new Error("Проверьте дату рождения: такой даты нет.");
   }
 
   if (npc) {

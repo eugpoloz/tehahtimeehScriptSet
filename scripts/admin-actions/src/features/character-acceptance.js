@@ -7,11 +7,16 @@ import {
 } from "../helpers/parse-character-application";
 import {
   getAcceptanceInput,
+  snapshot,
   suggestCollectionAddress,
   validateCollectionAddress
 } from "../helpers/character-data";
 import { readJournal, saveJournal } from "../helpers/acceptance-journal";
-import { getStarterCollection } from "../helpers/acceptance-templates";
+import {
+  getProfileFields,
+  getStarterCollection
+} from "../helpers/acceptance-templates";
+import { ConfigMismatchError } from "./save-character-config";
 import { initCharacterForm } from "./character-form";
 import { escapeHtml } from "@teh/utils";
 /** @typedef {import('../helpers/character-data').AcceptanceSource} AcceptanceSource */
@@ -78,6 +83,24 @@ const createCharacterAcceptance = async (config) => {
   const retry = /** @type {HTMLButtonElement} */ (
     progressDialog.querySelector("#anfc-retry")
   );
+  const configReview = /** @type {HTMLElement} */ (
+    progressDialog.querySelector("#anfc-config-review")
+  );
+  const configExpected = /** @type {HTMLTextAreaElement} */ (
+    progressDialog.querySelector("#anfc-config-expected")
+  );
+  const configActual = /** @type {HTMLTextAreaElement} */ (
+    progressDialog.querySelector("#anfc-config-actual")
+  );
+  const configContinue = /** @type {HTMLButtonElement} */ (
+    progressDialog.querySelector("#anfc-config-continue")
+  );
+  const configUseCurrent = /** @type {HTMLButtonElement} */ (
+    progressDialog.querySelector("#anfc-config-use-current")
+  );
+  const back = /** @type {HTMLButtonElement} */ (
+    progressDialog.querySelector("#anfc-back")
+  );
   const manualPage = /** @type {HTMLElement} */ (
     progressDialog.querySelector("#anfc-manual-page")
   );
@@ -119,6 +142,10 @@ const createCharacterAcceptance = async (config) => {
   /** @type {ApplicationState | null} */
   let active = null;
   let busy = false;
+  /** @type {string | undefined} */
+  let reviewedConfigSnapshot;
+  /** @type {import('./character-form').Character | undefined} */
+  let reviewedConfigCharacter;
   /** @type {ReturnType<typeof initCharacterForm>} */
   let characterForm;
   const updateControls = () => {
@@ -222,6 +249,9 @@ const createCharacterAcceptance = async (config) => {
 
     const application = active;
     manualPage.hidden = true;
+    configReview.hidden = true;
+    reviewedConfigSnapshot = undefined;
+    reviewedConfigCharacter = undefined;
     renderProgress();
     if (!progressDialog.open) {
       progressDialog.showModal();
@@ -231,10 +261,7 @@ const createCharacterAcceptance = async (config) => {
     status.textContent = "Добавление персонажа в конфиг…";
     updateControls();
     try {
-      if (
-        !application.journal ||
-        application.journal.configState === "waiting"
-      ) {
+      if (!application.journal) {
         application.journal = { version: 1, input, configState: "waiting" };
         saveJournal(application.journal);
       }
@@ -252,6 +279,14 @@ const createCharacterAcceptance = async (config) => {
         } catch (error) {
           application.progress[step.id] = "failed";
           renderProgress();
+          if (error instanceof ConfigMismatchError) {
+            configExpected.value = error.expected;
+            configActual.value = error.actual;
+            reviewedConfigSnapshot = error.acceptedSnapshot;
+            reviewedConfigCharacter = error.actualCharacter;
+            configUseCurrent.hidden = !reviewedConfigCharacter;
+            configReview.hidden = false;
+          }
           const collection = application.journal.collection;
           if (
             step.id === "collection" &&
@@ -271,7 +306,7 @@ const createCharacterAcceptance = async (config) => {
             } else if (Object.values(expected.groups).every(Boolean)) {
               manualGroups.textContent = "Разрешите просмотр всем группам.";
             } else {
-              manualGroups.textContent = `Разрешите просмотр группам с ID: ${Object.entries(
+              manualGroups.textContent = `Доступ к странице: группы с ID ${Object.entries(
                 expected.groups
               )
                 .filter(([, checked]) => checked)
@@ -291,8 +326,8 @@ const createCharacterAcceptance = async (config) => {
       characterForm.refreshMainProfiles();
       status.textContent =
         application.source.mode === "npc"
-          ? "NPC внесён в конфиг. Сохранение подтверждено."
-          : "Персонаж принят. Конфиг, личная страница, профиль и сообщение проверены; анкета перенесена в принятые.";
+          ? "NPC добавлен в конфиг."
+          : "Персонаж принят. Анкета перенесена в принятые.";
     } catch (error) {
       status.classList.add("char-accept__status--error", "text-error");
       status.textContent =
@@ -304,6 +339,81 @@ const createCharacterAcceptance = async (config) => {
       updateControls();
     }
   };
+  back.addEventListener("click", () => {
+    progressDialog.close();
+  });
+  configContinue.addEventListener("click", () => {
+    if (!active?.journal || reviewedConfigSnapshot === undefined) {
+      return;
+    }
+    active.journal.configAcceptedSnapshot = reviewedConfigSnapshot;
+    try {
+      saveJournal(active.journal);
+      void execute(reviewAddress(active.journal.input));
+    } catch (error) {
+      status.classList.add("char-accept__status--error", "text-error");
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : "Не удалось продолжить принятие.";
+    }
+  });
+  configUseCurrent.addEventListener("click", () => {
+    if (!active?.journal || !reviewedConfigCharacter) {
+      return;
+    }
+    try {
+      const journal = active.journal;
+      const oldCharacter = journal.input.character;
+      const currentCharacter = reviewedConfigCharacter;
+      const identity = (
+        /** @type {import('./character-form').Character} */ character
+      ) => JSON.stringify([character.id, character.anketa, character.main]);
+      if (
+        (journal.collection ||
+          journal.group ||
+          journal.profile ||
+          journal.letter ||
+          journal.move) &&
+        identity(oldCharacter) !== identity(currentCharacter)
+      ) {
+        throw new Error(
+          "После выполнения следующих шагов изменились ID профиля, анкета или основной персонаж. Проверьте их вручную."
+        );
+      }
+      const input = reviewAddress({
+        ...getAcceptanceInput(
+          { name: journal.input.name, character: currentCharacter },
+          active.source
+        ),
+        collectionAddress: journal.input.collectionAddress
+      });
+      if (
+        journal.profile &&
+        journal.collection &&
+        snapshot(journal.profile.expected) !==
+          snapshot(getProfileFields(input, journal.collection.address))
+      ) {
+        throw new Error(
+          "Данные в конфиге отличаются от тех, что уже были внесены в профиль. Проверьте профиль вручную."
+        );
+      }
+      journal.input = input;
+      journal.configState = "complete";
+      delete journal.configAcceptedSnapshot;
+      saveJournal(journal);
+      active.initialValues = input;
+      active.draft = undefined;
+      characterForm.fill(input.name, input.character);
+      void execute(input);
+    } catch (error) {
+      status.classList.add("char-accept__status--error", "text-error");
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : "Не удалось использовать запись из конфига.";
+    }
+  });
   manualCopy.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(manualCode.value);
@@ -312,7 +422,7 @@ const createCharacterAcceptance = async (config) => {
       manualCode.focus();
       manualCode.select();
       manualCopy.textContent =
-        "Не удалось скопировать — скопируйте выделенный код";
+        "Не удалось скопировать код. Скопируйте выделенный текст вручную.";
     }
   });
   characterForm = initCharacterForm(form, {
@@ -416,13 +526,16 @@ const createCharacterAcceptance = async (config) => {
       if (journal) {
         application.initialValues = journal.input;
         application.notes.push(
-          "Восстановлена операция из этого браузера. Сохранённые шаги будут проверены перед продолжением."
+          "Найдено незавершённое принятие. Выполненные шаги будут проверены."
         );
       }
       applications.set(key, application);
     }
     active = application;
     manualPage.hidden = true;
+    configReview.hidden = true;
+    reviewedConfigSnapshot = undefined;
+    reviewedConfigCharacter = undefined;
     manualCopy.textContent = "Скопировать код";
     if (
       source.mode === "npc" &&
@@ -472,26 +585,25 @@ const createCharacterAcceptance = async (config) => {
     status.classList.remove("char-accept__status--error", "text-error");
     if (source.mode === "regular") {
       notes.textContent +=
-        " Конфиг, личная страница, профиль, сообщение и перенос анкеты выполняются по порядку.";
+        " Сначала персонаж будет добавлен в конфиг, затем будет подготовлена личная страница, обновлён профиль, опубликовано сообщение и перенесена анкета.";
     }
     if (application.journal?.configState === "pending") {
       status.textContent =
-        "Предыдущее сохранение не подтверждено. Проверьте его перед повторной отправкой.";
+        "Не удалось проверить, сохранились ли изменения. Проверьте их перед повторной попыткой.";
     } else if (
       source.mode === "npc" &&
       application.journal?.configState === "complete"
     ) {
-      status.textContent = "NPC внесён в конфиг. Сохранение подтверждено.";
+      status.textContent = "NPC добавлен в конфиг.";
     } else if (
       application.steps.every(
         (step) => application.progress[step.id] === "complete"
       )
     ) {
-      status.textContent =
-        "Принятие персонажа завершено. Все шаги подтверждены.";
+      status.textContent = "Персонаж принят.";
     } else if (application.journal?.configState === "complete") {
       status.textContent =
-        "Конфиг ранее сохранён. Кнопка ниже проверит выполненные шаги и продолжит оставшиеся.";
+        "Персонаж уже был добавлен в конфиг. Нажмите «Продолжить принятие», чтобы продолжить.";
     }
     renderProgress();
     dialog.showModal();
@@ -507,7 +619,7 @@ const createCharacterAcceptance = async (config) => {
   /** @param {number} topicId */
   const openingPost = async (topicId) => {
     if (busy) {
-      throw new Error("Дождитесь завершения сохранения персонажа.");
+      throw new Error("Дождитесь, пока персонаж сохранится.");
     }
 
     let post = findOpeningPost(document);

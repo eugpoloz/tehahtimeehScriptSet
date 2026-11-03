@@ -45,6 +45,11 @@ manual review. NPCs use «Проверить сохранение» for config r
 controls disappear once all steps are confirmed; reopening a confirmed NPC save
 shows its completed status without another verification button.
 
+If the character's config entry differs from the acceptance data, the progress
+dialog shows both side by side. You can return to the form or choose either the
+form values or the current config values for the remaining steps, without changing
+the config. The script rechecks the displayed entry before continuing.
+
 Without a saved operation, an exact matching config entry can be recovered. An
 existing main collection can also be recovered when its title, tag, and collection
 markers match; its current content is preserved. An existing twin gift section

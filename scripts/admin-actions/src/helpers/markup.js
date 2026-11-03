@@ -474,12 +474,43 @@ export const getConfigFormMarkup = () =>
             aria-live="polite"
             aria-atomic="true"
           ></p>
+          <div id="anfc-config-review" hidden>
+            <div class="grid-col-2">
+              <div class="min-w-0">
+                <label for="anfc-config-expected">Данные из формы:</label>
+                <textarea
+                  class="w-full"
+                  id="anfc-config-expected"
+                  rows="12"
+                  readonly
+                ></textarea>
+              </div>
+              <div class="min-w-0">
+                <label for="anfc-config-actual">Сейчас в конфиге:</label>
+                <textarea
+                  class="w-full"
+                  id="anfc-config-actual"
+                  rows="12"
+                  readonly
+                ></textarea>
+              </div>
+            </div>
+            <p>Выберите, как продолжить? (Сам конфиг изменен не будет.)</p>
+            <button type="button" class="button" id="anfc-config-use-current">
+              C данными из конфига
+            </button>
+            <button type="button" class="button" id="anfc-config-continue">
+              C данными из формы
+            </button>
+          </div>
           <div id="anfc-manual-page" hidden>
             <p>
-              Если страница не создана, создайте её вручную в
+              Если страница не создалась, откройте
               <a href="/admin_pages.php" target="_blank" rel="noopener"
-                >администрировании страниц</a
-              >. Отключите визуальный редактор и вставьте код в содержимое.
+                >администрирование страниц</a
+              >
+              и создайте её вручную. Отключите визуальный редактор и вставьте
+              код в поле содержимого.
             </p>
             <p>
               Название: <strong id="anfc-manual-title"></strong><br />Адресное
@@ -511,11 +542,16 @@ export const getConfigFormMarkup = () =>
             >
           </label>
           <div class="char-form__actions flex justify-end gap-xs">
-            <button type="button" class="button" id="anfc-retry" hidden>
-              Проверить сохранение
+            <button type="button" class="button" id="anfc-back">
+              Вернуться к форме
             </button>
-            <button type="button" class="button" data-close-acceptance>
-              Закрыть
+            <button
+              type="button"
+              class="button button--primary"
+              id="anfc-retry"
+              hidden
+            >
+              Проверить сохранение
             </button>
           </div>
         </div>

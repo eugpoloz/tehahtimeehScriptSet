@@ -260,7 +260,7 @@ export const initCharacterForm = (form, options = {}) => {
       fields.main.value
     );
     mainValue.textContent = fields.main.value || "Выберите профиль";
-    mainStatus.textContent = "Главные профили не найдены";
+    mainStatus.textContent = "Основные профили не найдены";
     mainStatus.hidden = names.length > 0;
   };
   const updateMain = () => {
@@ -472,7 +472,10 @@ export const initCharacterForm = (form, options = {}) => {
     } else {
       const anketaId = parsePositiveId(fields.anketa.value);
       if (anketaId === null) {
-        fieldError(fields.anketa, "Укажите положительный целый ID анкеты");
+        fieldError(
+          fields.anketa,
+          "Укажите ID анкеты: целое число больше нуля."
+        );
       }
 
       character.anketa = anketaId;
@@ -483,7 +486,7 @@ export const initCharacterForm = (form, options = {}) => {
     } else {
       const profileId = parsePositiveId(fields.id.value);
       if (profileId === null) {
-        fieldError(fields.id, "Укажите положительный целый ID профиля");
+        fieldError(fields.id, "Укажите ID профиля: целое число больше нуля.");
       }
 
       character.id = profileId;
@@ -494,7 +497,7 @@ export const initCharacterForm = (form, options = {}) => {
       fields.dob.validity.rangeOverflow ||
       fields.dob.validity.rangeUnderflow
     ) {
-      fieldError(fields.dob, "Укажите существующую дату рождения.");
+      fieldError(fields.dob, "Проверьте дату рождения: такой даты нет.");
     }
 
     if (fields.dob.value) {
@@ -511,7 +514,7 @@ export const initCharacterForm = (form, options = {}) => {
     ) {
       fieldError(
         fields.dobAlt,
-        "Укажите существующую дополнительную дату рождения."
+        "Проверьте дополнительную дату рождения: такой даты нет."
       );
     }
 
@@ -589,7 +592,7 @@ export const initCharacterForm = (form, options = {}) => {
     }
 
     if (fields.dob.validity.badInput || fields.dobAlt.validity.badInput) {
-      showStatus("Завершите ввод дат перед обменом.", true);
+      showStatus("Сначала введите обе даты целиком.", true);
       return;
     }
 
