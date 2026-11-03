@@ -17,6 +17,7 @@ import { parsePositiveId } from "../helpers/character-data";
  * @property {boolean} genderFemale
  * @property {boolean} dobAltEnabled
  * @property {boolean} cursed
+ * @property {boolean} alien
  * @property {string[]} who
  * @property {string[]} affiliations
  */
@@ -133,6 +134,7 @@ export const initCharacterForm = (form, options = {}) => {
   }
 
   const cursed = input("char-form-cursed");
+  const alien = input("char-form-alien");
   const nature = element("char-form-who-nature");
   const magic = element("char-form-who-magic");
   const affiliations = element("char-form-aff");
@@ -198,6 +200,7 @@ export const initCharacterForm = (form, options = {}) => {
     genderFemale: genderFemale.checked,
     dobAltEnabled: dobAltEnabled.checked,
     cursed: cursed.checked,
+    alien: alien.checked,
     who: [...checkedValues(nature), ...checkedValues(magic)],
     affiliations: checkedValues(affiliations)
   });
@@ -357,6 +360,7 @@ export const initCharacterForm = (form, options = {}) => {
     genderFemale.checked = character.gender === "f";
     dobAltEnabled.checked = Boolean(fields.dobAlt.value.trim());
     cursed.checked = Boolean(character.cursed);
+    alien.checked = character.alien === true;
     const who = arrayValues(character.who);
     const natureValue =
       choices(nature).find((choice) => who.includes(choice.value))?.value ||
@@ -397,6 +401,7 @@ export const initCharacterForm = (form, options = {}) => {
     genderFemale.checked = draft.genderFemale;
     dobAltEnabled.checked = draft.dobAltEnabled;
     cursed.checked = draft.cursed;
+    alien.checked = draft.alien;
     setCheckedValues(nature, draft.who);
     setCheckedValues(magic, draft.who);
     setCheckedValues(affiliations, draft.affiliations);
@@ -456,6 +461,11 @@ export const initCharacterForm = (form, options = {}) => {
       )
     ];
     character.cursed = cursed.checked;
+    if (alien.checked) {
+      character.alien = true;
+    } else {
+      delete character.alien;
+    }
     if (npc.checked && !fields.anketa.value.trim()) {
       delete character.anketa;
     } else {

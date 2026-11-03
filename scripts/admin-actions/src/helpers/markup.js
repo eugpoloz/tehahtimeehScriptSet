@@ -313,6 +313,10 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
             <input type="checkbox" id="char-form-cursed" />
             <span id="char-form-cursed-label">Проклят</span>
           </label>
+          <label class="char-form__option flex items-center gap-xs">
+            <input type="checkbox" id="char-form-alien" />
+            <span>Из другого мира</span>
+          </label>
         </div>
       </div>
     </div>
