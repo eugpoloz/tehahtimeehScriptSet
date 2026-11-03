@@ -24,7 +24,7 @@ opening post. Review the prefilled form, then press «Принять» to open t
 overlay. Parsing errors appear in red; drafts survive closing the dialog.
 
 Regular acceptance saves the config, prepares the collection, assigns the group,
-updates the profile, posts the acceptance letter, and moves the topic without a
+updates the profile, posts the acceptance message, and moves the topic without a
 redirect. NPCs save only the config. Each step is verified before continuing.
 
 Regular characters require a profile ID, DOB, and the source topic ID; in-game age
@@ -45,9 +45,21 @@ manual review. NPCs use «Проверить сохранение» for config r
 controls disappear once all steps are confirmed; reopening a confirmed NPC save
 shows its completed status without another verification button.
 
-If the letter is unconfirmed, open the linked topic and check it. Only when it is
-absent, select «Проверил тему: письмо не опубликовано…» and continue to permit
-resending. Edited/deleted letters or multiple matches require manual review.
+Without a saved operation, an exact matching config entry can be recovered. An
+existing main collection can also be recovered when its title, tag, and collection
+markers match; its current content is preserved. An existing twin gift section
+marks that twin's collection update as complete. Otherwise, the script increases
+existing starter coupon quantities or adds the coupons, and adds the gift section
+in the same page edit.
+
+The acceptance control is also available in the accepted forum without a saved
+operation. Before posting a message without one, the script checks the editable
+source of every post in the topic and recovers a single exact match. If a post
+cannot be inspected or multiple matches exist, it stops instead of posting.
+
+If the message is unconfirmed, open the linked topic and check it. Only when it is
+absent, select «Проверил тему: сообщение не опубликовано…» and continue to permit
+resending. Edited/deleted messages or multiple matches require manual review.
 
 ## Shared character form
 

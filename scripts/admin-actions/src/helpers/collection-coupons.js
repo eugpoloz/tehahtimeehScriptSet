@@ -13,10 +13,14 @@ export const addTwinCollection = (source, name) => {
   const gifts = [
     ...doc.querySelectorAll('[data-collection="gift"][data-profile]')
   ];
-  if (gifts.some((gift) => gift.getAttribute("data-profile") === name)) {
-    throw new Error(
-      "Раздел подарков этого твина уже существует. Проверьте купоны вручную."
-    );
+  const existing = gifts.filter(
+    (gift) => gift.getAttribute("data-profile") === name
+  );
+  if (existing.length > 1) {
+    throw new Error("Найдено несколько разделов подарков этого твина.");
+  }
+  if (existing.length === 1) {
+    return source;
   }
 
   const blocks = [

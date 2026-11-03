@@ -38,11 +38,18 @@ const readPage = (form) => ({
   )
 });
 
-/** @param {AcceptanceIframe} iframe @param {string} address */
-const loadPage = async (iframe, address) => {
+/** @param {AcceptanceIframe} iframe @param {string} address @param {string} [creationResponse] */
+const loadPage = async (iframe, address, creationResponse) => {
   const doc = await iframe.load(
     `/admin_pages.php?edit_page=${encodeURIComponent(address)}`
   );
+  if (!doc.querySelector("form#editpage") && creationResponse !== undefined) {
+    let message = "Не удалось проверить созданную страницу.";
+    if (creationResponse) {
+      message += ` Ответ форума после отправки: ${creationResponse}`;
+    }
+    throw new Error(message);
+  }
   const form = getForm(doc, "form#editpage");
   const page = readPage(form);
   if (page.name !== address) {
@@ -185,9 +192,17 @@ const prepareMainCollection = async ({ input, iframe }) => {
     const loaded = await loadPage(iframe, address);
     const current = loaded.page;
     checkMainPage(current, input.name);
+    const pageDoc = new DOMParser().parseFromString(
+      current.content,
+      "text/html"
+    );
+    const existingCollection =
+      pageDoc.querySelector("[data-character-vault-page]") &&
+      pageDoc.querySelector('[data-collection="gift"]:not([data-profile])');
     if (
-      current.content.trim() !== getStarterCollection().trim() ||
-      current.announcement !== "0"
+      !existingCollection &&
+      (current.content.trim() !== getStarterCollection().trim() ||
+        current.announcement !== "0")
     ) {
       throw new Error(
         "Адрес личной страницы занят. Существующее содержимое не будет заменено."
@@ -296,12 +311,18 @@ export const updateCharacterCollection = async (context) => {
     ).checked = true;
   }
   getField(form, "content").value = expected.content;
-  await iframe.submit(
+  const response = await iframe.submit(
     form,
     getSubmitter(form, current ? "save" : "add_page"),
     values
   );
-  const verified = await loadPage(iframe, address);
+  const responseMessage =
+    response.querySelector(".info .container")?.textContent?.trim() || "";
+  const verified = await loadPage(
+    iframe,
+    address,
+    current ? undefined : responseMessage
+  );
   if (snapshot(verified.page) !== snapshot(expected)) {
     throw new Error(
       "Личная страница не подтвердила сохранение. Нажмите «Продолжить принятие»."

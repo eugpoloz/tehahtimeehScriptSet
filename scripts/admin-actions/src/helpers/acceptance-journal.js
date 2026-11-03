@@ -84,17 +84,3 @@ export const saveJournal = (journal) => {
     );
   }
 };
-
-/** Find this browser's regular operation after the topic has moved. @param {number} topicId @returns {AcceptanceJournal | null} */
-export const readTopicJournal = (topicId) => {
-  const prefix = `teh:character-acceptance:${location.origin}:regular:${topicId}:`;
-  for (let index = 0; index < localStorage.length; index++) {
-    const storedKey = localStorage.key(index);
-    if (storedKey?.startsWith(prefix)) {
-      const postId = Number(storedKey.slice(prefix.length));
-      return readJournal({ mode: "regular", topicId, postId });
-    }
-  }
-
-  return null;
-};

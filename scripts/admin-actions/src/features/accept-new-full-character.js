@@ -12,7 +12,6 @@ import {
 } from "./update-character-profile";
 import { postAcceptanceLetter } from "./post-acceptance-letter";
 import { moveAcceptedTopic } from "./move-accepted-topic";
-import { readTopicJournal } from "../helpers/acceptance-journal";
 import { escapeHtml } from "@teh/utils";
 
 /**
@@ -85,8 +84,7 @@ const acceptNewFullCharacter = async (config) => {
     if (
       topicId !== npcTopicId &&
       !isApplication &&
-      (Number(FORUM.topic.forum_id) !== acceptedForumId ||
-        !readTopicJournal(topicId))
+      Number(FORUM.topic.forum_id) !== acceptedForumId
     ) {
       return;
     }

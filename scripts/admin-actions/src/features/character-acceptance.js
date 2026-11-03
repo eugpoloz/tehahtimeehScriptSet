@@ -11,6 +11,7 @@ import {
   validateCollectionAddress
 } from "../helpers/character-data";
 import { readJournal, saveJournal } from "../helpers/acceptance-journal";
+import { getStarterCollection } from "../helpers/acceptance-templates";
 import { initCharacterForm } from "./character-form";
 import { escapeHtml } from "@teh/utils";
 /** @typedef {import('../helpers/character-data').AcceptanceSource} AcceptanceSource */
@@ -76,6 +77,24 @@ const createCharacterAcceptance = async (config) => {
   );
   const retry = /** @type {HTMLButtonElement} */ (
     progressDialog.querySelector("#anfc-retry")
+  );
+  const manualPage = /** @type {HTMLElement} */ (
+    progressDialog.querySelector("#anfc-manual-page")
+  );
+  const manualTitle = /** @type {HTMLElement} */ (
+    progressDialog.querySelector("#anfc-manual-title")
+  );
+  const manualAddress = /** @type {HTMLElement} */ (
+    progressDialog.querySelector("#anfc-manual-address")
+  );
+  const manualGroups = /** @type {HTMLElement} */ (
+    progressDialog.querySelector("#anfc-manual-groups")
+  );
+  const manualCode = /** @type {HTMLTextAreaElement} */ (
+    progressDialog.querySelector("#anfc-manual-code")
+  );
+  const manualCopy = /** @type {HTMLButtonElement} */ (
+    progressDialog.querySelector("#anfc-manual-copy")
   );
   const fields = /** @type {HTMLFieldSetElement} */ (
     form.querySelector("fieldset")
@@ -202,6 +221,7 @@ const createCharacterAcceptance = async (config) => {
     }
 
     const application = active;
+    manualPage.hidden = true;
     renderProgress();
     if (!progressDialog.open) {
       progressDialog.showModal();
@@ -232,6 +252,34 @@ const createCharacterAcceptance = async (config) => {
         } catch (error) {
           application.progress[step.id] = "failed";
           renderProgress();
+          const collection = application.journal.collection;
+          if (
+            step.id === "collection" &&
+            typeof input.character.main !== "string" &&
+            input.collectionAddress &&
+            (!collection ||
+              (collection.state === "pending" && !collection.before))
+          ) {
+            const expected =
+              collection?.state === "pending" ? collection.expected : null;
+            manualTitle.textContent = expected?.title || input.name;
+            manualAddress.textContent =
+              expected?.name || input.collectionAddress;
+            manualCode.value = expected?.content || getStarterCollection();
+            if (!expected) {
+              manualGroups.textContent = "Оставьте группы по умолчанию.";
+            } else if (Object.values(expected.groups).every(Boolean)) {
+              manualGroups.textContent = "Разрешите просмотр всем группам.";
+            } else {
+              manualGroups.textContent = `Разрешите просмотр группам с ID: ${Object.entries(
+                expected.groups
+              )
+                .filter(([, checked]) => checked)
+                .map(([name]) => name.replace(/\D/g, ""))
+                .join(", ")}.`;
+            }
+            manualPage.hidden = false;
+          }
           const message =
             error instanceof Error
               ? error.message
@@ -244,7 +292,7 @@ const createCharacterAcceptance = async (config) => {
       status.textContent =
         application.source.mode === "npc"
           ? "NPC внесён в конфиг. Сохранение подтверждено."
-          : "Персонаж принят. Конфиг, личная страница, профиль и письмо проверены; анкета перенесена в принятые.";
+          : "Персонаж принят. Конфиг, личная страница, профиль и сообщение проверены; анкета перенесена в принятые.";
     } catch (error) {
       status.classList.add("char-accept__status--error", "text-error");
       status.textContent =
@@ -256,6 +304,17 @@ const createCharacterAcceptance = async (config) => {
       updateControls();
     }
   };
+  manualCopy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(manualCode.value);
+      manualCopy.textContent = "Скопировано";
+    } catch {
+      manualCode.focus();
+      manualCode.select();
+      manualCopy.textContent =
+        "Не удалось скопировать — скопируйте выделенный код";
+    }
+  });
   characterForm = initCharacterForm(form, {
     onChange: () => {
       if (active && characterForm && !busy) {
@@ -363,6 +422,8 @@ const createCharacterAcceptance = async (config) => {
       applications.set(key, application);
     }
     active = application;
+    manualPage.hidden = true;
+    manualCopy.textContent = "Скопировать код";
     if (
       source.mode === "npc" &&
       application.journal?.configState === "complete"
@@ -411,7 +472,7 @@ const createCharacterAcceptance = async (config) => {
     status.classList.remove("char-accept__status--error", "text-error");
     if (source.mode === "regular") {
       notes.textContent +=
-        " Конфиг, личная страница, профиль, письмо и перенос анкеты выполняются по порядку.";
+        " Конфиг, личная страница, профиль, сообщение и перенос анкеты выполняются по порядку.";
     }
     if (application.journal?.configState === "pending") {
       status.textContent =

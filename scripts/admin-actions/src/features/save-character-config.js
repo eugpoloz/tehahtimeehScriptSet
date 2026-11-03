@@ -114,6 +114,11 @@ export const saveCharacterConfig = async ({ input, journal, iframe }) => {
       );
     }
   } else if (
+    journal.configState === "waiting" &&
+    hasSavedCharacter(current.data, input)
+  ) {
+    // Recover an exact match even when this browser has no previous journal.
+  } else if (
     journal.configState === "pending" &&
     currentSnapshot === journal.expectedSnapshot
   ) {

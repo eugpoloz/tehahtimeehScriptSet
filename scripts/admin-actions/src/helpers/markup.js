@@ -474,6 +474,30 @@ export const getConfigFormMarkup = () =>
             aria-live="polite"
             aria-atomic="true"
           ></p>
+          <div id="anfc-manual-page" hidden>
+            <p>
+              Если страница не создана, создайте её вручную в
+              <a href="/admin_pages.php" target="_blank" rel="noopener"
+                >администрировании страниц</a
+              >. Отключите визуальный редактор и вставьте код в содержимое.
+            </p>
+            <p>
+              Название: <strong id="anfc-manual-title"></strong><br />Адресное
+              имя: <strong id="anfc-manual-address"></strong><br />Теги:
+              <strong>vault</strong><br />Объявление: <strong>Нет</strong>
+            </p>
+            <p id="anfc-manual-groups"></p>
+            <textarea
+              id="anfc-manual-code"
+              rows="5"
+              readonly
+              aria-label="Код личной страницы"
+            ></textarea>
+            <button type="button" class="button" id="anfc-manual-copy">
+              Скопировать код
+            </button>
+            <p>После создания нажмите «Продолжить принятие».</p>
+          </div>
           <label
             class="flex items-center gap-sm"
             id="anfc-letter-review"
@@ -483,7 +507,7 @@ export const getConfigFormMarkup = () =>
             <span
               >Проверил
               <a id="anfc-letter-link" target="_blank" rel="noopener">тему</a>:
-              письмо не опубликовано. Разрешаю повторную отправку.</span
+              сообщение не опубликовано. Разрешаю повторную отправку.</span
             >
           </label>
           <div class="char-form__actions flex justify-end gap-xs">

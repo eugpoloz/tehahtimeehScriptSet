@@ -84,6 +84,39 @@ export const postAcceptanceLetter = async ({ input, journal, iframe }) => {
     // First writes, approved resends and uncertain results need the full topic.
     posts = await readPosts(iframe, topicId);
   }
+  if (!previous) {
+    const matches = [];
+    for (const post of posts) {
+      const doc = await iframe.load(`/edit.php?id=${post.id}`);
+      const text = getField(getForm(doc, "form#post"), "req_message").value;
+      if (text.replace(/\r\n?/g, "\n") === expected) {
+        matches.push(post);
+      }
+    }
+    if (matches.length > 1) {
+      throw new Error(
+        "Найдено несколько сообщений о принятии. Проверьте тему вручную."
+      );
+    }
+    if (matches.length === 1) {
+      const match = matches[0];
+      if (parsePositiveId(match.authorId) === null) {
+        throw new Error(
+          "Не удалось подтвердить автора сообщения. Проверьте тему вручную."
+        );
+      }
+      journal.letter = {
+        state: "complete",
+        expected,
+        authorId: match.authorId,
+        lastPostId: 0,
+        postId: match.id,
+        url: `/viewtopic.php?pid=${match.id}#p${match.id}`
+      };
+      saveJournal(journal);
+      return;
+    }
+  }
   if (previous) {
     const matches = [];
     for (const post of posts) {
@@ -113,7 +146,7 @@ export const postAcceptanceLetter = async ({ input, journal, iframe }) => {
 
     if (previous.state === "complete" || matches.length > 1) {
       throw new Error(
-        "Сохранённое письмо изменено, удалено или найдено несколько копий. Проверьте тему вручную."
+        "Сохранённое сообщение изменено, удалено или найдено несколько копий. Проверьте тему вручную."
       );
     }
 
@@ -121,7 +154,7 @@ export const postAcceptanceLetter = async ({ input, journal, iframe }) => {
       previous.reviewRequired = true;
       saveJournal(journal);
       throw new Error(
-        "Публикация письма не подтверждена. Проверьте тему. Повторная отправка доступна только после подтверждения ниже."
+        "Публикация сообщения не подтверждена. Проверьте тему. Повторная отправка доступна только после подтверждения ниже."
       );
     }
   }
@@ -140,7 +173,7 @@ export const postAcceptanceLetter = async ({ input, journal, iframe }) => {
   const formUser = getField(form, "form_user").value;
   if (authorId === null || !formUser) {
     throw new Error(
-      "Не удалось подтвердить автора письма. Проверьте вход в форум."
+      "Не удалось подтвердить автора сообщения. Проверьте вход в форум."
     );
   }
 
