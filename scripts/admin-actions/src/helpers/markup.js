@@ -331,6 +331,10 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
           ><input type="checkbox" name="affiliations" value="mafia" />
           синдикат</label
         >
+        <label class="char-form__option flex items-center gap-xs"
+          ><input type="checkbox" name="affiliations" value="knossos" />
+          университет</label
+        >
       </div>
     </div>
   </fieldset>`;
