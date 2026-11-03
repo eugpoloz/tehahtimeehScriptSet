@@ -27,35 +27,6 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         />
         <span>NPC</span>
       </label>
-      <div
-        class="char-form__field char-form__field--main flex items-center gap-sm flex-1"
-        id="char-form-main-optional"
-      >
-        <div class="char-form__checks flex items-center gap-sm">
-          <label class="char-form__toggle flex items-center">
-            <input
-              type="checkbox"
-              id="char-form-main-is-main"
-              checked
-              aria-controls="char-form-main-body"
-            />
-          </label>
-          <label for="char-form-main-is-main">
-            <strong class="char-form__label flex items-center gap-sm"
-              >Это основной профиль</strong
-            >
-          </label>
-        </div>
-        <div class="pickers gap-sm flex-1" id="char-form-main-body">
-          <input type="hidden" id="char-form-main" />
-          ${getProfilePickerMarkup({
-            id: "char-form-main-picker",
-            label: "Имя основного профиля",
-            hideLabel: true,
-            disabled: true
-          })}
-        </div>
-      </div>
     </div>
     <div
       class="char-form__field char-form__field--application subgrid"
@@ -121,6 +92,37 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         </div>
       </div>
     </div>
+    <div
+      class="char-form__field char-form__field--main flex flex-col gap-xs"
+      id="char-form-main-optional"
+    >
+      <div
+        class="char-form__checks char-form__control flex items-center gap-sm"
+      >
+        <label class="char-form__toggle flex items-center">
+          <input
+            type="checkbox"
+            id="char-form-main-is-main"
+            checked
+            aria-controls="char-form-main-body"
+          />
+        </label>
+        <label for="char-form-main-is-main">
+          <strong class="char-form__label flex items-center gap-sm"
+            >Это основной профиль</strong
+          >
+        </label>
+      </div>
+      <div class="pickers gap-sm" id="char-form-main-body">
+        <input type="hidden" id="char-form-main" />
+        ${getProfilePickerMarkup({
+          id: "char-form-main-picker",
+          label: "Имя основного профиля",
+          hideLabel: true,
+          disabled: true
+        })}
+      </div>
+    </div>
     <div class="char-form__names subgrid col-span-full">
       <div class="char-form__field flex flex-col">
         <label class="char-form__control flex flex-col gap-xs">
@@ -168,56 +170,96 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         </label>
       </div>
     </div>
-    <div class="char-form__field flex flex-col">
-      <label class="char-form__control flex flex-col gap-xs">
-        <span class="char-form__label flex items-center gap-sm">
+    <div class="char-form__dates subgrid col-span-full">
+      <div
+        class="char-form__field char-form__date-field char-form__date-field--birth char-form__control subgrid"
+      >
+        <label
+          class="char-form__label flex items-center col-span-full"
+          for="char-form-dob"
+        >
           <strong>Дата рождения</strong>
-          <small class="char-form__hint">ДД.ММ.ГГГГ</small>
-        </span>
+        </label>
         <input
           type="date"
-          class="char-form__input w-full"
+          class="char-form__input w-full col-span-full"
           id="char-form-dob"
           min="0001-01-01"
           max="9999-12-31"
         />
-      </label>
-    </div>
-    <div class="char-form__field flex flex-col gap-xs">
-      <div
-        class="char-form__checks char-form__control flex items-center gap-sm"
-      >
-        <label class="char-form__toggle flex items-center">
-          <input
-            type="checkbox"
-            id="char-form-dob-alt-enabled"
-            aria-controls="char-form-dob-alt-body"
-            aria-expanded="false"
-          />
-        </label>
-        <label for="char-form-dob-alt-enabled">
-          <strong class="char-form__label flex items-center gap-sm"
-            >Дополнительная дата рождения</strong
-          >
-        </label>
       </div>
       <div
-        class="char-form__control flex flex-col gap-xs"
-        id="char-form-dob-alt-body"
-        hidden
+        class="char-form__field char-form__date-field char-form__date-field--age char-form__control subgrid"
       >
-        <input
-          type="date"
-          class="char-form__input w-full"
-          id="char-form-dob-alt"
-          min="0001-01-01"
-          max="9999-12-31"
-          aria-label="Дополнительная дата рождения"
-          disabled
-        />
+        <strong class="char-form__label flex items-center col-span-full"
+          >Возраст</strong
+        >
+        <span
+          class="flex items-center col-span-full"
+          id="char-form-age-preview"
+          aria-live="polite"
+          >—</span
+        >
+      </div>
+      <div
+        class="char-form__field char-form__date-field char-form__date-field--alternative subgrid"
+      >
+        <div
+          class="char-form__checks char-form__control flex items-center gap-sm col-span-full"
+        >
+          <label class="char-form__toggle flex items-center">
+            <input
+              type="checkbox"
+              id="char-form-dob-alt-enabled"
+              aria-controls="char-form-dob-alt-body"
+              aria-expanded="false"
+            />
+          </label>
+          <label for="char-form-dob-alt-enabled">
+            <strong class="char-form__label flex items-center gap-sm"
+              >Дополнительная дата рождения</strong
+            >
+          </label>
+        </div>
+        <div
+          class="char-form__date-alt-body subgrid col-span-full"
+          id="char-form-dob-alt-body"
+          hidden
+        >
+          <input
+            type="date"
+            class="char-form__input char-form__date-alt-input w-full"
+            id="char-form-dob-alt"
+            min="0001-01-01"
+            max="9999-12-31"
+            aria-label="Дополнительная дата рождения"
+            disabled
+          />
+          <button
+            class="button char-form__swap flex items-center justify-center"
+            type="button"
+            id="char-form-swap-dates"
+            aria-label="Поменять даты местами"
+            title="Поменять даты местами"
+          >
+            <i class="material-symbols-sharp icon-16" aria-hidden="true"
+              >swap_horiz</i
+            >
+          </button>
+        </div>
       </div>
     </div>
     ${collectionMarkup}
+    <div class="char-form__field flex flex-col gap-xs">
+      <label class="char-form__label flex items-center" for="char-form-desc">
+        <strong>Описание</strong>
+      </label>
+      <textarea
+        class="char-form__input char-form__description"
+        id="char-form-desc"
+        placeholder="Чем занимается?"
+      ></textarea>
+    </div>
     <div class="char-form__field char-form__field--who subgrid">
       <div
         class="char-form__who-heading flex items-center gap-sm col-span-full"
@@ -225,55 +267,53 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         <strong class="char-form__label flex items-center gap-sm">Кто</strong>
         <label class="char-form__toggle flex items-center gap-xs">
           <input type="checkbox" id="char-form-gender-f" />
-          <span>Использовать окончания женского рода</span>
+          <small><strong>окончания женского рода</strong></small>
         </label>
       </div>
-      <div class="char-form__who-body subgrid col-span-full">
-        <div class="char-form__who-options flex flex-col gap-xs">
-          <div
-            class="char-form__options flex gap-sm"
-            id="char-form-who-nature"
-            role="radiogroup"
-            aria-label="Тип"
-          >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="radio" name="who-nature" value="human" checked />
-              человек</label
-            >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="radio" name="who-nature" value="hybrid" />
-              полукровка</label
-            >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="radio" name="who-nature" value="creature" />
-              существо</label
-            >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="radio" name="who-nature" value="other" /> ???</label
-            >
-          </div>
-          <div
-            class="char-form__options flex gap-sm"
-            id="char-form-who-magic"
-            role="group"
-            aria-label="Магия"
-          >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="checkbox" name="who-magic" value="magician" />
-              <span id="char-form-magician-label">волшебник</span></label
-            >
-            <label class="char-form__option flex items-center gap-xs"
-              ><input type="checkbox" name="who-magic" value="hedgewitch" />
-              хедж-ведьма</label
-            >
-          </div>
-        </div>
-        <label
-          class="char-form__cursed char-form__toggle flex items-center gap-sm"
+      <div class="flex flex-col gap-xs col-span-full">
+        <div
+          class="char-form__options flex gap-sm"
+          id="char-form-who-nature"
+          role="radiogroup"
+          aria-label="Тип"
         >
-          <input type="checkbox" id="char-form-cursed" />
-          <span id="char-form-cursed-label">Проклят</span>
-        </label>
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="human" checked />
+            человек</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="hybrid" />
+            полукровка</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="creature" />
+            существо</label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="radio" name="who-nature" value="other" /> ???</label
+          >
+        </div>
+        <div
+          class="char-form__options flex gap-sm"
+          id="char-form-who-magic"
+          role="group"
+          aria-label="Магия"
+        >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="checkbox" name="who-magic" value="magician" />
+            <span id="char-form-magician-label">волшебник</span></label
+          >
+          <label class="char-form__option flex items-center gap-xs"
+            ><input type="checkbox" name="who-magic" value="hedgewitch" />
+            хедж-ведьма</label
+          >
+        </div>
+        <div class="char-form__options flex gap-sm">
+          <label class="char-form__option flex items-center gap-xs">
+            <input type="checkbox" id="char-form-cursed" />
+            <span id="char-form-cursed-label">Проклят</span>
+          </label>
+        </div>
       </div>
     </div>
     <div
@@ -292,18 +332,6 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
           синдикат</label
         >
       </div>
-    </div>
-    <div class="char-form__field flex flex-col col-span-full">
-      <label class="char-form__control flex flex-col gap-xs">
-        <strong class="char-form__label flex items-center gap-sm"
-          >Описание</strong
-        >
-        <textarea
-          class="char-form__input char-form__description"
-          id="char-form-desc"
-          placeholder="Чем занимается?"
-        ></textarea>
-      </label>
     </div>
   </fieldset>`;
 

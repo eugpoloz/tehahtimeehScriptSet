@@ -51,6 +51,35 @@ const fromDateInput = (value) => {
   return `${day}.${month}.${year}`;
 };
 
+/** @param {HTMLInputElement} input @returns {number | null} */
+const ageFromInput = (input) => {
+  const gameDate = window.GAME_LATEST_DATE;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value);
+  if (
+    !match ||
+    !input.validity.valid ||
+    !(gameDate instanceof Date) ||
+    Number.isNaN(gameDate.getTime())
+  ) {
+    return null;
+  }
+
+  const [, year, month, day] = match.map(Number);
+  let age = gameDate.getFullYear() - year;
+  if (
+    gameDate.getMonth() < month - 1 ||
+    (gameDate.getMonth() === month - 1 && gameDate.getDate() < day)
+  ) {
+    age--;
+  }
+
+  if (age < 0) {
+    return null;
+  }
+
+  return age;
+};
+
 /**
  * Initialize a form containing getCharacterFormMarkup(). Does not save config.
  * @param {HTMLFormElement} form
@@ -97,6 +126,12 @@ export const initCharacterForm = (form, options = {}) => {
   const genderFemale = input("char-form-gender-f");
   const dobAltEnabled = input("char-form-dob-alt-enabled");
   const dobAltBody = element("char-form-dob-alt-body");
+  const agePreview = element("char-form-age-preview");
+  const swapDates = element("char-form-swap-dates");
+  if (!(swapDates instanceof HTMLButtonElement)) {
+    throw new Error("Character form date swap button is missing.");
+  }
+
   const cursed = input("char-form-cursed");
   const nature = element("char-form-who-nature");
   const magic = element("char-form-who-magic");
@@ -286,6 +321,21 @@ export const initCharacterForm = (form, options = {}) => {
     fields.dobAlt.disabled = !dobAltEnabled.checked;
     dobAltEnabled.setAttribute("aria-expanded", String(dobAltEnabled.checked));
   };
+  const updateAgePreview = () => {
+    const primaryAge = ageFromInput(fields.dob);
+    if (primaryAge === null) {
+      agePreview.textContent = "—";
+      return;
+    }
+
+    agePreview.textContent = String(primaryAge);
+    if (dobAltEnabled.checked) {
+      const alternativeAge = ageFromInput(fields.dobAlt);
+      if (alternativeAge !== null) {
+        agePreview.textContent += ` (${alternativeAge})`;
+      }
+    }
+  };
 
   const restoreBaseline = () => {
     const character = originalCharacter;
@@ -320,6 +370,7 @@ export const initCharacterForm = (form, options = {}) => {
     updateNpc();
     updateGender();
     updateDobAlt();
+    updateAgePreview();
     refreshMainProfiles();
     clearErrors();
     initialFormState = getFormState();
@@ -352,6 +403,7 @@ export const initCharacterForm = (form, options = {}) => {
     updateNpc();
     updateGender();
     updateDobAlt();
+    updateAgePreview();
     refreshMainProfiles();
     clearErrors();
     notifyChange();
@@ -515,10 +567,26 @@ export const initCharacterForm = (form, options = {}) => {
   const onActivity = () => {
     clearErrors();
     updateLinks();
+    updateAgePreview();
     notifyChange();
   };
   fieldset.addEventListener("input", onActivity);
   fieldset.addEventListener("change", onActivity);
+  swapDates.addEventListener("click", () => {
+    if (!dobAltEnabled.checked || fieldset.matches(":disabled")) {
+      return;
+    }
+
+    if (fields.dob.validity.badInput || fields.dobAlt.validity.badInput) {
+      showStatus("Завершите ввод дат перед обменом.");
+      return;
+    }
+
+    const previousDob = fields.dob.value;
+    fields.dob.value = fields.dobAlt.value;
+    fields.dobAlt.value = previousDob;
+    onActivity();
+  });
   for (const field of [fields.id, fields.anketa]) {
     field.addEventListener("blur", updateLinks);
     field.addEventListener("keydown", (event) => {
