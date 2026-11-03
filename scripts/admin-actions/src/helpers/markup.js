@@ -29,12 +29,12 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </label>
     </div>
     <div
-      class="char-form__field char-form__field--application subgrid"
+      class="char-form__field char-form__field--application subgrid min-w-0"
       id="char-form-anketa-field"
     >
-      <div class="char-form__control subgrid col-span-full">
+      <div class="char-form__control subgrid col-span-full min-w-0 row-gap-xs">
         <label
-          class="char-form__label flex items-center gap-sm col-span-full"
+          class="char-form__label flex items-center gap-sm col-span-full flex-wrap"
           for="char-form-anketa"
         >
           <strong>Анкета</strong>
@@ -42,10 +42,10 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
             >ID темы</small
           >
         </label>
-        <div class="char-form__reference flex gap-sm col-span-full">
+        <div class="char-form__reference flex gap-sm col-span-full min-w-0">
           <input
             type="text"
-            class="char-form__input w-full"
+            class="char-form__input w-full min-w-0"
             id="char-form-anketa"
             required
             placeholder="00"
@@ -62,21 +62,21 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
     </div>
     <div
-      class="char-form__field char-form__field--profile subgrid"
+      class="char-form__field char-form__field--profile subgrid min-w-0"
       id="char-form-id-field"
     >
-      <div class="char-form__control subgrid col-span-full">
+      <div class="char-form__control subgrid col-span-full min-w-0 row-gap-xs">
         <label
-          class="char-form__label flex items-center gap-sm col-span-full"
+          class="char-form__label flex items-center gap-sm col-span-full flex-wrap"
           for="char-form-id"
         >
           <strong>ID профиля</strong>
           <small class="char-form__hint">Только цифры</small>
         </label>
-        <div class="char-form__reference flex gap-sm col-span-full">
+        <div class="char-form__reference flex gap-sm col-span-full min-w-0">
           <input
             type="text"
-            class="char-form__input w-full"
+            class="char-form__input w-full min-w-0"
             id="char-form-id"
             required
             placeholder="00"
@@ -93,11 +93,11 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
     </div>
     <div
-      class="char-form__field char-form__field--main flex flex-col gap-xs"
+      class="char-form__field char-form__field--main flex flex-col gap-xs min-w-0"
       id="char-form-main-optional"
     >
       <div
-        class="char-form__checks char-form__control flex items-center gap-sm"
+        class="char-form__checks char-form__control flex items-center gap-sm min-w-0"
       >
         <label class="char-form__toggle flex items-center">
           <input
@@ -108,7 +108,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
           />
         </label>
         <label for="char-form-main-is-main">
-          <strong class="char-form__label flex items-center gap-sm"
+          <strong class="char-form__label flex items-center gap-sm flex-wrap"
             >Это основной профиль</strong
           >
         </label>
@@ -124,45 +124,45 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
     </div>
     <div class="char-form__names subgrid col-span-full">
-      <div class="char-form__field flex flex-col">
-        <label class="char-form__control flex flex-col gap-xs">
-          <span class="char-form__label flex items-center gap-sm">
+      <div class="char-form__field flex flex-col min-w-0">
+        <label class="char-form__control flex flex-col gap-xs min-w-0">
+          <span class="char-form__label flex items-center gap-sm flex-wrap">
             <strong>Name</strong>
             <small class="char-form__hint">Латиницей (имя профиля)</small>
           </span>
           <input
             type="text"
-            class="char-form__input w-full"
+            class="char-form__input w-full min-w-0"
             id="char-form-name"
             required
             placeholder="Name Surname"
           />
         </label>
       </div>
-      <div class="char-form__field flex flex-col">
-        <label class="char-form__control flex flex-col gap-xs">
-          <span class="char-form__label flex items-center gap-sm">
+      <div class="char-form__field flex flex-col min-w-0">
+        <label class="char-form__control flex flex-col gap-xs min-w-0">
+          <span class="char-form__label flex items-center gap-sm flex-wrap">
             <strong>Имя</strong>
             <small class="char-form__hint">Кириллицей</small>
           </span>
           <input
             type="text"
-            class="char-form__input w-full"
+            class="char-form__input w-full min-w-0"
             id="char-form-ru"
             required
             placeholder="Имярек Имярекович"
           />
         </label>
       </div>
-      <div class="char-form__field flex flex-col">
-        <label class="char-form__control flex flex-col gap-xs">
-          <span class="char-form__label flex items-center gap-sm">
+      <div class="char-form__field flex flex-col min-w-0">
+        <label class="char-form__control flex flex-col gap-xs min-w-0">
+          <span class="char-form__label flex items-center gap-sm flex-wrap">
             <strong>FC</strong>
             <small class="char-form__hint">Внешность латиницей</small>
           </span>
           <input
             type="text"
-            class="char-form__input w-full"
+            class="char-form__input w-full min-w-0"
             id="char-form-fc"
             required
             placeholder="Name Surname"
@@ -170,28 +170,29 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         </label>
       </div>
     </div>
-    <div class="char-form__dates subgrid col-span-full">
+    <div class="char-form__dates subgrid col-span-full row-gap-xs">
       <div
-        class="char-form__field char-form__date-field char-form__date-field--birth char-form__control subgrid"
+        class="char-form__field char-form__date-field char-form__date-field--birth char-form__control subgrid min-w-0"
       >
         <label
-          class="char-form__label flex items-center col-span-full"
+          class="char-form__label flex items-center col-span-full flex-wrap"
           for="char-form-dob"
         >
           <strong>Дата рождения</strong>
         </label>
         <input
           type="date"
-          class="char-form__input w-full col-span-full"
+          class="char-form__input w-full col-span-full min-w-0"
           id="char-form-dob"
           min="0001-01-01"
           max="9999-12-31"
         />
       </div>
       <div
-        class="char-form__field char-form__date-field char-form__date-field--age char-form__control subgrid"
+        class="char-form__field char-form__date-field char-form__date-field--age char-form__control subgrid min-w-0"
       >
-        <strong class="char-form__label flex items-center col-span-full"
+        <strong
+          class="char-form__label flex items-center col-span-full flex-wrap"
           >Возраст</strong
         >
         <span
@@ -202,10 +203,10 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         >
       </div>
       <div
-        class="char-form__field char-form__date-field char-form__date-field--alternative subgrid"
+        class="char-form__field char-form__date-field char-form__date-field--alternative subgrid min-w-0"
       >
         <div
-          class="char-form__checks char-form__control flex items-center gap-sm col-span-full"
+          class="char-form__checks char-form__control flex items-center gap-sm col-span-full min-w-0"
         >
           <label class="char-form__toggle flex items-center">
             <input
@@ -216,7 +217,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
             />
           </label>
           <label for="char-form-dob-alt-enabled">
-            <strong class="char-form__label flex items-center gap-sm"
+            <strong class="char-form__label flex items-center gap-sm flex-wrap"
               >Дополнительная дата рождения</strong
             >
           </label>
@@ -228,7 +229,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
         >
           <input
             type="date"
-            class="char-form__input char-form__date-alt-input w-full"
+            class="char-form__input char-form__date-alt-input w-full min-w-0"
             id="char-form-dob-alt"
             min="0001-01-01"
             max="9999-12-31"
@@ -250,21 +251,28 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
     </div>
     ${collectionMarkup}
-    <div class="char-form__field flex flex-col gap-xs">
-      <label class="char-form__label flex items-center" for="char-form-desc">
+    <div class="char-form__field flex flex-col gap-xs min-w-0">
+      <label
+        class="char-form__label flex items-center flex-wrap"
+        for="char-form-desc"
+      >
         <strong>Описание</strong>
       </label>
       <textarea
-        class="char-form__input char-form__description"
+        class="char-form__input char-form__description min-w-0 flex-1"
         id="char-form-desc"
         placeholder="Чем занимается?"
       ></textarea>
     </div>
-    <div class="char-form__field char-form__field--who subgrid">
+    <div
+      class="char-form__field char-form__field--who subgrid min-w-0 row-gap-xs content-start"
+    >
       <div
-        class="char-form__who-heading flex items-center gap-sm col-span-full"
+        class="char-form__who-heading flex items-center gap-sm col-span-full flex-wrap"
       >
-        <strong class="char-form__label flex items-center gap-sm">Кто</strong>
+        <strong class="char-form__label flex items-center gap-sm flex-wrap"
+          >Кто</strong
+        >
         <label class="char-form__toggle flex items-center gap-xs">
           <input type="checkbox" id="char-form-gender-f" />
           <small><strong>окончания женского рода</strong></small>
@@ -272,7 +280,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
       <div class="flex flex-col gap-xs col-span-full">
         <div
-          class="char-form__options flex gap-sm"
+          class="char-form__options flex gap-sm flex-wrap"
           id="char-form-who-nature"
           role="radiogroup"
           aria-label="Тип"
@@ -294,7 +302,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
           >
         </div>
         <div
-          class="char-form__options flex gap-sm"
+          class="char-form__options flex gap-sm flex-wrap"
           id="char-form-who-magic"
           role="group"
           aria-label="Магия"
@@ -308,7 +316,7 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
             хедж-ведьма</label
           >
         </div>
-        <div class="char-form__options flex gap-sm">
+        <div class="char-form__options flex gap-sm flex-wrap">
           <label class="char-form__option flex items-center gap-xs">
             <input type="checkbox" id="char-form-cursed" />
             <span id="char-form-cursed-label">Проклят</span>
@@ -321,12 +329,12 @@ const getCharacterFieldsMarkup = (collectionMarkup = "") =>
       </div>
     </div>
     <div
-      class="char-form__field char-form__field--affiliations flex flex-col gap-xs"
+      class="char-form__field char-form__field--affiliations flex flex-col gap-xs min-w-0"
     >
-      <strong class="char-form__label flex items-center gap-sm"
+      <strong class="char-form__label flex items-center gap-sm flex-wrap"
         >Принадлежность</strong
       >
-      <div class="char-form__options flex gap-sm" id="char-form-aff">
+      <div class="char-form__options flex gap-sm flex-wrap" id="char-form-aff">
         <label class="char-form__option flex items-center gap-xs"
           ><input type="checkbox" name="affiliations" value="lawenforcement" />
           полиция</label
@@ -367,7 +375,12 @@ export const getConfigFormMarkup = () =>
           </div>
         </article>
         <p class="char-accept__notes" id="anfc-notes"></p>
-        <p class="char-accept__errors" id="anfc-errors" role="alert" hidden></p>
+        <p
+          class="char-accept__errors text-error"
+          id="anfc-errors"
+          role="alert"
+          hidden
+        ></p>
         <form
           class="char-form relative"
           id="char-form"
@@ -376,17 +389,17 @@ export const getConfigFormMarkup = () =>
         >
           ${getCharacterFieldsMarkup(
             /* HTML */ `<div
-              class="char-form__field flex flex-col col-span-full"
+              class="char-form__field flex flex-col col-span-full min-w-0"
               id="anfc-collection"
             >
               <label
-                class="char-form__control flex flex-col gap-xs"
+                class="char-form__control flex flex-col gap-xs min-w-0"
                 for="anfc-address"
               >
                 <strong class="char-form__label">Адрес личной страницы</strong>
                 <input
                   type="text"
-                  class="char-form__input w-full"
+                  class="char-form__input w-full min-w-0"
                   id="anfc-address"
                   maxlength="48"
                   aria-describedby="anfc-address-hint"
@@ -399,7 +412,7 @@ export const getConfigFormMarkup = () =>
             </div>`
           )}
           <p
-            class="char-form__status char-accept__status char-accept__status--error col-span-full"
+            class="char-form__status char-accept__status col-span-full"
             id="char-form-status"
             role="status"
             aria-live="polite"

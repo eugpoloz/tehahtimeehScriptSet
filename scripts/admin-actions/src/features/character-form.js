@@ -213,9 +213,10 @@ export const initCharacterForm = (form, options = {}) => {
 
     options.onChange?.();
   };
-  /** @param {string} message */
-  const showStatus = (message) => {
+  /** @param {string} message @param {boolean} [isError] */
+  const showStatus = (message, isError = false) => {
     if (status) {
+      status.classList.toggle("text-error", isError);
       status.textContent = message;
     }
   };
@@ -238,7 +239,7 @@ export const initCharacterForm = (form, options = {}) => {
     } else {
       field.focus();
     }
-    showStatus(message);
+    showStatus(message, true);
     throw new Error(message);
   };
 
@@ -588,7 +589,7 @@ export const initCharacterForm = (form, options = {}) => {
     }
 
     if (fields.dob.validity.badInput || fields.dobAlt.validity.badInput) {
-      showStatus("Завершите ввод дат перед обменом.");
+      showStatus("Завершите ввод дат перед обменом.", true);
       return;
     }
 
@@ -623,7 +624,8 @@ export const initCharacterForm = (form, options = {}) => {
       }
     } catch (error) {
       showStatus(
-        error instanceof Error ? error.message : "Проверьте поля формы."
+        error instanceof Error ? error.message : "Проверьте поля формы.",
+        true
       );
     } finally {
       submitting = false;

@@ -186,7 +186,12 @@ const createCharacterAcceptance = async (config) => {
     progress.innerHTML = active.steps
       .map((step) => {
         const state = active?.progress[step.id] || "waiting";
-        return `<li class="char-accept__step char-accept__step--${state}">${escapeHtml(step.title)}: <strong>${labels[state]}</strong></li>`;
+        let errorClass = "";
+        if (state === "failed") {
+          errorClass = " text-error";
+        }
+
+        return `<li class="char-accept__step char-accept__step--${state}${errorClass}">${escapeHtml(step.title)}: <strong>${labels[state]}</strong></li>`;
       })
       .join("");
   };
@@ -202,7 +207,7 @@ const createCharacterAcceptance = async (config) => {
       progressDialog.showModal();
     }
     busy = true;
-    status.classList.remove("char-accept__status--error");
+    status.classList.remove("char-accept__status--error", "text-error");
     status.textContent = "Добавление персонажа в конфиг…";
     updateControls();
     try {
@@ -241,7 +246,7 @@ const createCharacterAcceptance = async (config) => {
           ? "NPC внесён в конфиг. Сохранение подтверждено."
           : "Персонаж принят. Конфиг, личная страница, профиль и письмо проверены; анкета перенесена в принятые.";
     } catch (error) {
-      status.classList.add("char-accept__status--error");
+      status.classList.add("char-accept__status--error", "text-error");
       status.textContent =
         error instanceof Error
           ? error.message
@@ -277,7 +282,7 @@ const createCharacterAcceptance = async (config) => {
         }
         void execute(reviewAddress(active.journal.input));
       } catch (error) {
-        status.classList.add("char-accept__status--error");
+        status.classList.add("char-accept__status--error", "text-error");
         status.textContent =
           error instanceof Error
             ? error.message
@@ -403,7 +408,7 @@ const createCharacterAcceptance = async (config) => {
     errors.hidden = application.errors.length === 0;
     notes.textContent = application.notes.join(" ");
     status.textContent = "";
-    status.classList.remove("char-accept__status--error");
+    status.classList.remove("char-accept__status--error", "text-error");
     if (source.mode === "regular") {
       notes.textContent +=
         " Конфиг, личная страница, профиль, письмо и перенос анкеты выполняются по порядку.";
