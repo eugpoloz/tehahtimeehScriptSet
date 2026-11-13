@@ -7,7 +7,7 @@ const SUPERLIKE_BUTTON_ID = "superlike";
 const SUPERLIKE_TOOLTIP_ID = "superlike-tooltip";
 
 async function autoReactToPosts() {
-  if (!hasTopic) {
+  if (!hasTopic || !document.querySelector(".post .post-vote a[href]")) {
     return;
   }
 
