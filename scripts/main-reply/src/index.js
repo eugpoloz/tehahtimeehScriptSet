@@ -4,13 +4,19 @@ import countTextareaCharacters from "./features/textarea/char-counter";
 import submitOnHotkey from "./features/textarea/fast-submit";
 import * as refactorEditorButtons from "./features/textarea/refactor-editor-buttons";
 import addEditorButtons from "./features/textarea/add-editor-buttons";
+import enableBbQuoting from "./features/bb-quoting";
 
 // default scripts
 refactorEditorButtons.addCtrlClicks();
 refactorEditorButtons.originalUploadedFirst();
 
 // module exports
-export { submitOnHotkey, countTextareaCharacters, addEditorButtons };
+export {
+  submitOnHotkey,
+  countTextareaCharacters,
+  addEditorButtons,
+  enableBbQuoting
+};
 
 // config example
 //

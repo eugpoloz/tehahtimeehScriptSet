@@ -55,6 +55,7 @@ declare function insert(text: string): void;
 
 interface Window {
   FORUM?: Forum;
+  quote?: (author: string, postId: number | string) => void;
   GAME_LATEST_DATE?: Date;
   ForumAPITicket?: string;
   UserID?: string | number;
