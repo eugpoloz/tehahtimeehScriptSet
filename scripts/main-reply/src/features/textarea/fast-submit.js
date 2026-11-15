@@ -1,9 +1,9 @@
 export default function submitPostOnHotkey() {
   if (typeof FORUM.editor === "object" && typeof FORUM.topic === "object") {
     const textarea = document.querySelector("#main-reply");
-    const submitInput = document.querySelector(`input[name="submit"]`);
-
     if (textarea instanceof HTMLTextAreaElement) {
+      const submitInput = textarea.form?.querySelector('input[name="submit"]');
+
       /** @param {KeyboardEvent} event */
       function checkClicked(event) {
         const { key, ctrlKey, metaKey } = event;
@@ -16,10 +16,10 @@ export default function submitPostOnHotkey() {
 
       textarea.addEventListener("keydown", checkClicked);
 
-      const tehTarget = document.querySelector("#teh-target");
-      const html = `<div id="teh-fastsubmit" class="fastsubmit">Для быстрой отправки нажмите <strong><kbd>Ctrl</kbd>+<kbd>Enter</kbd></strong> (<strong><kbd>Cmd</kbd>+<kbd>Enter</kbd></strong> для Mac).</div>`;
+      const submitControls = submitInput?.closest(".formsubmit");
+      const html = `<small id="teh-fastsubmit" class="reply__hint">Для быстрой отправки нажмите <kbd class="reply__emphasis"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></kbd> (<kbd class="reply__emphasis"><kbd>Cmd</kbd>+<kbd>Enter</kbd></kbd> для Mac).</small>`;
 
-      tehTarget?.insertAdjacentHTML("afterbegin", html);
+      submitControls?.insertAdjacentHTML("beforeend", html);
     }
   }
 }
