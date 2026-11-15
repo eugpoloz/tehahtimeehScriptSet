@@ -605,6 +605,10 @@ export const initCharacterForm = (form, options = {}) => {
     field.addEventListener("blur", updateLinks);
     field.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
+        if (event.isComposing || event.keyCode === 229) {
+          return;
+        }
+
         event.preventDefault();
         updateLinks();
       }
