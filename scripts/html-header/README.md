@@ -13,6 +13,9 @@ const content = await teh.loadSiteContent("/path/to/content.json");
 
 Returns a JSON object. Loads are cached by URL; failed requests can be retried.
 
+Set `teh.siteContentPromise` to the load promise to share the request. The
+last item of `gamePeriod` is the game date used for ages.
+
 ## Editor
 
 Call after `FORUM.editor` is available:

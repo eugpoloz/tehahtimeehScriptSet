@@ -46,6 +46,8 @@ import { escapeHtml } from "@teh/utils";
 
 /** @param {{stylesUrl?: string}} config @returns {Promise<CharacterAcceptance>} */
 const createCharacterAcceptance = async (config) => {
+  const { gamePeriod } = await teh.siteContentPromise;
+  const gameDate = gamePeriod[gamePeriod.length - 1];
   await loadAssets(config);
   const container = document.querySelector(".punbb") || document.body;
   container.insertAdjacentHTML("beforeend", getConfigFormMarkup());
@@ -384,7 +386,8 @@ const createCharacterAcceptance = async (config) => {
       const input = reviewAddress({
         ...getAcceptanceInput(
           { name: journal.input.name, character: currentCharacter },
-          active.source
+          active.source,
+          gameDate
         ),
         collectionAddress: journal.input.collectionAddress
       });
@@ -426,6 +429,7 @@ const createCharacterAcceptance = async (config) => {
     }
   });
   characterForm = initCharacterForm(form, {
+    gameDate,
     onChange: () => {
       if (active && characterForm && !busy) {
         active.draft = characterForm.getDraft();
@@ -438,7 +442,9 @@ const createCharacterAcceptance = async (config) => {
         return;
       }
 
-      await execute(reviewAddress(getAcceptanceInput(values, active.source)));
+      await execute(
+        reviewAddress(getAcceptanceInput(values, active.source, gameDate))
+      );
     }
   });
   retry.addEventListener("click", () => {

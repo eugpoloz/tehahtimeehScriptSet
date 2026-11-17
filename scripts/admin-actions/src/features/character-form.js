@@ -5,6 +5,7 @@ import { parsePositiveId } from "../helpers/character-data";
 /** @typedef {{ name: string, character: Character }} CharacterFormValues */
 /**
  * @typedef {object} CharacterFormOptions
+ * @property {string} gameDate Game date used for age previews.
  * @property {(values: CharacterFormValues) => void | Promise<void>} [onSubmit] Called after field validation.
  * @property {() => void} [onChange] Called after edits, filling or resetting.
  */
@@ -52,25 +53,17 @@ const fromDateInput = (value) => {
   return `${day}.${month}.${year}`;
 };
 
-/** @param {HTMLInputElement} input @returns {number | null} */
-const ageFromInput = (input) => {
-  const gameDate = window.GAME_LATEST_DATE;
+/** @param {HTMLInputElement} input @param {string} gameDate @returns {number | null} */
+const ageFromInput = (input, gameDate) => {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value);
-  if (
-    !match ||
-    !input.validity.valid ||
-    !(gameDate instanceof Date) ||
-    Number.isNaN(gameDate.getTime())
-  ) {
+  if (!match || !input.validity.valid) {
     return null;
   }
 
   const [, year, month, day] = match.map(Number);
-  let age = gameDate.getFullYear() - year;
-  if (
-    gameDate.getMonth() < month - 1 ||
-    (gameDate.getMonth() === month - 1 && gameDate.getDate() < day)
-  ) {
+  const [gameYear, gameMonth, gameDay] = gameDate.split("-").map(Number);
+  let age = gameYear - year;
+  if (gameMonth < month || (gameMonth === month && gameDay < day)) {
     age--;
   }
 
@@ -84,10 +77,11 @@ const ageFromInput = (input) => {
 /**
  * Initialize a form containing getCharacterFormMarkup(). Does not save config.
  * @param {HTMLFormElement} form
- * @param {CharacterFormOptions} [options]
+ * @param {CharacterFormOptions} options
  * @returns {CharacterFormController}
  */
-export const initCharacterForm = (form, options = {}) => {
+export const initCharacterForm = (form, options) => {
+  const { gameDate } = options;
   /** @param {string} id @returns {HTMLInputElement} */
   const input = (id) => {
     const element = form.querySelector(`#${id}`);
@@ -326,7 +320,7 @@ export const initCharacterForm = (form, options = {}) => {
     dobAltEnabled.setAttribute("aria-expanded", String(dobAltEnabled.checked));
   };
   const updateAgePreview = () => {
-    const primaryAge = ageFromInput(fields.dob);
+    const primaryAge = ageFromInput(fields.dob, gameDate);
     if (primaryAge === null) {
       agePreview.textContent = "—";
       return;
@@ -334,7 +328,7 @@ export const initCharacterForm = (form, options = {}) => {
 
     agePreview.textContent = String(primaryAge);
     if (dobAltEnabled.checked) {
-      const alternativeAge = ageFromInput(fields.dobAlt);
+      const alternativeAge = ageFromInput(fields.dobAlt, gameDate);
       if (alternativeAge !== null) {
         agePreview.textContent += ` (${alternativeAge})`;
       }

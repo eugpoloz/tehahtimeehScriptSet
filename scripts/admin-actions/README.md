@@ -28,7 +28,7 @@ updates the profile, posts the acceptance message, and moves the topic without a
 redirect. NPCs save only the config. Each step is verified before continuing.
 
 Regular characters require a profile ID, DOB, and the source topic ID; in-game age
-uses `GAME_LATEST_DATE`. NPCs need no profile ID or DOB. Their application link is
+uses the configured game period. NPCs need no profile ID or DOB. Their application link is
 optional, but must match the selected post when supplied.
 
 The collection address appears below the profile and application links and is
@@ -73,6 +73,7 @@ The bundle also exposes the form used by acceptance and the character editor:
 ```js
 form.insertAdjacentHTML("afterbegin", teh.getCharacterFormMarkup());
 const characterForm = teh.initCharacterForm(form, {
+  gameDate: (await teh.siteContentPromise).gamePeriod.at(-1),
   onSubmit: async ({ name, character }) => {
     await saveCharacter(name, character);
   },

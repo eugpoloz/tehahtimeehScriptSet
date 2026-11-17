@@ -106,8 +106,8 @@ export const findCharacterByApplication = (data, source) =>
         (source.mode === "npc" ? source.postId : source.topicId)
   );
 
-/** Validate DOB and calculate the age required for later profile writes. @param {CharacterFormValues} values @param {AcceptanceSource} source @returns {AcceptanceInput} */
-export const getAcceptanceInput = (values, source) => {
+/** Validate DOB and calculate the age required for later profile writes. @param {CharacterFormValues} values @param {AcceptanceSource} source @param {string} gameDate @returns {AcceptanceInput} */
+export const getAcceptanceInput = (values, source, gameDate) => {
   const character = values.character;
   const npc = source.mode === "npc";
   if ((character.id == null) !== npc) {
@@ -155,12 +155,9 @@ export const getAcceptanceInput = (values, source) => {
     return input;
   }
 
-  const gameDate = /** @type {Date} */ (window.GAME_LATEST_DATE);
-  let age = gameDate.getFullYear() - year;
-  if (
-    gameDate.getMonth() < month - 1 ||
-    (gameDate.getMonth() === month - 1 && gameDate.getDate() < day)
-  ) {
+  const [gameYear, gameMonth, gameDay] = gameDate.split("-").map(Number);
+  let age = gameYear - year;
+  if (gameMonth < month || (gameMonth === month && gameDay < day)) {
     age--;
   }
   return { ...input, age };

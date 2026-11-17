@@ -39,7 +39,7 @@ export {
 
 // config example
 //
-// teh.defineAgeFromBirthday("age-from-dob", "GAME_LATEST_DATE");
+// teh.defineAgeFromBirthday("age-from-dob");
 // teh.loadFriendsBanners();
 // teh.loadCharacterVault({
 //   scriptUrl: "//forumstatic.ru/files/001c/ab/7e/61137.js?v=2",

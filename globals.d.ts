@@ -56,7 +56,6 @@ declare function insert(text: string): void;
 interface Window {
   FORUM?: Forum;
   quote?: (author: string, postId: number | string) => void;
-  GAME_LATEST_DATE?: Date;
   ForumAPITicket?: string;
   UserID?: string | number;
   UserLogin?: string;
@@ -69,13 +68,16 @@ type CharactersConfig = Record<string, Record<string, unknown>>;
 
 /** Runtime namespace populated by @teh/core (and extended by other IIFEs). */
 interface TehNamespace {
+  siteContentPromise?: Promise<
+    Record<string, unknown> & { gamePeriod: string[] }
+  >;
   acceptNewFullCharacter?: (
     config: import("./scripts/admin-actions/src/features/accept-new-full-character.js").AcceptNewFullCharacterConfig
   ) => Promise<void>;
   getCharacterFormMarkup?: () => string;
   initCharacterForm?: (
     form: HTMLFormElement,
-    options?: import("./scripts/admin-actions/src/features/character-form.js").CharacterFormOptions
+    options: import("./scripts/admin-actions/src/features/character-form.js").CharacterFormOptions
   ) => import("./scripts/admin-actions/src/features/character-form.js").CharacterFormController;
   adminActionsScriptUrl?: string;
   loadCharacters?: (url?: string) => Promise<CharactersConfig>;
@@ -84,7 +86,9 @@ interface TehNamespace {
   [key: string]: unknown;
 }
 
-declare const teh: TehNamespace;
+/** Header-loaded pages have the site-content and game-date APIs installed. */
+declare const teh: TehNamespace &
+  Required<Pick<TehNamespace, "siteContentPromise">>;
 
 interface JQueryDocumentEvents {
   on(events: string, handler: (event: Event) => void): JQueryDocumentEvents;
