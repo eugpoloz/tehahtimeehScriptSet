@@ -47,6 +47,13 @@ The config must be Windows-1251 JSON. The loader remembers the URL in
 `teh.charactersConfigUrl` and returns `window.characters`. Character values are
 objects; NPCs may omit `id` and DOB.
 
+## Post HTML
+
+The HTML footer accepts group IDs in `fullAccessGroupId` for unrestricted access and `scopedAccessGroupId`
+for post-local rendering through an SES worker. The build also writes `dist/teh.post-worker.js` for on-demand loading. Full access takes precedence.
+Inline scripts can use `teh.post()` in both modes to access block data and render HTML. See the
+[configuration and authoring example](scripts/html-footer/README.md#post-html).
+
 ## BB quoting
 
 On topic pages with a reply editor, opt in after loading `main-reply`:

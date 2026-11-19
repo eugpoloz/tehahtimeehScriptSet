@@ -1,24 +1,37 @@
 # @teh/html-footer
 
-Footer features for trusted post HTML, accessible title popovers, and image proxy
-fallback.
+The footer can display HTML in posts, show tooltips, and retry images that fail to load.
 
 ## Post HTML
 
+Choose which forum groups can use HTML in their posts:
+
 ```js
-teh.renderPostHtml({ userIds: [3], groupIds: [1] });
+teh.renderPostHtml({ fullAccessGroupId: [1], scopedAccessGroupId: [5] });
 ```
 
-This renders marked code blocks from allowed authors, including AJAX previews:
+Set `workerUrl` to the uploaded `teh.post-worker.js` file. It includes SES and loads only when a scoped post runs JavaScript.
+
+- **Full** access lets scripts run directly on the forum page. Give it only to trusted groups.
+- **Scoped** access lets authors use forum classes, style their post, and generate HTML with JavaScript. Their scripts run separately from the forum page.
+
+If a group appears in both lists, full access wins. Previews use the post author's group, even when a moderator edits the post. Quoted blocks and posts from other groups stay as code.
+
+Start a code block with `<!-- HTML -->`. For a layout with editable data, put the JSON first. Here, changing `105` changes which episode the link opens.
 
 ```text
 [code]<!-- HTML -->
-<section>Rendered as HTML</section>
+<script type="application/json">{ "topic": 105 }</script>
+<script>
+  {
+    const { data, render } = teh.post();
+    render(`<a href="/viewtopic.php?id=${Number(data.topic)}">Эпизод</a>`);
+  }
+</script>
 [/code]
 ```
 
-Both allowlists default to empty. Quoted blocks are ignored. Rendered scripts
-execute on the forum origin, so only allow fully trusted users and groups.
+`data` reads the first JSON block. Use `dataBlocks` for all of them in order. `render(html)` inserts HTML where the script appears. If scoped rendering fails, readers see the original code and an error message.
 
 ## Title popovers
 

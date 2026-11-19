@@ -10,6 +10,8 @@ import addTitlePopovers from "./features/add-title-popovers";
 import renderPostHtml from "./features/render-post-html";
 import proxyImages from "./features/proxy-images";
 
+export { post } from "./helpers/post-context";
+
 // module exports
 export {
   createFastLoginLinks,
@@ -63,5 +65,5 @@ export {
 //  }
 //]);
 //teh.addTitlePopovers(["abbr[title]", "button[title]"]);
-//teh.renderPostHtml({ userIds: [3], groupIds: [1] });
+//teh.renderPostHtml({ fullAccessGroupId: [1], scopedAccessGroupId: [5] });
 //teh.proxyImages();
