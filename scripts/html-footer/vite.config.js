@@ -30,7 +30,8 @@ export default mergeConfig(
             type: "asset",
             fileName: "teh.post-worker.js",
             source:
-              readFileSync(runtime, "utf8") +
+              // The forum uploader converts literal U+034F in SES identifiers to HTML entities.
+              readFileSync(runtime, "utf8").replaceAll("\u034f", "\\u034f") +
               ";\n" +
               readFileSync(bootstrap, "utf8")
           });

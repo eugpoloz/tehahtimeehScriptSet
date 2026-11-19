@@ -6,11 +6,13 @@
  * @returns {Promise<string[]>}
  */
 export const evaluatePostScripts = async (programs, json, workerUrl) => {
-  const script = new URL(workerUrl, document.baseURI).href;
+  const response = await fetch(workerUrl, { credentials: "omit" });
+  if (!response.ok) {
+    throw new Error(`Post worker download failed (HTTP ${response.status})`);
+  }
+
   const url = URL.createObjectURL(
-    new Blob([`importScripts(${JSON.stringify(script)});`], {
-      type: "text/javascript"
-    })
+    new Blob([await response.blob()], { type: "text/javascript" })
   );
   try {
     const worker = new Worker(url);
