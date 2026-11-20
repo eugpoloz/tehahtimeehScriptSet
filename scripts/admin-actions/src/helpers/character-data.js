@@ -4,15 +4,7 @@
 /** @typedef {{mode: 'regular' | 'npc', topicId: number, postId: number}} AcceptanceSource */
 /** @typedef {CharacterFormValues & {source: AcceptanceSource, age?: number, collectionAddress?: string}} AcceptanceInput */
 
-/** Remove accents and derive a forum page address from the name. @param {string} name */
-export const suggestCollectionAddress = (name) =>
-  name
-    .normalize("NFKD")
-    .toLowerCase()
-    .replace(/\p{Mark}/gu, "")
-    .replace(/[^a-z0-9_-]+/g, "_")
-    .replace(/^_+|_+$/g, "")
-    .slice(0, 48);
+export { suggestCollectionAddress } from "@teh/utils";
 
 /** @param {string} address */
 export const validateCollectionAddress = (address) => {

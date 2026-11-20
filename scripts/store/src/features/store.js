@@ -1,7 +1,16 @@
 "use strict";
 
+import { setupGifts } from "./gifts";
 import { escapeHtml } from "@teh/utils";
-import { storeMarkup, storeProfileOptionMarkup } from "../helpers/markup";
+import {
+  cartFieldMarkup,
+  cartImageMarkup,
+  cartRowMarkup,
+  getStoreImageUrl,
+  storeItemCountMarkup,
+  storeMarkup,
+  storeProfileOptionMarkup
+} from "../helpers/markup";
 
 /**
  * @typedef {object} StoreProfile
@@ -12,6 +21,7 @@ import { storeMarkup, storeProfileOptionMarkup } from "../helpers/markup";
  * @property {string} comment
  * @property {string} output
  * @property {string} templateValue
+ * @property {"icon" | "plashka"} [profileType]
  *
  * @typedef {object} StoreCartItem
  * @property {string} cartItemId
@@ -39,7 +49,7 @@ import { storeMarkup, storeProfileOptionMarkup } from "../helpers/markup";
  * @property {Array<any>} items
  * @property {string} layout
  * @property {string} profileType
- * @property {number} profileUnitPrice
+ * @property {number} unitPrice
  * @property {boolean} wide
  *
  * @typedef {object} StoreCatalogGroup
@@ -80,12 +90,14 @@ const store = () => {
   const categoriesRoot = store.querySelector("[data-store-categories]");
   const cart = store.querySelector("[data-store-cart]");
   const cartList = store.querySelector("[data-store-cart-list]");
+  const giftList = store.querySelector("[data-store-gift-list]");
+  const giftSection = store.querySelector("[data-store-gift-group]");
   const cartEmpty = store.querySelector("[data-store-cart-empty]");
   const cartCount = store.querySelector("[data-store-cart-count]");
   const cartTotal = store.querySelector("[data-store-cart-total]");
   const checkoutButton = store.querySelector("[data-store-checkout]");
   const clearButton = store.querySelector("[data-store-clear]");
-  const cartStatus = store.querySelector("[data-store-cart-status]");
+  const cartStatus = store.querySelector("#store-cart-status");
   const profileSelectors = /** @type {NodeListOf<HTMLFieldSetElement>} */ (
     store.querySelectorAll("[data-profile-picker]")
   );
@@ -180,6 +192,7 @@ const store = () => {
 
   /** @param {Record<string, StoreProfile>} characters */
   const populateProfileSelectors = (characters) => {
+    gifts?.setProfiles(characters);
     const entries = Object.entries(characters);
     const profiles = entries
       .filter(([, character]) => isMainProfile(character))
@@ -298,10 +311,15 @@ const store = () => {
     );
     templateElements.forEach((template, index) => {
       const marker = `__STORE_TEMPLATE_${index}__`;
+      const { profileType } = template.dataset;
       templates.set(marker, {
         comment: template.dataset.comment ?? "",
         output: template.dataset.output ?? "text",
-        templateValue: normalizeTemplateValue(template.textContent ?? "")
+        templateValue: normalizeTemplateValue(template.textContent ?? ""),
+        profileType:
+          profileType === "icon" || profileType === "plashka"
+            ? profileType
+            : undefined
       });
       template.replaceWith(document.createTextNode(`\n${marker}\n`));
     });
@@ -334,7 +352,7 @@ const store = () => {
       const price = Number(priceText);
       if (
         !name ||
-        !/^[1-9]\d*$/.test(priceText ?? "") ||
+        !/^(?:0|[1-9]\d*)$/.test(priceText ?? "") ||
         !Number.isSafeInteger(price)
       ) {
         console.warn(
@@ -412,56 +430,76 @@ const store = () => {
   const groupElements = /** @type {NodeListOf<HTMLElement>} */ (
     source.querySelectorAll("[data-group-name]")
   );
+  const giftCategories = Array.from(
+    source.querySelectorAll('[data-category-layout="gifts"]')
+  );
+  const giftSource = giftCategories.find(
+    (category) =>
+      category.hasAttribute("data-gifts-source") ||
+      category.querySelector("[data-gifts-source]")
+  );
+  const giftGroup = giftSource?.closest("[data-group-name]");
+  const customGiftCategory = Array.from(giftGroup?.children ?? []).find(
+    (category) =>
+      category !== giftSource &&
+      category.matches("[data-category-name]") &&
+      category.querySelector('pre[data-output="gift"]')
+  );
   /** @type {StoreCatalogGroup[]} */
-  const catalogGroups = Array.from(groupElements).map((group) => ({
-    title: group.dataset.groupName ?? "",
-    categories: Array.from(group.children)
-      .filter(
-        (category) =>
-          category instanceof HTMLElement &&
-          category.matches("[data-category-name]")
-      )
-      .map((category) => {
-        const categoryElement = /** @type {HTMLElement} */ (category);
-        const layout = categoryElement.dataset.categoryLayout ?? "";
-        const profileType = categoryElement.dataset.profileType ?? "";
-        const profileUnitPrice = Number(
-          categoryElement.dataset.profileUnitPrice
-        );
-        /** @type {Array<StoreCatalogRecord | StoreCatalogItem>} */
-        let items = [];
-        if (layout === "profile") {
-          const profile = profileTypes[profileType];
-          if (profile) {
-            items = parseVisualItems(
-              categoryElement,
-              profile.sourceSelector,
-              profile.itemType,
-              profileUnitPrice
-            );
+  const catalogGroups = Array.from(groupElements)
+    .filter((group) => group !== giftGroup)
+    .map((group) => ({
+      title: group.dataset.groupName ?? "",
+      categories: Array.from(group.children)
+        .filter(
+          (category) =>
+            category instanceof HTMLElement &&
+            category.matches("[data-category-name]")
+        )
+        .map((category) => {
+          const categoryElement = /** @type {HTMLElement} */ (category);
+          const layout = categoryElement.dataset.categoryLayout ?? "";
+          const profileType = categoryElement.dataset.profileType ?? "";
+          const unitPrice = Number(categoryElement.dataset.unitPrice);
+          /** @type {Array<StoreCatalogRecord | StoreCatalogItem>} */
+          let items = [];
+          if (layout === "profile") {
+            const profile = profileTypes[profileType];
+            if (profile) {
+              items = parseVisualItems(
+                categoryElement,
+                profile.sourceSelector,
+                profile.itemType,
+                unitPrice
+              );
+            }
+          } else {
+            items = parseCategoryItems(categoryElement);
           }
-        } else {
-          items = parseCategoryItems(categoryElement);
-        }
 
-        return {
-          title: categoryElement.dataset.categoryName ?? "",
-          comment:
-            categoryElement
-              .querySelector("[data-category-comment]")
-              ?.innerHTML.trim() ?? "",
-          items,
-          layout,
-          profileType,
-          profileUnitPrice,
-          wide: categoryElement.hasAttribute("data-category-wide")
-        };
-      })
-  }));
+          return {
+            title: categoryElement.dataset.categoryName ?? "",
+            comment:
+              categoryElement
+                .querySelector("[data-category-comment]")
+                ?.innerHTML.trim() ?? "",
+            items,
+            layout,
+            profileType,
+            unitPrice,
+            wide: categoryElement.hasAttribute("data-category-wide")
+          };
+        })
+    }));
 
   /** @param {number} price */
-  const getPriceMarkup = (price) =>
-    `${price} <i class="mgc mgc-copper-coin-core-regular" aria-hidden="true"></i>`;
+  const getPriceMarkup = (price) => {
+    if (price === 0) {
+      return "Бесплатно";
+    }
+
+    return `${price} <i class="mgc mgc-copper-coin-core-regular" aria-hidden="true"></i>`;
+  };
 
   const couponForms = {
     one: "купон",
@@ -534,8 +572,8 @@ const store = () => {
     return parts.join(" + ");
   };
 
-  /** @param {StoreGroup} group */
-  const getGroupPayload = (group) => {
+  /** @param {StoreGroup} group @param {string} blockBreak */
+  const getGroupPayload = (group, blockBreak) => {
     /** @type {string[]} */
     const textValues = [];
     /** @type {string[]} */
@@ -566,28 +604,32 @@ const store = () => {
       parts.push(textValues.join("\n"));
     }
     if (codeValues.length) {
-      parts.push("[" + "code]\n" + codeValues.join("\n") + "\n[/" + "code]");
+      parts.push(
+        `[code]${blockBreak}${codeValues.join("\n")}${blockBreak}[/code]`
+      );
     }
 
     return parts.join("\n\n");
   };
 
-  /** @param {StoreGroup} group */
-  const getGroupOrderBlock = (group) => {
+  /** @param {StoreGroup} group @param {string} blockBreak */
+  const getGroupOrderBlock = (group, blockBreak) => {
     const quantity =
       group.items.length > 1 ? ` (${group.items.length} шт.)` : "";
-    const parts = [
-      `[b]${group.name}[/b]${quantity} — ${getGroupPaymentSummary(group)}`,
-      getGroupPayload(group)
-    ].filter(Boolean);
-    return parts.join("\n\n");
+    const title = `[b]${group.name}[/b]${quantity} — ${getGroupPaymentSummary(group) || "0 [coin]"}`;
+    const payload = getGroupPayload(group, blockBreak);
+    if (!payload) {
+      return title;
+    }
+
+    const separator = payload.startsWith("[code]")
+      ? blockBreak.repeat(2)
+      : "\n\n";
+    return title + separator + payload;
   };
 
   const buildCheckoutText = () => {
-    if (!cartItems.length) {
-      return "";
-    }
-    if (!recipientProfile) {
+    if ((!cartItems.length && !giftCount()) || hasIncompleteOrder()) {
       return "";
     }
 
@@ -604,7 +646,7 @@ const store = () => {
     const deductionLines = [];
     const totalCoins = cartItems.reduce(
       (total, item) => total + (item.payment === "coins" ? item.price : 0),
-      0
+      giftTotal()
     );
     if (totalCoins > 0) {
       deductionLines.push(`${totalCoins} [coin]`);
@@ -620,19 +662,33 @@ const store = () => {
       }
     });
 
+    const giftCoupons = gifts?.couponCount ?? 0;
+    if (giftCoupons > 0) {
+      deductionLines.push(
+        `${giftCoupons} ${getRussianNounForm(giftCoupons, couponForms)}`
+      );
+    }
+
+    const blockBreak = gifts?.count ? "" : "\n";
+    const giftBlock = gifts?.count
+      ? `[b]Подарки:[/b][block=tab]${gifts.order(blockBreak)}[/block]`
+      : "";
+
     return [
-      recipientLine,
-      `[block=tab][quote]\n${groups.map(getGroupOrderBlock).join("\n\n[hr]\n\n")}\n[/quote][/block]`,
-      `[b]Итого списать:[/b]\n[ul]\n${deductionLines.join("\n")}\n[/ul]`,
+      cartItems.length ? recipientLine : "",
+      groups.length &&
+        `[block=tab][quote]${blockBreak}${groups.map((group) => getGroupOrderBlock(group, blockBreak)).join(`${blockBreak.repeat(2)}[hr]${blockBreak.repeat(2)}`)}${blockBreak}[/quote][/block]`,
+      giftBlock,
+      `[b]Итого списать:[/b]${blockBreak}[ul]${blockBreak}${deductionLines.join("\n") || "0 [coin]"}${blockBreak}[/ul]`,
       payerLine
     ]
       .filter(Boolean)
-      .join("\n\n");
+      .join(blockBreak.repeat(2));
   };
 
   /** @param {string} message */
   const setCartStatus = (message) => {
-    if (cartStatus) {
+    if (cartStatus.textContent !== message) {
       cartStatus.textContent = message;
     }
   };
@@ -645,17 +701,18 @@ const store = () => {
   /** @param {{ type?: string, url?: string }} item */
   const renderProfileAsset = (item) => {
     if (item.type === "plashka") {
-      return `<profile-plashka src="${item.url}"></profile-plashka>`;
+      return `<profile-plashka src="${escapeHtml(item.url ?? "")}"></profile-plashka>`;
     }
 
-    return `<profile-icon src="${item.url}"></profile-icon>`;
+    return `<profile-icon src="${escapeHtml(item.url ?? "")}"></profile-icon>`;
   };
 
   /** @param {StoreCatalogRecord} item */
   const renderItem = (item) => {
     const [name, price, optionalComment, field] = item;
+    const customGift = field?.output === "gift";
     const itemId = String(nextItemId++);
-    if (field) {
+    if (field && !customGift) {
       catalogItemFields.set(itemId, field);
     }
 
@@ -666,7 +723,7 @@ const store = () => {
     return `
       <button
         class="button store__item store__card items-start w-full"
-        data-store-add
+        ${customGift ? `data-custom-add data-gift-image-label="${escapeHtml(field?.comment ?? "")}"` : "data-store-add"}
         data-store-item-id="${itemId}"
         data-store-price="${price}"
         type="button"
@@ -674,7 +731,7 @@ const store = () => {
         <strong data-store-item-name>${name}</strong>
         <span class="store__price flex items-center">${getPriceMarkup(price)}</span>
         ${comment}
-        <span class="store__count" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
+        ${storeItemCountMarkup}
       </button>`;
   };
 
@@ -704,7 +761,7 @@ const store = () => {
       >
         ${assetMarkup}
         <span class="sr-only" data-store-item-name>${itemName}</span>
-        <span class="store__count" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>
+        ${storeItemCountMarkup}
       </button>`;
   };
 
@@ -716,7 +773,9 @@ const store = () => {
       itemRenderer = renderProfileItem;
     }
 
-    const renderedItems = category.items.map(itemRenderer).join("");
+    const renderedItems = category.items
+      .map((item) => itemRenderer(item))
+      .join("");
     const categoryComment = category.comment
       ? `<small class="catalog__note">${category.comment}</small>`
       : "";
@@ -753,12 +812,12 @@ const store = () => {
 
     let categoryTitle = category.title;
     if (category.layout === "profile") {
-      categoryTitle = `${category.title} — ${getPriceMarkup(category.profileUnitPrice)} за шт.`;
+      categoryTitle = `${category.title} — ${getPriceMarkup(category.unitPrice)} за шт.`;
     }
 
     return `
       <article class="${categoryClass}">
-        <h5 class="catalog__title relative flex items-center">${categoryTitle}</h5>
+        ${categoryTitle ? `<h5 class="catalog__title relative flex items-center">${categoryTitle}</h5>` : ""}
         ${categoryComment}
 
         ${itemsMarkup}
@@ -779,54 +838,95 @@ const store = () => {
 
   const renderItemCounts = () => {
     const itemCounts = new Map();
-    cartItems.forEach((item) => {
-      const count = itemCounts.get(item.itemId) ?? 0;
-      itemCounts.set(item.itemId, count + 1);
-    });
+    const itemIds = cartItems.map((item) => item.itemId);
+    itemIds.push(...(gifts?.itemIds ?? []));
+    for (const itemId of itemIds) {
+      const count = itemCounts.get(itemId) ?? 0;
+      itemCounts.set(itemId, count + 1);
+    }
 
-    store.querySelectorAll("[data-store-add]").forEach((addButton) => {
-      const itemCount = addButton.querySelector("[data-store-item-count]");
-      const itemCountValue = addButton.querySelector(
-        "[data-store-item-count-value]"
-      );
+    store
+      .querySelectorAll("[data-store-add], [data-gift-url], [data-custom-add]")
+      .forEach((addButton) => {
+        const itemCount = addButton.querySelector("[data-store-item-count]");
+        const itemCountValue = addButton.querySelector(
+          "[data-store-item-count-value]"
+        );
+        if (
+          !(addButton instanceof HTMLButtonElement) ||
+          !(itemCount instanceof HTMLElement) ||
+          !(itemCountValue instanceof HTMLElement)
+        ) {
+          return;
+        }
+
+        const count = itemCounts.get(addButton.dataset.storeItemId) ?? 0;
+        itemCountValue.textContent = String(count);
+        itemCount.hidden = count === 0;
+        addButton.classList.toggle("store__item--added", count > 0);
+        const itemType = addButton.dataset.storeItemType;
+        if (itemType === "icon" || itemType === "plashka") {
+          addButton.setAttribute("aria-pressed", String(count > 0));
+        }
+      });
+  };
+
+  /** @param {HTMLInputElement | HTMLTextAreaElement} input @param {StoreCartItem} item */
+  const populateCartField = (input, item) => {
+    const value = item.fieldValue ?? "";
+    if (input.value !== value) {
+      input.value = value;
+    }
+    if (item.field?.output === "image") {
+      const preview = input
+        .closest(".cart__row")
+        ?.querySelector("[data-store-image-preview]");
+      const url = getStoreImageUrl(value.trim());
+      input.setAttribute("aria-invalid", String(!url));
       if (
-        !(addButton instanceof HTMLButtonElement) ||
-        !(itemCount instanceof HTMLElement) ||
-        !(itemCountValue instanceof HTMLElement)
+        preview &&
+        (preview.firstElementChild?.getAttribute("src") ?? "") !== url
       ) {
-        return;
+        preview.innerHTML = "";
+        if (url) {
+          preview.innerHTML = item.field.profileType
+            ? renderProfileAsset({ type: item.field.profileType, url })
+            : cartImageMarkup(url);
+        }
       }
-
-      const count = itemCounts.get(addButton.dataset.storeItemId) ?? 0;
-      itemCountValue.textContent = String(count);
-      itemCount.hidden = count === 0;
-      addButton.classList.toggle("store__item--added", count > 0);
-      const itemType = addButton.dataset.storeItemType;
-      if (itemType === "icon" || itemType === "plashka") {
-        addButton.setAttribute("aria-pressed", String(count > 0));
-      }
-    });
+    }
   };
 
   const populateCartFields = () => {
-    const textareas = /** @type {NodeListOf<HTMLTextAreaElement>} */ (
-      cartList.querySelectorAll("[data-store-cart-field]")
-    );
-    textareas.forEach((textarea) => {
-      const cartItemId = textarea.dataset.storeCartItemId;
-      const item = cartItems.find(
-        (cartItem) => cartItem.cartItemId === cartItemId
-      );
-      if (!item?.field) {
+    cartList.querySelectorAll("[data-store-cart-field]").forEach((input) => {
+      if (!(
+        input instanceof HTMLInputElement ||
+        input instanceof HTMLTextAreaElement
+      )) {
         return;
       }
 
-      const fieldValue = item.fieldValue ?? "";
-      if (textarea.value !== fieldValue) {
-        textarea.value = fieldValue;
+      const item = cartItems.find(
+        (item) => item.cartItemId === input.dataset.storeCartItemId
+      );
+      if (item?.field) {
+        populateCartField(input, item);
       }
     });
   };
+
+  const hasInvalidImageField = () =>
+    cartItems.some(
+      (item) =>
+        item.field?.output === "image" &&
+        !getStoreImageUrl(item.fieldValue?.trim() ?? "")
+    );
+
+  const hasIncompleteOrder = () =>
+    (cartItems.length > 0 && !recipientProfile) ||
+    (giftCount() > 0 && !payerProfile) ||
+    Boolean(gifts?.hasMissingRecipient || gifts?.hasInvalidImage) ||
+    hasInvalidImageField();
 
   const renderCartTotal = () => {
     const totals = cartItems.reduce(
@@ -839,10 +939,10 @@ const store = () => {
 
         return result;
       },
-      { coins: 0, coupons: 0 }
+      { coins: giftTotal(), coupons: gifts?.couponCount ?? 0 }
     );
     const totalLines = [];
-    if (totals.coins > 0) {
+    if (totals.coins > 0 || (cartItems.length && !totals.coupons)) {
       totalLines.push(getPriceMarkup(totals.coins));
     }
     if (totals.coupons > 0) {
@@ -862,17 +962,37 @@ const store = () => {
   };
 
   const renderCartSummary = () => {
-    cartCount.textContent = String(cartItems.length);
-    cartEmpty.hidden = cartItems.length > 0;
+    const hasGifts = giftCount() > 0;
+    const count = cartItems.length + giftCount();
+    cartCount.textContent = String(count);
+    cartEmpty.hidden = count > 0;
+    const recipientPicker = cart.querySelector(
+      '[data-profile-picker="recipient"]'
+    );
+    if (recipientPicker instanceof HTMLElement) {
+      recipientPicker.hidden = hasGifts && !cartItems.length;
+    }
     cartList.hidden = cartItems.length === 0;
-    if (!cartItems.length) {
+    if (giftSection instanceof HTMLElement) {
+      giftSection.hidden = !hasGifts;
+    }
+    if (!count) {
       hideCartConfirmations();
     }
+    profileSelectors.forEach((picker) => {
+      let invalid = hasGifts && !payerProfile;
+      if (picker.dataset.profilePicker === "recipient") {
+        invalid = cartItems.length > 0 && !recipientProfile;
+      }
+      picker
+        .querySelector("[data-profile-picker-trigger]")
+        ?.setAttribute("aria-invalid", String(invalid));
+    });
     if (checkoutButton instanceof HTMLButtonElement) {
-      checkoutButton.disabled = cartItems.length === 0;
+      checkoutButton.disabled = !count || hasIncompleteOrder();
     }
     if (clearButton instanceof HTMLButtonElement) {
-      clearButton.disabled = cartItems.length === 0;
+      clearButton.disabled = !count;
     }
     renderCartTotal();
     renderItemCounts();
@@ -880,7 +1000,10 @@ const store = () => {
 
   const renderCart = () => {
     renderCartSummary();
-    cartList.innerHTML = cartItems
+    cartList
+      .querySelectorAll(".cart__row[data-store-cart-item-id]")
+      .forEach((row) => row.remove());
+    const rows = cartItems
       .map((item) => {
         let preview = "";
         let productClass = "cart__product flex items-center gap-sm";
@@ -895,48 +1018,34 @@ const store = () => {
           }
         }
 
-        const field = item.field
-          ? `<div class="cart__field flex flex-col col-span-full gap-xs">
-                <label class="cart__label" for="hehe-store-cart-field-${item.cartItemId}">${escapeHtml(item.field.comment)}</label>
-                <textarea
-                  class="cart__input"
-                  id="hehe-store-cart-field-${item.cartItemId}"
-                  data-store-cart-field
-                  data-store-cart-item-id="${item.cartItemId}"
-                ></textarea>
-              </div>`
-          : "";
-        let priceClass = "store__price flex items-center";
-        if (item.payment === "coupon") {
-          priceClass += " store__price--coupon";
+        let field = "";
+        if (item.field) {
+          const id = `hehe-store-cart-field-${item.cartItemId}`;
+          const attrs = `class="cart__input" id="${id}" data-store-cart-field data-store-cart-item-id="${item.cartItemId}"`;
+          let control = `<textarea ${attrs}></textarea>`;
+          if (item.field.output === "image") {
+            control = `<input type="url" aria-required="true" ${attrs}>`;
+            const imagePreview = "<div data-store-image-preview></div>";
+            if (item.field.profileType === "plashka") {
+              productClass = "cart__product flex flex-col gap-xs";
+              productMarkup += imagePreview;
+            } else {
+              productMarkup = `${imagePreview}${productMarkup}`;
+            }
+          }
+          field = cartFieldMarkup(id, item.field.comment, control);
         }
-
-        return `
-          <li class="cart__row items-center gap-sm" data-store-cart-item-id="${item.cartItemId}">
-            <div class="${productClass}">
-              ${productMarkup}
-            </div>
-            <span class="${priceClass}" data-store-cart-price>${getPriceMarkup(item.price)}</span>
-            <button
-              class="button-icon shrink-0"
-              data-store-cart-remove
-              type="button"
-            >
-              <i class="mgc mgc-delete-2-core-regular icon-16" aria-hidden="true"></i>
-              <span class="sr-only">Удалить позицию</span>
-            </button>
-            <label class="cart__coupon flex items-center gap-xs col-span-full">
-              <input
-                data-store-cart-coupon
-                type="checkbox"
-                ${item.payment === "coupon" ? "checked" : ""}
-              >
-              <span>Плачу купоном</span>
-            </label>
-            ${field}
-          </li>`;
+        return cartRowMarkup({
+          attributes: `data-store-cart-item-id="${item.cartItemId}"`,
+          product: `<div class="${productClass}">${productMarkup}</div>`,
+          price: getPriceMarkup(item.price),
+          removeHook: "data-store-cart-remove",
+          coupon: item.price > 0 ? item.payment === "coupon" : undefined,
+          fields: field
+        });
       })
       .join("");
+    cartList.insertAdjacentHTML("afterbegin", rows);
     populateCartFields();
   };
 
@@ -974,6 +1083,7 @@ const store = () => {
 
   const resetCart = () => {
     cartItems.splice(0);
+    gifts?.reset();
     nextCartItemId = 0;
     resetProfileSelectors();
     setCartStatus("");
@@ -983,7 +1093,6 @@ const store = () => {
   const checkoutCart = () => {
     const text = buildCheckoutText();
     if (!text) {
-      setCartStatus("Выберите профиль, для которого оформляется заказ.");
       return;
     }
 
@@ -1188,20 +1297,26 @@ const store = () => {
 
   store.addEventListener("input", (event) => {
     const input = event.target;
-    const textarea = input;
     if (
-      !(textarea instanceof HTMLTextAreaElement) ||
-      !textarea.matches("[data-store-cart-field]")
+      !(
+        input instanceof HTMLInputElement ||
+        input instanceof HTMLTextAreaElement
+      ) ||
+      !input.matches("[data-store-cart-field]")
     ) {
       return;
     }
 
     const item = cartItems.find(
-      (cartItem) => cartItem.cartItemId === textarea.dataset.storeCartItemId
+      (cartItem) => cartItem.cartItemId === input.dataset.storeCartItemId
     );
     if (item?.field) {
-      item.fieldValue = textarea.value;
+      item.fieldValue = input.value;
       item.fieldEdited = true;
+      if (item.field.output === "image") {
+        populateCartField(input, item);
+        renderCartSummary();
+      }
     }
   });
 
@@ -1234,16 +1349,65 @@ const store = () => {
     }
 
     const selector = input.closest("[data-profile-picker]");
-    if (!(selector instanceof HTMLFieldSetElement)) {
+    if (
+      !(selector instanceof HTMLFieldSetElement) ||
+      selector.dataset.profilePicker === "gift-recipient"
+    ) {
       return;
     }
 
     updateProfileSelector(selector, input.value);
+    renderCartSummary();
   });
 
+  const giftUnitPrice = Number(
+    giftSource?.getAttribute("data-unit-price") ?? 1
+  );
+  let customGiftMarkup = "";
+  if (customGiftCategory instanceof HTMLElement) {
+    customGiftMarkup = renderCategory({
+      title: customGiftCategory.dataset.categoryName ?? "",
+      comment:
+        customGiftCategory
+          .querySelector("[data-category-comment]")
+          ?.innerHTML.trim() ?? "",
+      items: parseCategoryItems(customGiftCategory),
+      layout: "",
+      profileType: "",
+      unitPrice: 0,
+      wide: customGiftCategory.hasAttribute("data-category-wide")
+    });
+  }
+
+  const gifts =
+    giftSource instanceof HTMLElement &&
+    giftList instanceof HTMLElement &&
+    Number.isSafeInteger(giftUnitPrice) &&
+    giftUnitPrice > 0
+      ? setupGifts(
+          giftSource,
+          customGiftMarkup,
+          giftUnitPrice,
+          getPriceMarkup,
+          categoriesRoot,
+          giftList,
+          parseVisualItems(
+            giftSource,
+            "[data-gifts-source]",
+            "gift",
+            giftUnitPrice
+          ),
+          renderCartSummary
+        )
+      : undefined;
+  const giftCount = () => gifts?.count ?? 0;
+  const giftTotal = () => gifts?.total ?? 0;
   renderCart();
   loadCharacters()
-    .then(populateProfileSelectors)
+    .then((characters) => {
+      populateProfileSelectors(characters);
+      renderCartSummary();
+    })
     .catch(() => setProfileSelectorStatus("Не удалось загрузить профили"));
 };
 

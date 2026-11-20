@@ -93,6 +93,10 @@ export const storeMarkup = () => `<section class="store relative" data-store>
         <div class="cart__scroll scrollable flex flex-col flex-1 w-full">
           <p class="cart__empty w-full" data-store-cart-empty>Корзина пуста.</p>
           <ol class="cart__list" data-store-cart-list hidden></ol>
+          <section aria-labelledby="store-gift-cart-title" data-store-gift-group hidden>
+            <h5 class="cart__subtitle" id="store-gift-cart-title">Подарки</h5>
+            <ol class="cart__list" data-store-gift-list></ol>
+          </section>
         </div>
       </div>
       <div class="cart__footer sticky--bottom items-center gap-sm shrink-0">
@@ -131,6 +135,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
               type="button"
               popovertarget="store-checkout-confirmation"
               aria-haspopup="dialog"
+              aria-describedby="store-cart-status"
               disabled
             >
               Оформить заказ
@@ -152,8 +157,60 @@ export const storeMarkup = () => `<section class="store relative" data-store>
             </div>
           </div>
         </div>
-        <p class="cart__status col-span-full" data-store-cart-status aria-live="polite"></p>
+        <p class="cart__status col-span-full" id="store-cart-status" aria-live="polite"></p>
       </div>
     </div>
   </dialog>
 </section>`;
+
+/**
+ * @param {{attributes: string, product: string, price: string, fields: string, removeHook: string, coupon?: boolean}} row
+ */
+export const cartRowMarkup = ({
+  attributes,
+  product,
+  price,
+  fields,
+  removeHook,
+  coupon
+}) => `
+  <li class="cart__row items-center" ${attributes}>
+    ${product}
+    <span class="store__price flex items-center${coupon ? " store__price--coupon" : ""}" data-store-cart-price>${price}</span>
+    ${
+      coupon === undefined
+        ? ""
+        : `<label class="cart__coupon flex items-center gap-xs"><input data-store-cart-coupon type="checkbox" ${coupon ? "checked" : ""}><small>Плачу купоном</small></label>`
+    }
+    <button class="button-icon shrink-0" ${removeHook} type="button">
+      <i class="mgc mgc-delete-2-core-regular icon-16" aria-hidden="true"></i>
+      <span class="sr-only">Удалить позицию</span>
+    </button>
+    ${fields ? `<div class="cart__details">${fields}</div>` : ""}
+  </li>`;
+
+export const storeItemCountMarkup = `<span class="store__count" data-store-item-count hidden><span class="sr-only">В корзине: </span><span data-store-item-count-value>0</span></span>`;
+
+/** @param {string} text */
+export const getStoreImageUrl = (text) => {
+  try {
+    if (!/^(https?:)?\/\/[^\s]+$/i.test(text)) {
+      return "";
+    }
+
+    return new URL(text, location.href).href;
+  } catch {
+    return "";
+  }
+};
+
+/** @param {string} url @param {number} [size] */
+export const cartImageMarkup = (url, size = 50) =>
+  `<img width="${size}" height="${size}" style="object-fit: contain" loading="lazy" src="${escapeHtml(url)}" alt="">`;
+
+/** @param {string} id @param {string} label @param {string} control */
+export const cartFieldMarkup = (id, label, control) => `
+  <div class="cart__field flex flex-col col-span-full gap-xs">
+    <label class="cart__label" for="${escapeHtml(id)}">${escapeHtml(label)}</label>
+    ${control}
+  </div>`;

@@ -39,3 +39,6 @@ allows retry after failure. Core exposes it as `teh.loadCharacters()`; see
 
 `IMAGE_PROXY` is the DuckDuckGo image proxy prefix. Escape URLs before inserting
 them into HTML.
+
+`suggestCollectionAddress(name)` derives the default forum vault page handle
+used by character acceptance and store gift delivery.
