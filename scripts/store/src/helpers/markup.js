@@ -1,4 +1,35 @@
-import { getProfilePickerMarkup } from "@teh/utils";
+import { escapeHtml, getProfilePickerMarkup } from "@teh/utils";
+
+/**
+ * @param {{ name: string, profile: string, label: string, twinks: string[], checked: boolean }} option
+ */
+export const storeProfileOptionMarkup = ({
+  name,
+  profile,
+  label,
+  twinks,
+  checked
+}) =>
+  /* HTML */ `<label
+    class="picker__option flex items-center justify-between gap-sm"
+  >
+    <input
+      class="picker__radio sr-only"
+      data-profile-picker-option
+      type="radio"
+      name="${escapeHtml(name)}"
+      value="${escapeHtml(profile)}"
+      ${checked ? "checked" : ""}
+    />
+    <span class="flex flex-col min-w-0">
+      <strong>${escapeHtml(label)}</strong>
+      ${twinks.length ? `<small>${escapeHtml(twinks.join(", "))}</small>` : ""}
+    </span>
+    <i
+      class="mgc mgc-check-core-regular picker__check shrink-0"
+      aria-hidden="true"
+    ></i>
+  </label>`;
 
 /**
  * Returns the store shell with separate CSS classes and JavaScript hooks.
@@ -14,7 +45,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
       type="button"
       aria-haspopup="dialog"
     >
-      <i class="material-symbols-sharp icon-20" aria-hidden="true">shopping_cart</i>
+      <i class="mgc mgc-shopping-cart-1-core-regular icon-20" aria-hidden="true"></i>
       <span class="sr-only">Корзина</span>
       <span class="store__count" data-store-cart-count>0</span>
     </button>
@@ -35,7 +66,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
             data-store-cart-toggle
             type="button"
           >
-            <i class="material-symbols-sharp icon-20" aria-hidden="true">close</i>
+            <i class="mgc mgc-close-core-regular icon-20" aria-hidden="true"></i>
             <span class="sr-only">Закрыть корзину</span>
           </button>
         </div>
@@ -43,7 +74,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
           ${getProfilePickerMarkup({
             id: "store-recipient",
             key: "recipient",
-            label: "Покупаю для",
+            label: "Покупка для:",
             value: "Загрузка...",
             status: "Загрузка профилей...",
             disabled: true
@@ -51,7 +82,7 @@ export const storeMarkup = () => `<section class="store relative" data-store>
           ${getProfilePickerMarkup({
             id: "store-payer",
             key: "payer",
-            label: "Платит",
+            label: "Списать с:",
             value: "Загрузка...",
             status: "Загрузка профилей...",
             disabled: true

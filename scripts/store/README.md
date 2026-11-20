@@ -10,6 +10,9 @@ to initialize it explicitly.
 Each catalog icon or plashka can appear in the cart once. Clicking its button
 again removes it; other products can be added repeatedly.
 
+In a profile category, put `data-icon-source` or `data-plashka-source` on the
+category itself or on a nested element. Write one asset URL per line.
+
 Styles: `hehedges-backups/styles/style_cs.css`.
 
 Profile selectors use the shared picker markup in `@teh/utils`, also used by the

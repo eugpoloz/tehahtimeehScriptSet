@@ -1,7 +1,7 @@
 "use strict";
 
-import { storeMarkup } from "../helpers/markup";
-import { getProfilePickerOptionsMarkup } from "@teh/utils";
+import { escapeHtml } from "@teh/utils";
+import { storeMarkup, storeProfileOptionMarkup } from "../helpers/markup";
 
 /**
  * @typedef {object} StoreProfile
@@ -104,12 +104,13 @@ const store = () => {
 
   source.dataset.storeInitialized = "true";
 
+  const cartCloseButton = cart.querySelector("[data-store-cart-toggle]");
+
   /** @type {StoreCartItem[]} */
   const cartItems = [];
 
   let recipientProfile = "";
   let payerProfile = "";
-  let currentMainProfile = "";
   let defaultProfile = "";
 
   /** @param {StoreProfile | undefined} character */
@@ -152,8 +153,12 @@ const store = () => {
         );
       }
     });
-    renderCart();
+    populateCartFields();
   };
+
+  /** @param {string} profile */
+  const getProfileLabel = (profile) =>
+    profile === defaultProfile ? `Меня (${profile})` : profile;
 
   /**
    * @param {HTMLFieldSetElement} selector
@@ -162,7 +167,7 @@ const store = () => {
   const updateProfileSelector = (selector, profile) => {
     const value = selector.querySelector("[data-profile-picker-value]");
     if (value) {
-      value.textContent = profile;
+      value.textContent = getProfileLabel(profile);
     }
 
     if (selector.dataset.profilePicker === "recipient") {
@@ -175,7 +180,8 @@ const store = () => {
 
   /** @param {Record<string, StoreProfile>} characters */
   const populateProfileSelectors = (characters) => {
-    const profiles = Object.entries(characters)
+    const entries = Object.entries(characters);
+    const profiles = entries
       .filter(([, character]) => isMainProfile(character))
       .map(([name]) => name);
     if (!profiles.length) {
@@ -185,13 +191,24 @@ const store = () => {
 
     const currentLogin =
       typeof window.UserLogin === "string" ? window.UserLogin.trim() : "";
-    const currentCharacter = characters[currentLogin];
+    const main = characters[currentLogin]?.main;
     const currentMain =
-      typeof currentCharacter?.main === "string" && currentCharacter.main !== ""
-        ? currentCharacter.main
-        : currentLogin;
+      typeof main === "string" && main !== "" ? main : currentLogin;
     defaultProfile = profiles.includes(currentMain) ? currentMain : "";
-    currentMainProfile = defaultProfile;
+    const orderedProfiles = defaultProfile
+      ? [
+          defaultProfile,
+          ...profiles.filter((profile) => profile !== defaultProfile)
+        ]
+      : profiles;
+
+    /** @type {Map<string, string[]>} */
+    const twinksByProfile = new Map(profiles.map((profile) => [profile, []]));
+    entries.forEach(([name, character]) => {
+      if (typeof character.main === "string") {
+        twinksByProfile.get(character.main)?.push(name);
+      }
+    });
 
     profileSelectors?.forEach((selector) => {
       const type = selector.dataset.profilePicker;
@@ -202,11 +219,17 @@ const store = () => {
         return;
       }
 
-      options.innerHTML = getProfilePickerOptionsMarkup(
-        profiles,
-        `store-${type}-profile`,
-        defaultProfile
-      );
+      options.innerHTML = orderedProfiles
+        .map((profile) =>
+          storeProfileOptionMarkup({
+            name: `store-${type}-profile`,
+            profile,
+            label: getProfileLabel(profile),
+            twinks: twinksByProfile.get(profile) ?? [],
+            checked: profile === defaultProfile
+          })
+        )
+        .join("");
       status?.remove();
       selector.disabled = false;
       if (defaultProfile) {
@@ -335,9 +358,16 @@ const store = () => {
    * @returns {StoreCatalogItem[]}
    */
   const parseVisualItems = (category, sourceSelector, itemType, price) => {
-    const itemSource = category.querySelector(sourceSelector);
+    const categoryIsSource = category.matches(sourceSelector);
+    const itemSource = categoryIsSource
+      ? category.cloneNode(true)
+      : category.querySelector(sourceSelector);
     if (!(itemSource instanceof HTMLElement)) {
       return [];
+    }
+
+    if (categoryIsSource) {
+      itemSource.querySelector("[data-category-comment]")?.remove();
     }
 
     let followsBlankLine = false;
@@ -457,20 +487,6 @@ const store = () => {
     return forms.many;
   };
 
-  /** @param {unknown} value */
-  const escapeHtml = (value) =>
-    String(value).replace(
-      /[&<>"']/g,
-      (character) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        })[character] ?? character
-    );
-
   /** @param {string} profile */
   const getProfileName = (profile) => profile.replace(/^@/, "");
 
@@ -575,7 +591,7 @@ const store = () => {
       return "";
     }
 
-    const mainProfile = currentMainProfile ? `@${currentMainProfile}` : "";
+    const mainProfile = defaultProfile ? `@${defaultProfile}` : "";
     const recipientLine =
       recipientProfile === mainProfile
         ? "[b]Покупаю:[/b] для себя"
@@ -805,23 +821,14 @@ const store = () => {
         return;
       }
 
-      textarea.value = item.fieldValue ?? "";
+      const fieldValue = item.fieldValue ?? "";
+      if (textarea.value !== fieldValue) {
+        textarea.value = fieldValue;
+      }
     });
   };
 
-  const renderCart = () => {
-    cartCount.textContent = String(cartItems.length);
-    cartEmpty.hidden = cartItems.length > 0;
-    cartList.hidden = cartItems.length === 0;
-    if (checkoutButton instanceof HTMLButtonElement) {
-      checkoutButton.disabled = cartItems.length === 0;
-    }
-    if (clearButton instanceof HTMLButtonElement) {
-      clearButton.disabled = cartItems.length === 0;
-    }
-    if (!cartItems.length) {
-      hideCartConfirmations();
-    }
+  const renderCartTotal = () => {
     const totals = cartItems.reduce(
       (result, item) => {
         if (item.payment === "coupon") {
@@ -852,8 +859,29 @@ const store = () => {
             '<span class="flex items-center" aria-hidden="true">+</span>'
           )}</span>`
       : "";
+  };
+
+  const renderCartSummary = () => {
+    cartCount.textContent = String(cartItems.length);
+    cartEmpty.hidden = cartItems.length > 0;
+    cartList.hidden = cartItems.length === 0;
+    if (!cartItems.length) {
+      hideCartConfirmations();
+    }
+    if (checkoutButton instanceof HTMLButtonElement) {
+      checkoutButton.disabled = cartItems.length === 0;
+    }
+    if (clearButton instanceof HTMLButtonElement) {
+      clearButton.disabled = cartItems.length === 0;
+    }
+    renderCartTotal();
+    renderItemCounts();
+  };
+
+  const renderCart = () => {
+    renderCartSummary();
     cartList.innerHTML = cartItems
-      .map((item, index) => {
+      .map((item) => {
         let preview = "";
         let productClass = "cart__product flex items-center gap-sm";
         let productMarkup = `<strong class="cart__name">${item.name}</strong>`;
@@ -884,24 +912,22 @@ const store = () => {
         }
 
         return `
-          <li class="cart__row items-center gap-sm">
+          <li class="cart__row items-center gap-sm" data-store-cart-item-id="${item.cartItemId}">
             <div class="${productClass}">
               ${productMarkup}
             </div>
-            <span class="${priceClass}">${getPriceMarkup(item.price)}</span>
+            <span class="${priceClass}" data-store-cart-price>${getPriceMarkup(item.price)}</span>
             <button
               class="button-icon shrink-0"
               data-store-cart-remove
-              data-store-cart-index="${index}"
               type="button"
             >
-              <i class="material-symbols-sharp icon-16" aria-hidden="true">delete</i>
+              <i class="mgc mgc-delete-2-core-regular icon-16" aria-hidden="true"></i>
               <span class="sr-only">Удалить позицию</span>
             </button>
             <label class="cart__coupon flex items-center gap-xs col-span-full">
               <input
                 data-store-cart-coupon
-                data-store-cart-index="${index}"
                 type="checkbox"
                 ${item.payment === "coupon" ? "checked" : ""}
               >
@@ -912,7 +938,6 @@ const store = () => {
       })
       .join("");
     populateCartFields();
-    renderItemCounts();
   };
 
   const hideCartConfirmations = () => {
@@ -940,7 +965,9 @@ const store = () => {
         option.checked = option.value === defaultProfile;
       });
       if (value) {
-        value.textContent = defaultProfile || "Выберите профиль";
+        value.textContent = defaultProfile
+          ? getProfileLabel(defaultProfile)
+          : "Выберите профиль";
       }
     });
   };
@@ -950,7 +977,6 @@ const store = () => {
     nextCartItemId = 0;
     resetProfileSelectors();
     setCartStatus("");
-    hideCartConfirmations();
     renderCart();
   };
 
@@ -989,10 +1015,51 @@ const store = () => {
     hideCartConfirmations();
   });
 
+  if (!("closedBy" in HTMLDialogElement.prototype)) {
+    /** @param {PointerEvent} event */
+    const isBackdropPress = (event) => {
+      const bounds = cart.getBoundingClientRect();
+      return (
+        event.target === cart &&
+        event.isPrimary &&
+        event.button === 0 &&
+        (event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom)
+      );
+    };
+    let pressedOutside = false;
+    cart.addEventListener("pointerdown", (event) => {
+      pressedOutside = isBackdropPress(event);
+    });
+    cart.addEventListener("pointerup", (event) => {
+      const dismiss = pressedOutside && isBackdropPress(event);
+      pressedOutside = false;
+      if (dismiss) {
+        setCartOpen(false);
+      }
+    });
+  }
+
+  /** @param {HTMLInputElement} input */
+  const closeProfilePicker = (input) => {
+    const popover = input.closest("[popover]");
+    if (popover instanceof HTMLElement && popover.matches(":popover-open")) {
+      popover.hidePopover();
+    }
+  };
+
   store.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : null;
-    if (target === cart) {
-      setCartOpen(false);
+    // Native arrow navigation can synthesize a click with detail 0.
+    if (
+      event instanceof MouseEvent &&
+      event.detail > 0 &&
+      target instanceof HTMLInputElement &&
+      target.matches("[data-profile-picker-option]")
+    ) {
+      closeProfilePicker(target);
       return;
     }
 
@@ -1011,15 +1078,32 @@ const store = () => {
     const clearConfirm = target?.closest("[data-store-clear-confirm]");
     if (clearConfirm instanceof HTMLButtonElement) {
       resetCart();
+      if (cartCloseButton instanceof HTMLButtonElement) {
+        cartCloseButton.focus();
+      }
       return;
     }
 
     const removeButton = target?.closest("[data-store-cart-remove]");
     if (removeButton instanceof HTMLButtonElement) {
-      const itemIndex = Number(removeButton.dataset.storeCartIndex);
-      if (Number.isInteger(itemIndex) && itemIndex >= 0) {
-        cartItems.splice(itemIndex, 1);
-        renderCart();
+      const row = removeButton.closest("[data-store-cart-item-id]");
+      const itemIndex = cartItems.findIndex(
+        (item) =>
+          item.cartItemId === row?.getAttribute("data-store-cart-item-id")
+      );
+      if (!row || itemIndex < 0) {
+        return;
+      }
+
+      const adjacentRow = row.nextElementSibling ?? row.previousElementSibling;
+      const focusTarget =
+        adjacentRow?.querySelector("[data-store-cart-remove]") ??
+        cartCloseButton;
+      cartItems.splice(itemIndex, 1);
+      row.remove();
+      renderCartSummary();
+      if (focusTarget instanceof HTMLButtonElement) {
+        focusTarget.focus();
       }
 
       return;
@@ -1086,6 +1170,22 @@ const store = () => {
     renderCart();
   });
 
+  store.addEventListener("keydown", (event) => {
+    const input = event.target;
+    if (
+      !(event instanceof KeyboardEvent) ||
+      (event.key !== "Enter" && event.key !== " ") ||
+      !(input instanceof HTMLInputElement) ||
+      !input.matches("[data-profile-picker-option]")
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    input.click();
+    closeProfilePicker(input);
+  });
+
   store.addEventListener("input", (event) => {
     const input = event.target;
     const textarea = input;
@@ -1112,13 +1212,20 @@ const store = () => {
     }
 
     if (input.matches("[data-store-cart-coupon]")) {
-      const itemIndex = Number(input.dataset.storeCartIndex);
-      const item = cartItems[itemIndex];
-      if (item) {
-        item.payment = input.checked ? "coupon" : "coins";
-        renderCart();
+      const row = input.closest("[data-store-cart-item-id]");
+      const item = cartItems.find(
+        (item) =>
+          item.cartItemId === row?.getAttribute("data-store-cart-item-id")
+      );
+      if (!row || !item) {
+        return;
       }
 
+      item.payment = input.checked ? "coupon" : "coins";
+      row
+        .querySelector("[data-store-cart-price]")
+        ?.classList.toggle("store__price--coupon", input.checked);
+      renderCartTotal();
       return;
     }
 
@@ -1132,12 +1239,6 @@ const store = () => {
     }
 
     updateProfileSelector(selector, input.value);
-    const popover = input.closest("[popover]");
-    if (popover?.matches(":popover-open")) {
-      /** @type {HTMLElement & { hidePopover: () => void }} */ (
-        popover
-      ).hidePopover();
-    }
   });
 
   renderCart();
