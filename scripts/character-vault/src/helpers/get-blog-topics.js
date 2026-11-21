@@ -1,134 +1,97 @@
 /** @typedef {import("../types.js").BlogTopic} BlogTopic */
 
-const BLOG_FORUM_ID = "13";
-// The working RusFF GET form submits "Отправить" encoded as Windows-1251.
-const SEARCH_SUBMIT_VALUE = "%CE%F2%EF%F0%E0%E2%E8%F2%FC";
+/**
+ * @typedef {object} ApiTopic
+ * @property {string | number} id
+ * @property {string} username
+ * @property {string} subject
+ */
 
-/** @param {string} handle @returns {string} */
-const getSearchUrl = (handle) => {
+const BLOG_FORUM_ID = "13";
+const PAGE_SIZE = 500;
+const MAX_SKIP = 10000;
+
+/** @type {Promise<ApiTopic[]> | undefined} */
+let blogTopicsRequest;
+
+/** @param {string} text @returns {string} */
+const normalizeText = (text) => text.trim().replace(/\s+/g, " ");
+
+/** @returns {Promise<ApiTopic[]>} */
+const loadBlogTopics = async () => {
+  /** @type {Map<string, ApiTopic>} */
+  const topics = new Map();
   const params = new URLSearchParams({
-    action: "search",
-    keywords: "",
-    author: handle,
-    forum: BLOG_FORUM_ID,
-    search_in: "-1",
-    sort_by: "0",
-    sort_dir: "DESC",
-    show_as: "topics"
+    method: "topic.get",
+    forum_id: BLOG_FORUM_ID,
+    fields: "id,username,subject",
+    sort_by: "last_post",
+    sort_dir: "desc",
+    limit: String(PAGE_SIZE)
   });
 
-  return `/search.php?${params}&search=${SEARCH_SUBMIT_VALUE}`;
-};
+  try {
+    for (let skip = 0; skip <= MAX_SKIP; skip += PAGE_SIZE) {
+      params.set("skip", String(skip));
+      const response = await fetch(`/api.php?${params}`, {
+        credentials: "include",
+        priority: "low"
+      });
+      if (!response.ok) {
+        blogTopicsRequest = undefined;
+        break;
+      }
 
-/** @param {string | null} text @returns {string} */
-const normalizeText = (text) => text?.trim().replace(/\s+/g, " ") ?? "";
+      const { response: page } = /** @type {{ response?: ApiTopic[] }} */ (
+        await response.json()
+      );
+      if (!Array.isArray(page)) {
+        blogTopicsRequest = undefined;
+        break;
+      }
 
-/**
- * @param {Element} row
- * @param {string} normalizedHandle
- * @returns {BlogTopic | undefined}
- */
-const parseTopicRow = (row, normalizedHandle) => {
-  const starter = normalizeText(
-    row.querySelector(".byuser-username")?.textContent ?? null
-  );
-  if (starter !== normalizedHandle) {
-    return;
-  }
+      for (const topic of page) {
+        const id = String(topic.id);
+        if (
+          /^\d+$/.test(id) &&
+          typeof topic.username === "string" &&
+          typeof topic.subject === "string"
+        ) {
+          topics.set(id, topic);
+        }
+      }
 
-  const anchor = row.querySelector(".tclcon a");
-  const href = anchor?.getAttribute("href");
-  const title = normalizeText(anchor?.textContent ?? null);
-  if (!href || !title) {
-    return;
-  }
-
-  const url = new URL(href, window.location.origin);
-
-  return {
-    title,
-    url: `${url.pathname}${url.search}${url.hash}`
-  };
-};
-
-/** @param {Element} container @param {string} handle @returns {BlogTopic[]} */
-const parseTopicRows = (container, handle) => {
-  const topics = new Map();
-  for (const row of container.querySelectorAll("tbody tr")) {
-    const topic = parseTopicRow(row, handle);
-    if (topic && !topics.has(topic.url)) {
-      topics.set(topic.url, topic);
+      if (page.length < PAGE_SIZE) {
+        break;
+      }
     }
+  } catch {
+    blogTopicsRequest = undefined;
   }
 
   return [...topics.values()];
 };
 
-/** @param {Element} container @returns {string[]} */
-const getPaginationUrls = (container) => {
-  /** @type {string[]} */
-  const urls = [];
-  for (const anchor of container.querySelectorAll(".pagelink a[href]")) {
-    const href = anchor.getAttribute("href");
-    if (!href) {
-      continue;
-    }
-
-    const url = new URL(href, window.location.origin);
-    if (url.pathname !== "/search.php") {
-      continue;
-    }
-
-    url.hash = "";
-    urls.push(`${url.pathname}${url.search}`);
-  }
-
-  return urls;
-};
-
 /** @param {string} handle @returns {Promise<BlogTopic[]>} */
 const getBlogTopics = async (handle) => {
-  const topics = new Map();
   const normalizedHandle = normalizeText(handle);
+  blogTopicsRequest ??= loadBlogTopics();
+  const topics = await blogTopicsRequest;
 
-  try {
-    const pending = [getSearchUrl(handle)];
-    const visited = new Set();
-
-    while (pending.length > 0) {
-      const url = pending.shift();
-      if (!url || visited.has(url)) {
-        continue;
-      }
-
-      visited.add(url);
-      const response = await fetch(url, {
-        credentials: "include",
-        priority: "low"
-      });
-      if (!response.ok) {
-        return [...topics.values()];
-      }
-
-      const html = new TextDecoder("windows-1251").decode(
-        await response.arrayBuffer()
-      );
-      const page = new DOMParser().parseFromString(html, "text/html");
-      const container = page.querySelector("#pun-searchtopics");
-      if (!container) {
-        return [...topics.values()];
-      }
-
-      for (const topic of parseTopicRows(container, normalizedHandle)) {
-        topics.set(topic.url, topic);
-      }
-      pending.push(...getPaginationUrls(container));
+  /** @type {BlogTopic[]} */
+  const blogs = [];
+  for (const topic of topics) {
+    if (normalizeText(topic.username) !== normalizedHandle) {
+      continue;
     }
 
-    return [...topics.values()];
-  } catch {
-    return [...topics.values()];
+    const title = normalizeText(topic.subject);
+    if (title) {
+      blogs.push({ title, url: `/viewtopic.php?id=${topic.id}` });
+    }
   }
+
+  return blogs;
 };
 
 export default getBlogTopics;
