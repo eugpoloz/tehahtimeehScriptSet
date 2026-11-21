@@ -1,5 +1,4 @@
-import { hasTopic, handleError } from "@teh/utils";
-import { randomDelay, sleep } from "../helpers/delay";
+import { hasTopic, handleError, randomDelay, sleep } from "@teh/utils";
 import { handleFastVote } from "../helpers/fast-vote";
 
 const ALL_LIKED_TEXT = "На этой странице всё пролайкано!";
@@ -96,7 +95,7 @@ async function autoReactToPosts() {
           );
 
           if (index < superlikesLength - 1) {
-            await sleep(randomDelay());
+            await sleep(randomDelay(700, 1300));
           }
         }
 

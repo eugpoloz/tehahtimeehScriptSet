@@ -2,6 +2,12 @@
 
 Shared browser utilities for the forum script workspace.
 
+## Timing
+
+`await sleep(ms)` pauses the current async function for the given duration in
+milliseconds. Use `await sleep(randomDelay(minMs, maxMs))` to vary the delay
+within a range.
+
 ## Login
 
 `handleLogin({ login, password }, { reload?, debug? })` returns `Promise<boolean>`:
