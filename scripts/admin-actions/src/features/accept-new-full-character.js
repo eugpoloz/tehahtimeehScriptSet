@@ -1,6 +1,9 @@
 import { isUserAdmin, isUserAdminByGroup } from "../helpers/is-admin";
 import { isAcceptanceWorker } from "../helpers/iframe";
-import { parsePositiveId } from "../helpers/character-data";
+import {
+  findCharacterByApplication,
+  parsePositiveId
+} from "../helpers/character-data";
 import { getPostId } from "../helpers/parse-character-application";
 import { getCharacterAcceptance } from "./character-acceptance";
 import { acceptNewNpcCharacter } from "./accept-new-npc-character";
@@ -18,6 +21,7 @@ import { escapeHtml } from "@teh/utils";
  * @typedef {object} AcceptNewFullCharacterConfig
  * @property {string} [stylesUrl] Optional extra stylesheet; form styles are included in style_cs.css.
  * @property {number} forumId Regular-character application forum.
+ * @property {number} [excludedTopicId] Topic in the application forum that should not show «Принять».
  * @property {number} [npcTopicId] Defaults to 30.
  * @property {number} [characterGroupId] Defaults to 5.
  * @property {number} [acceptedForumId] Defaults to 11.
@@ -57,6 +61,9 @@ const acceptNewFullCharacter = async (config) => {
     !config ||
     typeof config.forumId !== "number" ||
     parsePositiveId(config.forumId) === null ||
+    (config.excludedTopicId !== undefined &&
+      (typeof config.excludedTopicId !== "number" ||
+        parsePositiveId(config.excludedTopicId) === null)) ||
     (config.npcTopicId !== undefined &&
       (typeof config.npcTopicId !== "number" ||
         parsePositiveId(config.npcTopicId) === null)) ||
@@ -82,6 +89,14 @@ const acceptNewFullCharacter = async (config) => {
     const acceptedForumId = config.acceptedForumId ?? 11;
     const isApplication = Number(FORUM.topic.forum_id) === config.forumId;
     if (
+      isApplication &&
+      topicId === config.excludedTopicId &&
+      topicId !== npcTopicId
+    ) {
+      return;
+    }
+
+    if (
       topicId !== npcTopicId &&
       !isApplication &&
       Number(FORUM.topic.forum_id) !== acceptedForumId
@@ -99,20 +114,42 @@ const acceptNewFullCharacter = async (config) => {
       return;
     }
 
-    const menu = document.querySelector("#topic-modmenu .container");
-    if (!menu || menu.querySelector("#accept-new-full-character")) {
+    const controls = document.querySelector(
+      isApplication ? "#topic-modmenu .container" : "#pun-main > h1"
+    );
+    if (!controls || document.getElementById("accept-new-full-character")) {
       return;
     }
 
-    const markup = `<button type="button" id="accept-new-full-character" class="button button--primary button--wide">${isApplication ? "Принять" : "Проверить принятие"}</button>`;
-    const firstElement = menu.firstElementChild;
-    if (firstElement) {
-      firstElement.insertAdjacentHTML("afterend", markup);
-    } else {
-      menu.insertAdjacentHTML("beforeend", markup);
+    let label = "Принять";
+    let accepted = false;
+    if (!isApplication) {
+      accepted = Boolean(
+        findCharacterByApplication(window.characters || {}, {
+          mode: "regular",
+          topicId
+        })
+      );
+      label = accepted ? "Персонаж принят" : "Проверить принятие";
     }
+    const headingStyle = isApplication
+      ? ""
+      : ' style="margin-inline-end: 0.75rem; margin-block-end: 0.25rem"';
+    const markup = `<button type="button" id="accept-new-full-character" class="button button--primary button--wide"${headingStyle}${accepted ? " disabled" : ""}>${label}</button>`;
+    if (isApplication && controls.firstElementChild) {
+      controls.firstElementChild.insertAdjacentHTML("afterend", markup);
+    } else {
+      controls.insertAdjacentHTML(
+        isApplication ? "beforeend" : "afterbegin",
+        markup
+      );
+    }
+    if (accepted) {
+      return;
+    }
+
     const button = /** @type {HTMLButtonElement} */ (
-      menu.querySelector("#accept-new-full-character")
+      controls.querySelector("#accept-new-full-character")
     );
     button.addEventListener("click", async () => {
       try {
@@ -122,39 +159,49 @@ const acceptNewFullCharacter = async (config) => {
           throw new Error("Не удалось определить ID анкеты.");
         }
 
-        acceptance.open(post, { mode: "regular", topicId, postId }, [
-          {
-            id: "config",
-            title: "Добавление персонажа в конфиг",
-            run: saveCharacterConfig
-          },
-          {
-            id: "collection",
-            title: "Создание / обновление личной страницы",
-            run: updateCharacterCollection
-          },
-          {
-            id: "group",
-            title: "Перенос профиля в группу «Персонажи»",
-            run: (context) =>
-              updateCharacterGroup(context, config.characterGroupId ?? 5)
-          },
-          {
-            id: "profile",
-            title: "Заполнение полей профиля",
-            run: updateCharacterProfile
-          },
-          {
-            id: "letter",
-            title: "Публикация сообщения о принятии",
-            run: postAcceptanceLetter
-          },
-          {
-            id: "move",
-            title: "Перенос анкеты в принятые",
-            run: (context) => moveAcceptedTopic(context, acceptedForumId)
+        acceptance.open(
+          post,
+          { mode: "regular", topicId, postId },
+          [
+            {
+              id: "config",
+              title: "Добавление персонажа в конфиг",
+              run: saveCharacterConfig
+            },
+            {
+              id: "collection",
+              title: "Создание / обновление личной страницы",
+              run: updateCharacterCollection
+            },
+            {
+              id: "group",
+              title: "Перенос профиля в группу «Персонажи»",
+              run: (context) =>
+                updateCharacterGroup(context, config.characterGroupId ?? 5)
+            },
+            {
+              id: "profile",
+              title: "Заполнение полей профиля",
+              run: updateCharacterProfile
+            },
+            {
+              id: "letter",
+              title: "Публикация сообщения о принятии",
+              run: postAcceptanceLetter
+            },
+            {
+              id: "move",
+              title: "Перенос анкеты в принятые",
+              run: (context) => moveAcceptedTopic(context, acceptedForumId)
+            }
+          ],
+          () => {
+            if (!isApplication) {
+              button.disabled = true;
+              button.textContent = "Персонаж принят";
+            }
           }
-        ]);
+        );
       } catch (error) {
         console.error("[teh/accept-character]", error);
         alert(

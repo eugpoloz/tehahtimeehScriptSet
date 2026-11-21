@@ -8,6 +8,7 @@ load `dist/teh.admin-actions.iife.js`. Initialize after the topic DOM is ready:
 ```js
 await teh.acceptNewFullCharacter({
   forumId: 10,
+  excludedTopicId: 15,
   npcTopicId: 30
 });
 ```
@@ -15,6 +16,7 @@ await teh.acceptNewFullCharacter({
 `forumId` is required. Defaults: `npcTopicId: 30`, `characterGroupId: 5`,
 `acceptedForumId: 11`. Use `stylesUrl` for an extra stylesheet; the forum's form
 styles live in `hehedges-backups/styles/style_cs.css`.
+Set `excludedTopicId` to hide «Принять» on a specific topic in the application forum.
 
 ## Acceptance
 
@@ -57,10 +59,13 @@ marks that twin's collection update as complete. Otherwise, the script increases
 existing starter coupon quantities or adds the coupons, and adds the gift section
 in the same page edit.
 
-The acceptance control is also available in the accepted forum without a saved
-operation. Before posting a message without one, the script checks the editable
-source of every post in the topic and recovers a single exact match. If a post
-cannot be inspected or multiple matches exist, it stops instead of posting.
+In «Принятые анкеты», the topic heading shows a disabled «Персонаж принят»
+button when a regular character's config entry links to that topic. Topics
+without a matching entry show «Проверить принятие», which opens the acceptance
+workflow even without a saved operation. Before posting a message without one,
+the script checks the editable source of every post in the topic and recovers
+a single exact match. If a post cannot be inspected or multiple matches exist,
+it stops instead of posting.
 
 If the message is unconfirmed, open the linked topic and check it. Only when it is
 absent, select «Проверил тему: сообщение не опубликовано…» and continue to permit

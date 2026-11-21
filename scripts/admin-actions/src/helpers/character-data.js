@@ -89,7 +89,7 @@ export const serializeCharacters = (data) => {
   return `${json}\n`;
 };
 
-/** Match post references only to NPCs, and topic references only to regular characters. @param {CharactersConfig} data @param {AcceptanceSource} source */
+/** Match post references only to NPCs, and topic references only to regular characters. @param {CharactersConfig} data @param {{mode: 'regular', topicId: number} | {mode: 'npc', postId: number}} source */
 export const findCharacterByApplication = (data, source) =>
   Object.entries(data).find(
     ([, character]) =>
