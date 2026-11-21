@@ -222,6 +222,7 @@ const characterVault = async (root = null) => {
     };
     const renderGifts = () => {
       giftTarget.replaceChildren();
+      const showRecipient = keys.length > 1 && !selectedChar;
       Array.from(
         /** @type {NodeListOf<HTMLElement>} */ (
           root.querySelectorAll('[data-collection="gift"]')
@@ -236,7 +237,7 @@ const characterVault = async (root = null) => {
           parseDataFromElement(group).forEach((gift, index) => {
             giftTarget.insertAdjacentHTML(
               "beforeend",
-              giftMarkup(gift, index, profile)
+              giftMarkup(gift, index, profile, showRecipient)
             );
           });
         });

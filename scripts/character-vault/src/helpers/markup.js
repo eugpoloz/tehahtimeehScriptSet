@@ -174,8 +174,13 @@ export const characterMarkup = (character, profile, details) => {
 const decodeGiftText = (text) =>
   text.replace(/%7C|%25/g, (code) => (code === "%7C" ? "|" : "%"));
 
-/** @param {string} gift @param {number} index @param {string} profile */
-export const giftMarkup = (gift, index, profile) => {
+/**
+ * @param {string} gift
+ * @param {number} index
+ * @param {string} profile
+ * @param {boolean} showRecipient
+ */
+export const giftMarkup = (gift, index, profile, showRecipient) => {
   const [image, comment = "", sign] = gift.split("|");
   const imageUrl = getImageUrl(image.replace(/&amp;/g, "&"));
   if (!imageUrl) {
@@ -183,7 +188,10 @@ export const giftMarkup = (gift, index, profile) => {
   }
 
   const id = `gift_${profile.split(" ").join("_").toLowerCase()}_${index + 1}`;
-  const signature = sign ? `<br>— ${decodeGiftText(sign)}` : "";
+  const recipient = showRecipient ? `<em>для</em> ${escapeHtml(profile)}` : "";
+  const signature = sign
+    ? `${recipient ? "<br>" : ""}— ${decodeGiftText(sign)}`
+    : "";
 
   return `
     <li class="gift relative flex flex-col items-center">
@@ -193,8 +201,7 @@ export const giftMarkup = (gift, index, profile) => {
       </button>
       <div class="tooltip gift__info" popover="hint" id="${id}">
         ${decodeGiftText(comment)}
-        <br>
-        <small><em>для</em> ${profile}${signature}</small>
+        ${recipient || signature ? `${comment ? "<br>" : ""}<small>${recipient}${signature}</small>` : ""}
       </div>
     </li>
   `;
