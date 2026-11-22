@@ -60,9 +60,19 @@ export const loadVaultModal = (config) => {
     return;
   }
 
-  preloadCharacterVault(config).catch((error) => {
-    handleError("hehedges-specials/preloadCharacterVault", error);
-  });
+  const queuePreload = () => {
+    window.setTimeout(() => {
+      preloadCharacterVault(config).catch((error) => {
+        handleError("hehedges-specials/preloadCharacterVault", error);
+      });
+    }, 0);
+  };
+
+  if (document.readyState === "complete") {
+    queuePreload();
+  } else {
+    window.addEventListener("load", queuePreload, { once: true });
+  }
 
   document.querySelectorAll("[data-vault-href]").forEach((button) => {
     if (initializedButtons.has(button)) {
