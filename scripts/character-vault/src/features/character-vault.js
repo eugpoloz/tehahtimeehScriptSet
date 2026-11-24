@@ -6,6 +6,10 @@ import {
   parseDataFromElement,
   sortCharacterKeys
 } from "../helpers/character-vault.js";
+import {
+  initCollectionPreview,
+  initCouponScroll
+} from "../helpers/collection-preview.js";
 import getBlogTopics from "../helpers/get-blog-topics.js";
 import getProfile from "../helpers/get-profile.js";
 import {
@@ -38,7 +42,9 @@ const updateCollectionVisibility = (target) => {
     return;
   }
 
-  section.toggleAttribute("hidden", target.childElementCount === 0);
+  const empty = target.childElementCount === 0;
+  section.toggleAttribute("hidden", empty);
+  section.classList.toggle("empty", empty);
 };
 
 /**
@@ -81,9 +87,13 @@ const characterVault = async (root = null) => {
   );
   const keys = sortCharacterKeys(filteredCharacters);
 
+  const vaultPath = pageHref.split(/[?#]/, 1)[0] || window.location.pathname;
+  const surface = pageHref ? "modal" : "page";
+  const id = `character-vault-${surface}-${encodeURIComponent(vaultPath)}`;
+  content.classList.add("vault");
   content.insertAdjacentHTML(
     "beforeend",
-    vaultMarkup(isDirectPage, keys.length !== 1)
+    vaultMarkup(isDirectPage, keys.length !== 1, id)
   );
 
   const filters = getTarget(root, "all-chars");
@@ -95,10 +105,7 @@ const characterVault = async (root = null) => {
     return;
   }
 
-  const filterPopover =
-    /** @type {(HTMLElement & { hidePopover: () => void }) | null} */ (
-      root.querySelector("#character-filter-popover")
-    );
+  const filterPopover = getTarget(root, "character-filter");
   let handle = pageHref.split("?")[0];
   if (isDirectPage) {
     handle = window.location.pathname.split("/pages/").filter(Boolean)[0];
@@ -108,21 +115,48 @@ const characterVault = async (root = null) => {
     actionsTarget.insertAdjacentHTML("beforeend", adminActionMarkup(handle));
   }
 
-  const collectionMarkup = {
-    icon: iconMarkup,
-    plashka: plashkaMarkup,
-    coupon: couponMarkup
-  };
-  for (const [key, markup] of Object.entries(collectionMarkup)) {
-    const target = getTarget(root, key);
-    if (!target) {
+  /**
+   * @param {string} key
+   * @param {HTMLElement} target
+   * @param {number} rows
+   */
+  const initPreview = (key, target, rows) => {
+    const count = root.querySelector(`[data-vault-count="${key}"]`);
+    const button = root.querySelector(`[data-vault-toggle="${key}"]`);
+    if (
+      !(count instanceof HTMLElement) ||
+      !(button instanceof HTMLButtonElement)
+    ) {
       return;
     }
 
-    parseCollection(root, key).forEach((item) => {
-      target.insertAdjacentHTML("beforeend", markup(item));
-    });
+    return initCollectionPreview(target, count, button, rows);
+  };
+
+  const couponTarget = getTarget(root, "coupon");
+  const couponCount = root.querySelector('[data-vault-count="coupon"]');
+  if (couponTarget && couponCount) {
+    couponTarget.innerHTML = parseCollection(root, "coupon")
+      .map(couponMarkup)
+      .join("");
+    couponCount.textContent = String(couponTarget.childElementCount);
+    updateCollectionVisibility(couponTarget);
+    initCouponScroll(couponTarget);
+  }
+
+  const sharedGrids = [
+    { key: "icon", markup: iconMarkup },
+    { key: "plashka", markup: plashkaMarkup }
+  ];
+  for (const { key, markup } of sharedGrids) {
+    const target = getTarget(root, key);
+    if (!target) {
+      continue;
+    }
+
+    target.innerHTML = parseCollection(root, key).map(markup).join("");
     updateCollectionVisibility(target);
+    initPreview(key, target, 2)?.();
   }
 
   const readCharParam = () => {
@@ -162,6 +196,41 @@ const characterVault = async (root = null) => {
     /** @type {Map<string, import("../types.js").BlogTopic[]>} */
     const blogTopics = new Map();
     const requestedBlogTopics = new Set();
+    /** @type {Map<string, HTMLElement>} */
+    const characterCards = new Map();
+    const updateGiftPreview = initPreview("gift", giftTarget, 1);
+    /** @type {Map<string, number>} */
+    const giftNumbers = new Map();
+    const gifts = Array.from(
+      /** @type {NodeListOf<HTMLElement>} */ (
+        root.querySelectorAll('[data-collection="gift"]')
+      )
+    )
+      .flatMap((group) =>
+        parseDataFromElement(group).map((gift) => ({
+          gift,
+          profile: group.dataset.profile || mainKey || mainCharacter
+        }))
+      )
+      .flatMap(({ gift, profile }) => {
+        const number = (giftNumbers.get(profile) ?? 0) + 1;
+        const single = giftMarkup(gift, number, profile, false, id);
+        if (!single) {
+          return [];
+        }
+
+        giftNumbers.set(profile, number);
+        return [
+          {
+            profile,
+            single,
+            all:
+              keys.length > 1
+                ? giftMarkup(gift, number, profile, true, id)
+                : single
+          }
+        ];
+      });
 
     const renderFilters = () => {
       if (!filters || !selectedCharTarget) {
@@ -172,82 +241,76 @@ const characterVault = async (root = null) => {
       filters.innerHTML = filtersMarkup(keys, selectedChar, profiles);
       enableAvatarFallbacks(filters);
     };
-    const renderBlogTopics = (
-      /** @type {import("../types.js").BlogTopic[]} */ topics
-    ) => {
-      const markup = blogTopicsMarkup(topics);
-      if (!markup) {
-        return;
-      }
 
-      characterTarget
-        .querySelector(".char-info > .meta")
-        ?.insertAdjacentHTML("beforeend", markup);
+    const showCharacter = () => {
+      const activeKey = selectedChar || mainKey;
+      for (const [key, card] of characterCards) {
+        const inactive = key !== activeKey;
+        card.classList.toggle("inactive", inactive);
+        card.inert = inactive;
+      }
     };
-    const renderCharacter = () => {
-      const key = selectedChar || mainKey;
-      const character = filteredCharacters[key];
-      if (!character) {
-        return;
-      }
 
-      characterTarget.innerHTML = characterMarkup(
-        {
-          en: key,
-          ...character
-        },
-        profiles[key],
-        describeCharacter(character)
-      );
+    const renderCharacters = () => {
+      characterTarget.innerHTML = keys
+        .map((key) => {
+          const character = filteredCharacters[key];
+          return characterMarkup(
+            {
+              en: key,
+              ...character
+            },
+            profiles[key],
+            describeCharacter(character)
+          );
+        })
+        .join("");
+      Array.from(characterTarget.children).forEach((card, index) => {
+        if (card instanceof HTMLElement) {
+          const key = keys[index];
+          characterCards.set(key, card);
+          card
+            .querySelector(".char-info > .meta")
+            ?.insertAdjacentHTML(
+              "beforeend",
+              blogTopicsMarkup(blogTopics.get(key) ?? [])
+            );
+        }
+      });
+      showCharacter();
       enableAvatarFallbacks(characterTarget);
-
-      if (blogTopics.has(key)) {
-        renderBlogTopics(blogTopics.get(key) ?? []);
-      }
     };
-    const loadBlogTopics = (/** @type {string} */ key) => {
-      if (blogTopics.has(key) || requestedBlogTopics.has(key)) {
+
+    const renderGifts = () => {
+      giftTarget.innerHTML = gifts
+        .filter(({ profile }) => !selectedChar || selectedChar === profile)
+        .map(({ single, all }) => (selectedChar ? single : all))
+        .join("");
+      updateCollectionVisibility(giftTarget);
+      updateGiftPreview?.(true);
+    };
+
+    /** @param {string | undefined} key */
+    const loadBlogTopics = (key) => {
+      if (!key || requestedBlogTopics.has(key)) {
         return;
       }
 
       requestedBlogTopics.add(key);
-      void getBlogTopics(key).then((loadedTopics) => {
-        blogTopics.set(key, loadedTopics);
-        if ((selectedChar || mainKey) !== key) {
-          return;
-        }
-
-        renderBlogTopics(loadedTopics);
+      void getBlogTopics(key).then((topics) => {
+        blogTopics.set(key, topics);
+        characterCards
+          .get(key)
+          ?.querySelector(".char-info > .meta")
+          ?.insertAdjacentHTML("beforeend", blogTopicsMarkup(topics));
       });
     };
-    const renderGifts = () => {
-      giftTarget.replaceChildren();
-      const showRecipient = keys.length > 1 && !selectedChar;
-      Array.from(
-        /** @type {NodeListOf<HTMLElement>} */ (
-          root.querySelectorAll('[data-collection="gift"]')
-        )
-      )
-        .filter(
-          (group) =>
-            !selectedChar || (group.dataset.profile || mainKey) === selectedChar
-        )
-        .forEach((group) => {
-          const profile = group.dataset.profile || mainKey;
-          parseDataFromElement(group).forEach((gift, index) => {
-            giftTarget.insertAdjacentHTML(
-              "beforeend",
-              giftMarkup(gift, index, profile, showRecipient)
-            );
-          });
-        });
-      updateCollectionVisibility(giftTarget);
-    };
+
     const applySelection = (/** @type {string} */ nextChar) => {
       selectedChar = nextChar;
       syncCharParam(selectedChar);
       renderFilters();
-      renderCharacter();
+      showCharacter();
       renderGifts();
       loadBlogTopics(selectedChar || mainKey);
     };
@@ -275,6 +338,7 @@ const characterVault = async (root = null) => {
       applySelection(keys.includes(charFromUrl) ? charFromUrl : "");
     });
 
+    renderCharacters();
     applySelection(selectedChar);
     profiles = Object.fromEntries(
       await Promise.all(
@@ -285,7 +349,7 @@ const characterVault = async (root = null) => {
       )
     );
     renderFilters();
-    renderCharacter();
+    renderCharacters();
 
     const coins = root.querySelector("#coins");
     if (!coins) {

@@ -29,7 +29,7 @@ export const parseCollection = (root, key) =>
  */
 export const enableAvatarFallbacks = (root) => {
   /** @type {NodeListOf<HTMLImageElement>} */ (
-    root.querySelectorAll(".char-filter__avatar img, .char-avatar img")
+    root.querySelectorAll(".char-filter-avatar img, .char-avatar img")
   ).forEach((image) => {
     const removeImage = () => image.remove();
 
