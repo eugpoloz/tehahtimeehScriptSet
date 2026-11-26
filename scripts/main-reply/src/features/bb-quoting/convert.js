@@ -30,8 +30,33 @@ export function convertPost(post, selection, customRules = []) {
     return !selection || selection.intersectsNode(node);
   }
 
+  /** @param {Element} element */
+  function hidden(element) {
+    /** @type {Element | null} */
+    let current = element;
+    while (current && post.contains(current)) {
+      const style = window.getComputedStyle(current);
+      if (
+        current.matches(".hvmask, [hidden]") ||
+        style.display === "none" ||
+        style.visibility === "hidden" ||
+        style.visibility === "collapse"
+      ) {
+        return true;
+      }
+
+      current = current.parentElement;
+    }
+
+    return false;
+  }
+
   /** @param {Node} node */
   function children(node) {
+    if (node instanceof Element && hidden(node)) {
+      return "";
+    }
+
     return Array.from(node.childNodes, convert).join("");
   }
 
@@ -54,7 +79,7 @@ export function convertPost(post, selection, customRules = []) {
       return text.slice(start, end);
     }
 
-    if (!(node instanceof HTMLElement)) {
+    if (!(node instanceof HTMLElement) || hidden(node)) {
       return "";
     }
 
@@ -132,19 +157,7 @@ export function convertPost(post, selection, customRules = []) {
         return children(node);
       }
 
-      let content = children(body).trim();
-      const stored = Array.from(node.children).find(
-        (child) =>
-          child.tagName === "SCRIPT" &&
-          child.getAttribute("type") === "text/html"
-      );
-      if (!content && stored && !selection) {
-        const template = document.createElement("template");
-        template.innerHTML = stored.textContent || "";
-        content = Array.from(template.content.childNodes, convert)
-          .join("")
-          .trim();
-      }
+      const content = children(body).trim();
 
       if (!content) {
         return "";

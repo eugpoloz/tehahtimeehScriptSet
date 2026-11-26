@@ -58,7 +58,12 @@ export default function enableBbQuoting(options = {}) {
       return;
     }
 
-    const safeAuthor = bbParameter(author);
+    const id = String(postId);
+    const quoteAuthor =
+      /^\d+$/.test(id) && !/^#p\d+,/.test(author)
+        ? `#p${id},${author}`
+        : author;
+    const safeAuthor = bbParameter(quoteAuthor);
     insert(`[quote${safeAuthor}]${content}[/quote]\n`);
   };
 }
